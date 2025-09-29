@@ -50,7 +50,11 @@
                             <label tabindex="0" class="btn btn-ghost btn-circle avatar">
                                 <i data-lucide="circle-user" class=""></i>
                             </label>
-                            <span class="small">{{ Auth::user()->name }}</span>
+                            <span class="small">
+                                @auth
+                                    {{ Auth::user()->name }}
+                                @endauth
+                            </span>
                             <ul tabindex="0"
                                 class="menu menu-compact dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-52">
                                 <li class="justify-between">
@@ -85,7 +89,7 @@
                         <i data-lucide="x" class="h-5 w-5"></i>
                     </button>
                     <li class="mb-2 font-semibold text-xl">
-                        <a href="/app/welcome">
+                        <a href="/">
                             <i data-lucide="layers-2" class="mask mask-squircle w-10"></i> EventCard
                         </a>
                     </li>

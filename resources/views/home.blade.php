@@ -14,11 +14,6 @@
         content="Get a customizable and easily-themed admin dashboard template using Daisy UI and React js. Boost your productivity with pre-configured redux toolkit and other libraries.">
     <!-- Lucide Icons CDN -->
     <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- Heroicons outline -->
-    <script src="https://unpkg.com/@heroicons/react/outline"></script>
-
-    <!-- Heroicons solid -->
-    <script src="https://unpkg.com/@heroicons/react/solid"></script>
     @vite(['resources/css/user.css', 'resources/js/app.js'])
 </head>
 
@@ -47,7 +42,7 @@
                     <li><a>Item 3</a></li>
                 </ul>
             </div>
-            <a class="btn btn-ghost text-xl">daisyUI</a>
+            <a class="btn btn-ghost text-xl">EventCard</a>
         </div>
         <div class="navbar-center hidden lg:flex">
             <ul class="menu menu-horizontal px-1">
@@ -70,7 +65,36 @@
             <i data-lucide="moon" class="swap-off w-6 h-6"></i>
         </label>
         <div class="navbar-end">
-            <a class="btn">Button</a>
+            @auth
+                <!-- If user is logged in -->
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+
+                    <div class="navbar-center hidden lg:flex">
+                        <ul class="menu menu-horizontal px-1">
+                            <li>
+                                <details>
+                                    <summary>{{ Auth::user()->name }}</summary>
+                                    <ul class="p-2">
+                                        <li>
+                                            <button class="" type="submit">logout</button>
+                                        </li>
+                                        <li>
+                                            <a href="{{ route('user.dashboard') }}">Dashboard</a>
+                                        </li>
+                                    </ul>
+                                </details>
+                            </li>
+                        </ul>
+                    </div>
+                </form>
+            @endauth
+
+            @guest
+                <!-- If user is NOT logged in -->
+                <a href="{{ route('login') }}" class="btn btn-primary mr-2">Login</a>
+                <a href="{{ route('register') }}" class="btn btn-secondary">Register</a>
+            @endguest
         </div>
     </div>
 
