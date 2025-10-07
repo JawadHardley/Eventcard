@@ -58,7 +58,9 @@
                             <ul tabindex="0"
                                 class="menu menu-compact dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-52">
                                 <li class="justify-between">
-                                    <a href="/app/settings-profile">Profile Settings<span class="badge">New</span></a>
+                                    <a href="{{ route('profile.edit') }}">
+                                        Profile Settings <span class="badge">New</span>
+                                    </a>
                                 </li>
                                 <li><a href="/app/settings-billing">Bill History</a></li>
                                 <div class="divider mt-0 mb-0"></div>
@@ -74,8 +76,9 @@
                     </div>
                 </div>
                 <main class="flex-1 overflow-y-auto md:pt-4 pt-4 px-6  bg-base-200">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div class="">
+                    <div class="grid grid-cols-1">
+                        <div class="acme">
+
                             @yield('content')
 
                         </div>
