@@ -11,6 +11,8 @@
     <title>Event Card</title>
     <meta name="description"
         content="Get a customizable and easily-themed admin dashboard template using Daisy UI and React js. Boost your productivity with pre-configured redux toolkit and other libraries.">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
     <!-- Lucide Icons CDN -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <!-- Heroicons outline -->
@@ -98,18 +100,22 @@
                     </li>
                     <li class="">
                         <div tabindex="0" class="collapse">
-                            <div class="collapse-title flex items-center py-1 gap-2">
-                                <i data-lucide="layout-dashboard" class="h-6 w-6 inline"></i> Dashboard
-                                <span class="absolute inset-y-0 left-0 w-1 rounded-tr-md rounded-br-md bg-primary"
-                                    aria-hidden="true"></span>
-                            </div>
+                            <a href="{{ route('user.dashboard') }}" class="rin">
+                                <div class="collapse-title flex items-center py-1 gap-2">
+                                    <i data-lucide="layout-dashboard" class="h-6 w-6 inline"></i> Dashboard
+                                    <span class="absolute inset-y-0 left-0 w-1 rounded-tr-md rounded-br-md bg-primary"
+                                        aria-hidden="true"></span>
+                                </div>
+                            </a>
                         </div>
                     </li>
                     <li class="">
                         <div tabindex="0" class="collapse">
-                            <div class="collapse-title flex items-center py-1 gap-2">
-                                <i data-lucide="calendar" class="h-6 w-6 inline"></i> calendar
-                            </div>
+                            <a href="{{ route('user.cameralog') }}" class="rin">
+                                <div class="collapse-title flex items-center py-1 gap-2">
+                                    <i data-lucide="camera" class="h-6 w-6 inline"></i> camera
+                                </div>
+                            </a>
                         </div>
                     </li>
                     <li class="">

@@ -12,4 +12,11 @@ class UserController extends Controller
             'user' => $request->user(),
         ]);
     }
+
+    public function cameralog(Request $request)
+    {
+        return view('cameralog', [
+            'user' => $request->user(),
+        ]);
+    }
 }

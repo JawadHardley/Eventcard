@@ -3,3 +3,9 @@
 @tailwind utilities;
 
 /* daisyui plugin is picked up via tailwind.config.js */
+
+
+
+.big {
+    font-size: 200px;
+}
