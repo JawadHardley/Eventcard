@@ -8,11 +8,12 @@
                 </figure>
                 <div id="reader" style="width: 320px; margin: auto; border-radius: 12px; overflow: hidden;"></div>
                 <div class="card-body items-center text-center">
-                    <p>If you already have your gestlist ready and accurate, fire the camera button and lets get scanning
+                    <p>
+                        If you already have your gestlist ready and accurate, fire the camera button and lets get scanning
                     </p>
                     <div class="card-actions pt-10">
                         <button id="startCamera" class="btn btn-outline btn-primary">Activate Camera</button>
-                        <button id="stopCamera" class="btn btn-secondary">Activate Camera</button>
+                        <button id="stopCamera" class="btn btn-secondary">Stop Camera</button>
                     </div>
                 </div>
             </div>

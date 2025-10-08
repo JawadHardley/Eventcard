@@ -44,4 +44,6 @@ Route::prefix('user')
         Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
             ->name('logout');
         Route::get('/cameralog', [UserController::class, 'cameralog'])->name('cameralog');
+        Route::get('/guestlist', [UserController::class, 'guestlist'])->name('guestlist');
+        Route::post('/guestadd', [UserController::class, 'guestadd'])->name('guestadd');
     });
