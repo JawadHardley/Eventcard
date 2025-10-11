@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\qrverify;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\MasterController;
 use Illuminate\Support\Facades\Route;
@@ -45,5 +46,6 @@ Route::prefix('user')
             ->name('logout');
         Route::get('/cameralog', [UserController::class, 'cameralog'])->name('cameralog');
         Route::get('/guestlist', [UserController::class, 'guestlist'])->name('guestlist');
+        Route::get('/verify-qr', [qrverify::class, 'verify'])->name('verify');
         Route::post('/guestadd', [UserController::class, 'guestadd'])->name('guestadd');
     });

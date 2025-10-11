@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Guest;
 use Illuminate\Support\Str;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class UserController extends Controller
 {
@@ -71,6 +72,15 @@ class UserController extends Controller
             'delivery_method' => $validated['delivery_method'],
             'order_id' => 1, // or however you handle this
         ]);
+
+        // Generate unique code
+        $code = 'GUEST-' . strtoupper(Str::random(10));
+        $guest->update(['qrcode' => $code]);
+
+        // Generate and store QR
+        // $qrImage = QrCode::format('png')->size(300)->generate($code);
+        $qrImage = QrCode::format('svg')->size(300)->generate($code);
+        // Storage::put("public/qrcodes/{$guest->id}.png", $qrImage);
 
         return redirect()
             ->route('user.guestlist')

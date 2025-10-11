@@ -91,6 +91,9 @@
                         </tr>
                     </thead>
                     <tbody>
+                        @php
+                            $idcounter = 1;
+                        @endphp
                         @foreach ($guests as $guest)
                             <tr class="border border-stone-700/10">
                                 <th scope="row" class="px-6 py-4 font-medium whitespace-nowrap">
@@ -106,13 +109,38 @@
                                     {{ $guest->verified ? 'Verified' : 'Not Verified' }}
                                 </td>
                                 <td class="px-6 py-4">
-                                    {{ $guest->invitation_code }}
+                                    {{ $guest->qrcode }}
                                 </td>
                                 <td class="px-6 py-4">
-                                    <a href="#"
-                                        class="font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit</a>
+                                    <button class="font-medium text-blue-600 dark:text-blue-500"
+                                        onclick="qrmodal_{{ $idcounter }}.showModal()">
+                                        Edit
+                                    </button>
                                 </td>
                             </tr>
+
+                            <dialog id="qrmodal_{{ $idcounter }}" class="modal">
+                                <div class="modal-box">
+                                    <h3 class="text-lg font-bold">{{ $guest->full_name }}</h3>
+                                    <p class="py-4">{{ $guest->qrcode }}</p>
+                                    <p class="py-4 align-center">
+                                        @if ($guest->qrcode)
+                                            {!! QrCode::size(200)->generate($guest->qrcode) !!}
+                                        @else
+                                            <span class="text-red-500">No QR assigned</span>
+                                        @endif
+                                    </p>
+                                    <div class="modal-action">
+                                        <form method="dialog">
+                                            <!-- if there is a button in form, it will close the modal -->
+                                            <button class="btn">Close</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </dialog>
+                            @php
+                                $idcounter++;
+                            @endphp
                         @endforeach
                     </tbody>
                 </table>
