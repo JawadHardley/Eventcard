@@ -13,6 +13,7 @@
     <meta name="description"
         content="Get a customizable and easily-themed admin dashboard template using Daisy UI and React js. Boost your productivity with pre-configured redux toolkit and other libraries.">
     <!-- Lucide Icons CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
     <script src="https://unpkg.com/lucide@latest"></script>
     @vite(['resources/css/user.css', 'resources/js/app.js'])
 </head>
@@ -31,20 +32,45 @@
                 </div>
                 <ul tabindex="0"
                     class="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow">
-                    <li><a>Item 1</a></li>
-                    <li>
+                    <li><a>Home</a></li>
+                    {{-- <li>
                         <a>Parent</a>
                         <ul class="p-2">
                             <li><a>Submenu 1</a></li>
                             <li><a>Submenu 2</a></li>
                         </ul>
                     </li>
-                    <li><a>Item 3</a></li>
+                    <li><a>Item 3</a></li> --}}
+
+                    <li>
+                        @auth
+                            <div>
+                                <!-- If user is logged in -->
+                                <form method="POST" action="{{ route('logout') }}">
+                                    @csrf
+                                    <summary>{{ Auth::user()->name }}</summary>
+                                    <ul class="p-2">
+                                        <li>
+                                            <button class="" type="submit">logout</button>
+                                        </li>
+                                        <li>
+                                            <a href="{{ route('user.dashboard') }}">Dashboard</a>
+                                        </li>
+                                    </ul>
+                                </form>
+                            </div>
+                        @endauth
+                        @guest
+                            <!-- If user is NOT logged in -->
+                            <a href="{{ route('login') }}" class="mr-2">Login</a>
+                            <a href="{{ route('register') }}" class="text-decoration-none">Register</a>
+                        @endguest
+                    </li>
                 </ul>
             </div>
-            <a class="btn btn-ghost text-xl">EventCard</a>
+            <a class="btn btn-ghost text-xl"><i class="fa fa-object-ungroup text-primary mr-3"></i> EventCard</a>
         </div>
-        <div class="navbar-center hidden lg:flex">
+        {{-- <div class="navbar-center hidden lg:flex">
             <ul class="menu menu-horizontal px-1">
                 <li><a>Item 1</a></li>
                 <li>
@@ -58,7 +84,7 @@
                 </li>
                 <li><a>Item 3</a></li>
             </ul>
-        </div>
+        </div> --}}
         <label class="swap">
             <input type="checkbox" class="sr-only" id="theme-toggle">
             <i data-lucide="sun" class="swap-on w-6 h-6"></i>
@@ -92,104 +118,29 @@
 
             @guest
                 <!-- If user is NOT logged in -->
-                <a href="{{ route('login') }}" class="btn btn-primary mr-2">Login</a>
-                <a href="{{ route('register') }}" class="btn btn-secondary">Register</a>
+                <a href="{{ route('login') }}" class="btn btn-outline btn-primary mr-2">Login</a>
+                <a href="{{ route('register') }}" class="btn btn-outline btn-secondary">Register</a>
             @endguest
         </div>
     </div>
 
 
     <div class="hero min-h-screen"
-        style="background-image: url(https://img.daisyui.com/images/stock/photo-1507358522600-9f71e620c44e.webp);">
-        <div class="hero-overlay"></div>
+        style="background-image: url(https://c0.wallpaperflare.com/preview/648/294/332/ceremonial-chairs-curtain-flowers.jpg);">
+        <div class="hero-overlay bg-black/80"></div>
         <div class="hero-content text-neutral-content text-center">
             <div class="max-w-md">
-                <h1 class="mb-5 text-5xl font-bold">Hello there</h1>
+                <h1 class="mb-5 text-5xl font-bold">Digital Event Cards</h1>
                 <p class="mb-5">
-                    Provident cupiditate voluptatem et in. Quaerat fugiat ut assumenda excepturi exercitationem
-                    quasi. In deleniti eaque aut repudiandae et a id nisi.
+                    We are about to make your event memorable with our digital event cards. Create and share
+                    beautiful event cards with your loved ones.
                 </p>
                 <button class="btn btn-primary">Get Started</button>
             </div>
         </div>
     </div>
-    <div class="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-        <div class="card bg-base-100 shadow-xl">
-            <figure class="px-10 pt-10">
-                <img src="https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp" alt="Shoes"
-                    class="rounded-xl" />
-            </figure>
-            <div class="card-body items-center text-center">
-                <h2 class="card-title">Card Title</h2>
-                <p>A card component has a figure, a body part, and inside body there are title and actions parts</p>
-                <div class="card-actions">
-                    <button class="btn btn-primary">Buy Now</button>
-                </div>
-            </div>
-        </div>
 
-        <div class="card bg-base-100 shadow-xl">
-            <figure class="px-10 pt-10">
-                <img src="https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp" alt="Shoes"
-                    class="rounded-xl" />
-            </figure>
-            <div class="card-body items-center text-center">
-                <h2 class="card-title">Card Title</h2>
-                <p>A card component has a figure, a body part, and inside body there are title and actions parts</p>
-                <div class="card-actions">
-                    <button class="btn btn-primary">Buy Now</button>
-                </div>
-            </div>
-        </div>
-
-        <div class="card bg-base-100 shadow-xl">
-            <figure class="px-10 pt-10">
-                <img src="https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp" alt="Shoes"
-                    class="rounded-xl" />
-            </figure>
-            <div class="card-body items-center text-center">
-                <h2 class="card-title">Card Title</h2>
-                <p>A card component has a figure, a body part, and inside body there are title and actions parts</p>
-                <div class="card-actions">
-                    <button class="btn btn-primary">Buy Now</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
-    <div class="carousel w-full">
-        <div id="slide1" class="carousel-item relative w-full">
-            <img src="https://img.daisyui.com/images/stock/photo-1625726411847-8cbb60cc71e6.webp" class="w-full" />
-            <div class="absolute left-5 right-5 top-1/2 flex -translate-y-1/2 transform justify-between">
-                <a href="#slide4" class="btn btn-circle">❮</a>
-                <a href="#slide2" class="btn btn-circle">❯</a>
-            </div>
-        </div>
-        <div id="slide2" class="carousel-item relative w-full">
-            <img src="https://img.daisyui.com/images/stock/photo-1609621838510-5ad474b7d25d.webp" class="w-full" />
-            <div class="absolute left-5 right-5 top-1/2 flex -translate-y-1/2 transform justify-between">
-                <a href="#slide1" class="btn btn-circle">❮</a>
-                <a href="#slide3" class="btn btn-circle">❯</a>
-            </div>
-        </div>
-        <div id="slide3" class="carousel-item relative w-full">
-            <img src="https://img.daisyui.com/images/stock/photo-1414694762283-acccc27bca85.webp" class="w-full" />
-            <div class="absolute left-5 right-5 top-1/2 flex -translate-y-1/2 transform justify-between">
-                <a href="#slide2" class="btn btn-circle">❮</a>
-                <a href="#slide4" class="btn btn-circle">❯</a>
-            </div>
-        </div>
-        <div id="slide4" class="carousel-item relative w-full">
-            <img src="https://img.daisyui.com/images/stock/photo-1665553365602-b2fb8e5d1707.webp" class="w-full" />
-            <div class="absolute left-5 right-5 top-1/2 flex -translate-y-1/2 transform justify-between">
-                <a href="#slide3" class="btn btn-circle">❮</a>
-                <a href="#slide1" class="btn btn-circle">❯</a>
-            </div>
-        </div>
-    </div>
-
-    <footer class="footer sm:footer-horizontal bg-neutral text-neutral-content p-10">
+    <footer class="footer sm:footer-horizontal p-10">
         <nav>
             <h6 class="footer-title">Services</h6>
             <a class="link link-hover">Branding</a>

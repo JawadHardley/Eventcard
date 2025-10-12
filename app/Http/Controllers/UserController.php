@@ -35,6 +35,66 @@ class UserController extends Controller
     }
 
     // Handle guest registration
+    // public function guestadd(Request $request)
+    // {
+    //     $validated = $request->validate([
+    //         'full_name' => [
+    //             'required',
+    //             'string',
+    //             'max:100',
+    //             'regex:/^[A-Za-z\s\-\'\.]+$/', // only letters, spaces, hyphens, apostrophes, dots
+    //         ],
+    //         'title' => ['required', 'string', 'max:900'],
+    //         'address' => ['required', 'string', 'max:900'],
+    //         'delivery_method' => ['required', 'in:sms,email,whatsapp'],
+    //         'email' => ['required', 'email'],
+    //         'phone' => [
+    //             'required',
+    //             'string',
+    //             'regex:/^(\+?255|0)[0-9]{9}$/', // +255XXXXXXXXX or 07XXXXXXXX
+    //         ],
+    //     ]);
+
+    //     // Clean & format before saving
+    //     $cleanPhone = $this->normalizePhone($validated['phone']);
+
+    //     // dd($cleanPhone);
+
+    //     // Format the full_name to Title Case
+    //     $validated['full_name'] = Str::title(strtolower($validated['full_name']));
+
+    //     $guest = Guest::create([
+    //         'full_name' => $validated['full_name'],
+    //         'title' => $validated['title'] ?? null,
+    //         'email' => $validated['email'] ?? null,
+    //         'phone' => $cleanPhone,
+    //         'address' => $validated['address'] ?? null,
+    //         'delivery_method' => $validated['delivery_method'],
+    //         'order_id' => 1, // or however you handle this
+    //     ]);
+
+    //     // Generate unique code
+    //     $code = 'GUEST-' . strtoupper(Str::random(10));
+    //     $link = url('/guest/' . $code);
+    //     // $guest->update(['qrcode' => $code]);
+    //     $guest->update([
+    //         'qrcode' => $code,
+    //         'more' => $link,
+    //     ]);
+
+    //     // Generate and store QR
+    //     // $qrImage = QrCode::format('png')->size(300)->generate($code);
+    //     $qrImage = QrCode::format('svg')->size(300)->generate($link);
+    //     // Storage::put("public/qrcodes/{$guest->id}.png", $qrImage);
+
+    //     return redirect()
+    //         ->route('user.guestlist')
+    //         ->with([
+    //             'status' => 'success',
+    //             'message' => 'Registered Guest successfully.',
+    //         ]);
+    // }
+
     public function guestadd(Request $request)
     {
         $validated = $request->validate([
@@ -42,7 +102,7 @@ class UserController extends Controller
                 'required',
                 'string',
                 'max:100',
-                'regex:/^[A-Za-z\s\-\'\.]+$/', // only letters, spaces, hyphens, apostrophes, dots
+                'regex:/^[A-Za-z\s\-\'\.]+$/',
             ],
             'title' => ['required', 'string', 'max:900'],
             'address' => ['required', 'string', 'max:900'],
@@ -51,16 +111,11 @@ class UserController extends Controller
             'phone' => [
                 'required',
                 'string',
-                'regex:/^(\+?255|0)[0-9]{9}$/', // +255XXXXXXXXX or 07XXXXXXXX
+                'regex:/^(\+?255|0)[0-9]{9}$/',
             ],
         ]);
 
-        // Clean & format before saving
         $cleanPhone = $this->normalizePhone($validated['phone']);
-
-        // dd($cleanPhone);
-
-        // Format the full_name to Title Case
         $validated['full_name'] = Str::title(strtolower($validated['full_name']));
 
         $guest = Guest::create([
@@ -70,17 +125,28 @@ class UserController extends Controller
             'phone' => $cleanPhone,
             'address' => $validated['address'] ?? null,
             'delivery_method' => $validated['delivery_method'],
-            'order_id' => 1, // or however you handle this
+            'order_id' => 1,
         ]);
 
         // Generate unique code
         $code = 'GUEST-' . strtoupper(Str::random(10));
-        $guest->update(['qrcode' => $code]);
 
-        // Generate and store QR
-        // $qrImage = QrCode::format('png')->size(300)->generate($code);
-        $qrImage = QrCode::format('svg')->size(300)->generate($code);
-        // Storage::put("public/qrcodes/{$guest->id}.png", $qrImage);
+        // 🔥 Build the public URL for that guest
+        $publicUrl = url('/guest/' . $code);
+
+        // Update guest record with both code and link
+        $guest->update([
+            'qrcode' => $code,
+            'more' => $publicUrl,
+        ]);
+
+        // ✅ Generate QR code based on the URL, not the random code
+        $qrImage = QrCode::format('svg')
+            ->size(300)
+            ->generate($publicUrl);
+
+        // Optional: Save if you want (not required)
+        // Storage::put("public/qrcodes/{$guest->id}.svg", $qrImage);
 
         return redirect()
             ->route('user.guestlist')

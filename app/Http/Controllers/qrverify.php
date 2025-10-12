@@ -11,16 +11,17 @@ class qrverify extends Controller
     {
         $code = $request->query('code');
 
-        $mark = $request->query('mark');
-
         if (!$code) return response()->json(['success' => false, 'message' => 'No QR code provided']);
+        if (str_contains($code, '/')) {
+            $code = basename(parse_url($code, PHP_URL_PATH));
+        }
 
         $guest = Guest::where('qrcode', $code)->first();
 
         if (!$guest) return response()->json(['success' => false, 'message' => 'QR not found']);
 
         // Mark attended if requested
-        if ($mark) {
+        if ($request->query('mark')) {
             $guest->update(['verified' => true]);
         }
 

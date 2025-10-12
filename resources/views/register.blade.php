@@ -1,4 +1,4 @@
-@extends('layouts.auth')
+@extends('layouts.guest')
 
 @section('content')
     <div class="flex items-center justify-center min-h-screen bg-base-100">
@@ -7,8 +7,10 @@
 
         <form method="POST" action="{{ route('register') }}">
             @csrf
-            <fieldset class="fieldset bg-base-200 border-base-300 rounded-box w-96 border p-6 shadow-lg">
-                <legend class="fieldset-legend text-lg font-semibold mb-2">Register</legend>
+            <fieldset class="fieldset rounded-box w-96 p-6 border-2 shadow-lg border-stone-950/10">
+                <h2 class="text-2xl font-bold mb-5 text-center">
+                    <i class="fa fa-object-ungroup text-primary mr-3"></i> Sign Up
+                </h2>
 
                 <label class="label">Name</label>
                 <input type="text" name="name" class="input input-bordered w-full" placeholder="username"
@@ -35,7 +37,7 @@
                     Remember me
                 </label> --}}
 
-                <button class="btn btn-neutral w-full mt-4">Sign Up</button>
+                <button class="btn btn-primary w-full mt-4">Register</button>
                 <a href="{{ route('login') }}" class="text-decoration-none text-blue-700">
                     <label class="label text-blue-700 mt-3">Already have account ? login</label>
                 </a>

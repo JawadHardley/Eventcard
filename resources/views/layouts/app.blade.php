@@ -135,8 +135,8 @@
                             </div>
                             <div class="collapse-content">
                                 <ul>
-                                    <li><a href="/app/page1">Page 1</a></li>
-                                    <li><a href="/app/page2">Page 2</a></li>
+                                    <li><a href="/app/page1">Comming soon</a></li>
+                                    <li><a href="/app/page2">Comming soon</a></li>
                                 </ul>
                             </div>
                         </div>

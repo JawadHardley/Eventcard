@@ -23,12 +23,24 @@
                                         <input type="text" name="full_name" class="input w-full" placeholder="full name"
                                             required />
 
-                                        <label class="text-base mt-5">Guest Title</label>
-                                        <select class="select w-full" name="title" required>
-                                            <option selected value="Mr">Mr</option>
-                                            <option value="Mrs">Mrs</option>
-                                            <option value="Miss">Miss</option>
-                                        </select>
+                                        <div class="flex flex-wrap gap-4 mt-5">
+                                            <div class="flex-1">
+                                                <label class="text-base mt-5">Guest Title</label>
+                                                <select class="select w-50" name="title" required>
+                                                    <option selected value="Mr">Mr</option>
+                                                    <option value="Mrs">Mrs</option>
+                                                    <option value="Miss">Miss</option>
+                                                </select>
+                                            </div>
+                                            <div class="flex-1">
+                                                <label class="text-base mt-5">Delivery Method</label>
+                                                <select class="select w-full" name="delivery_method" required>
+                                                    <option selected value="sms">sms</option>
+                                                    <option value="email">email</option>
+                                                    <option value="whatsapp">whatsapp</option>
+                                                </select>
+                                            </div>
+                                        </div>
 
                                         <label class="text-base mt-5">Email</label>
                                         <input type="email" name="email" class="input w-full"
@@ -38,12 +50,6 @@
                                         <input type="text" name="phone" class="input w-full"
                                             placeholder="+255XX or 06XX" required />
 
-                                        <label class="text-base mt-5">Delivery Method</label>
-                                        <select class="select w-full" name="delivery_method" required>
-                                            <option selected value="sms">sms</option>
-                                            <option value="email">email</option>
-                                            <option value="whatsapp">whatsapp</option>
-                                        </select>
 
                                         <label class="text-base mt-5">Address</label>
                                         <textarea class="textarea w-full" name="address" placeholder="Bio"></textarea>
@@ -103,18 +109,43 @@
                                     {{ $guest->phone }}
                                 </td>
                                 <td class="px-6 py-4">
-                                    {{ $guest->delivery_method }}
+                                    {{-- {{ $guest->delivery_method }} --}}
+                                    @if ($guest->delivery_method == 'sms')
+                                        <div class="badge badge-dash  badge-primary">
+                                            <i class="fa fa-comment-dots"></i> sms
+                                        </div>
+                                    @elseif ($guest->delivery_method == 'whatsapp')
+                                        <div class="badge badge-dash  badge-info">
+                                            <i class="fa fa-comments"></i> Whatsapp
+                                        </div>
+                                    @elseif ($guest->delivery_method == 'email')
+                                        <div class="badge badge-dash  badge-secondary">
+                                            <i class="fa fa-envelope"></i> Email
+                                        </div>
+                                    @endif
                                 </td>
                                 <td class="px-6 py-4">
-                                    {{ $guest->verified ? 'Verified' : 'Not Verified' }}
+                                    @if ($guest->verified == 1)
+                                        <div class="badge badge-soft badge-success">Checked In</div>
+                                    @else
+                                        <div class="badge badge-soft badge-error">Pending</div>
+                                    @endif
                                 </td>
                                 <td class="px-6 py-4">
                                     {{ $guest->qrcode }}
                                 </td>
                                 <td class="px-6 py-4">
-                                    <button class="font-medium text-blue-600 dark:text-blue-500"
+                                    <button class="font-medium mx-2 text-blue-600 dark:text-blue-500"
                                         onclick="qrmodal_{{ $idcounter }}.showModal()">
-                                        Edit
+                                        <i class="fa fa-eye"></i>
+                                    </button>
+                                    <button class="font-medium mx-2 text-green-600 dark:text-teal-500"
+                                        onclick="qrmodal_{{ $idcounter }}.showModal()">
+                                        <i class="fa fa-edit"></i>
+                                    </button>
+                                    <button class="font-medium mx-2 text-red-600 dark:text-red-500"
+                                        onclick="qrmodal_{{ $idcounter }}.showModal()">
+                                        <i class="fa fa-trash"></i>
                                     </button>
                                 </td>
                             </tr>
@@ -125,7 +156,7 @@
                                     <p class="py-4">{{ $guest->qrcode }}</p>
                                     <p class="py-4 align-center">
                                         @if ($guest->qrcode)
-                                            {!! QrCode::size(200)->generate($guest->qrcode) !!}
+                                            {!! QrCode::size(200)->generate($guest->more ?? $guest->qrcode) !!}
                                         @else
                                             <span class="text-red-500">No QR assigned</span>
                                         @endif

@@ -6,10 +6,12 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\qrverify;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\MasterController;
+use App\Http\Controllers\GuestController;
 use Illuminate\Support\Facades\Route;
 
 
 Route::get('/', [MasterController::class, 'index'])->name('landing');
+Route::get('/guest/{code}', [GuestController::class, 'showpublic'])->name('showpublic');
 
 Route::middleware(['auth'])->group(function () {
     // Route::get('/dashboard', function () {
