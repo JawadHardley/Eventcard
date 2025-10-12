@@ -1911,6 +1911,12 @@
       "user.css"
     ]
   },
+  "resources/js/admin.js": {
+    "file": "assets/admin-ClYV-sQz.js",
+    "name": "admin",
+    "src": "resources/js/admin.js",
+    "isEntry": true
+  },
   "resources/js/app.js": {
     "file": "assets/app-SqauPgGs.js",
     "name": "app",
