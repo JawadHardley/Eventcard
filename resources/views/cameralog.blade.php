@@ -123,10 +123,16 @@
                 if (!cameras || cameras.length === 0) return alert("No camera found 😢");
 
                 const cameraId = cameras[0].id;
-                const backCamera = cameras.find(cam =>
-                    /back|rear|environment/i.test(cam.label)
-                );
-                if (backCamera) cameraId = backCamera.id;
+                // Detect if device is mobile
+                const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+
+                if (isMobile) {
+                    // Try to find back/rear/environment camera
+                    const rearCamera = cameras.find(cam =>
+                        /back|rear|environment/i.test(cam.label)
+                    );
+                    if (rearCamera) cameraId = rearCamera.id;
+                }
                 await html5QrCode.start(
                     cameraId, {
                         fps: 10,
