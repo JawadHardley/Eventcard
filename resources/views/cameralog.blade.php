@@ -228,7 +228,7 @@
                     modalMessage.innerHTML = `❌ Could not mark attended`;
                 }
             } catch (err) {
-                modalMessage.textContent = `❌ Error verifying`;
+                modalMessage.textContent = `❌ Error verifying guest`;
                 console.error(err);
             }
         });
