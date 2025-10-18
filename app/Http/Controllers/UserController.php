@@ -156,6 +156,7 @@ class UserController extends Controller
             ]);
     }
 
+
     function normalizePhone(string $input): string
     {
         // 1️⃣ Remove spaces, hyphens, parentheses, dots

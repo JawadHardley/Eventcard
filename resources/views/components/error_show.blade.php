@@ -1,5 +1,5 @@
 @if ($errors->any())
-    <div role="alert" class="alert alert-error alert-outline my-2">
+    <div role="alert" class="alert alert-error alert-outline mb-4">
         <ul class="mb-0">
             @foreach ($errors->all() as $error)
                 <li>{{ $error }}</li>
@@ -7,10 +7,13 @@
         </ul>
     </div>
 @elseif (session('message'))
-    <!-- <div class="col-12"> -->
-    <div class="alert alert-outline alert-{{ session('status') === 'success' ? 'success' : 'error' }}" role="alert">
-        <span>{{ session('message') }}</span>
-    </div>
-    <!-- </div> -->
-
+    @if (session('status') == 'success')
+        <div role="alert" class="alert alert-success alert-outline mb-4">
+            <span>{{ session('message') }}</span>
+        </div>
+    @else
+        <div role="alert" class="alert alert-error alert-outline mb-4">
+            <span>{{ session('message') }}</span>
+        </div>
+    @endif
 @endif

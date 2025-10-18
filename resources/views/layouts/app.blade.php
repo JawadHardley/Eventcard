@@ -110,6 +110,20 @@
                         </div>
                     </li>
                     <li class="">
+                        <div tabindex="0" class="collapse collapse-arrow">
+                            {{-- <input type="checkbox" class="peer" /> --}}
+                            <div class="collapse-title flex items-center py-1 gap-2">
+                                <i data-lucide="calendar" class="h-6 w-6 inline"></i> Events
+                            </div>
+                            <div class="collapse-content">
+                                <ul>
+                                    <li><a href="{{ route('user.eventlist') }}">Event list</a></li>
+                                    <li><a href="{{ route('user.addevent') }}">Add event</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="">
                         <div tabindex="0" class="collapse">
                             <a href="{{ route('user.cameralog') }}" class="rin">
                                 <div class="collapse-title flex items-center py-1 gap-2">

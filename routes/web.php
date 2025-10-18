@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\EventController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\qrverify;
@@ -49,5 +50,8 @@ Route::prefix('user')
         Route::get('/cameralog', [UserController::class, 'cameralog'])->name('cameralog');
         Route::get('/guestlist', [UserController::class, 'guestlist'])->name('guestlist');
         Route::get('/verify-qr', [qrverify::class, 'verify'])->name('verify');
+        Route::get('/addevent', [EventController::class, 'addevent'])->name('addevent');
+        Route::get('/eventlist', [EventController::class, 'eventlist'])->name('eventlist');
         Route::post('/guestadd', [UserController::class, 'guestadd'])->name('guestadd');
+        Route::post('/eventadd', [EventController::class, 'eventadd'])->name('eventadd');
     });
