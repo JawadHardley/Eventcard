@@ -14,7 +14,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-span-12 md:col-span-12 md:col-span-7">
+                            <div class="col-span-12 md:col-span-7 m-auto p-4 md:m-0 md:p-2">
                                 <h2 class="text-2xl">{{ $events->order_name }}</h2>
                                 <h2 class="text-lg opacity-60">{{ $events->event_host }}</h2>
                                 <p class="py-2">
