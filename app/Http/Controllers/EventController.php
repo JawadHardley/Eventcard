@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Event;
+use App\Models\Guest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -29,6 +30,14 @@ class EventController extends Controller
         // ]);
 
         return view('eventlist', compact('events'));
+    }
+
+
+    public function eventview($id)
+    {
+        $events = Event::where('id', $id)->first();
+        $guests = Guest::where('order_id', $events->id)->get();
+        return view('eventview', compact('events', 'guests'));
     }
 
     /**
@@ -61,6 +70,37 @@ class EventController extends Controller
             ->with([
                 'status' => 'success',
                 'message' => 'Event created successfully.',
+            ]);
+    }
+
+    public function eventupdate(Request $request, $id)
+    {
+        $event = Event::findOrFail($id);
+
+        // Optional: ownership check
+        if ($event->user_id !== Auth::id()) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $validated = $request->validate([
+            'order_name' => 'required|string|max:255',
+            'event_host' => 'required|string|max:255',
+            'event_type' => 'required|string|max:255',
+            'event_date' => 'required|date',
+            'arrival_time' => 'required',
+            'reminder_date' => 'nullable|date',
+            'timezone' => 'nullable|string|max:100',
+            'event_location' => 'nullable|string|max:255',
+            'event_desc' => 'nullable|string',
+            'guest_limit' => 'nullable|integer|min:1',
+        ]);
+
+        $event->update($validated);
+
+        return redirect()
+            ->back()->with([
+                'status' => 'success',
+                'message' => 'Event updated successfully!',
             ]);
     }
 

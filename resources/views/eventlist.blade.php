@@ -20,7 +20,13 @@
                         <thead class="text-xs uppercase">
                             <tr class="border border-stone-700/10">
                                 <th scope="col" class="px-6 py-3">
+                                    S/N
+                                </th>
+                                <th scope="col" class="px-6 py-3">
                                     Event Name
+                                </th>
+                                <th scope="col" class="px-6 py-3">
+                                    Event Host
                                 </th>
                                 <th scope="col" class="px-6 py-3">
                                     Even Type
@@ -37,9 +43,6 @@
                                 <th scope="col" class="px-6 py-3">
                                     Payment Status
                                 </th>
-                                <th scope="col" class="px-6 py-3">
-                                    Actions
-                                </th>
                             </tr>
                         </thead>
                         <tbody>
@@ -47,10 +50,17 @@
                                 $idcounter = 1;
                             @endphp
                             @foreach ($events as $event)
-                                <tr class="border border-stone-700/10">
+                                <tr class="border border-stone-700/10 hover:bg-base-300"
+                                    onclick="window.location='{{ route('user.eventview', ['id' => $event->id]) }}'">
+                                    <td class="text-center">
+                                        {{ $idcounter }}
+                                    </td>
                                     <th scope="row" class="px-6 py-4 font-medium whitespace-nowrap">
                                         {{ $event->order_name }}
                                     </th>
+                                    <td>
+                                        {{ $event->event_host }}
+                                    </td>
                                     <td class="px-6 py-4">
                                         {{ $event->event_type }}
                                     </td>
@@ -71,7 +81,7 @@
                                         {{ \Carbon\Carbon::parse($event->event_date)->format('j M Y') }}
                                     </td>
                                     <td class="px-6 py-4">
-                                        ###
+                                        {{ $event->guest_limit }}
                                     </td>
                                     <td class="px-6 py-4">
                                         @if ($event->payment_status == 'paid')
@@ -81,9 +91,6 @@
                                         @else
                                             <div class="badge badge-soft badge-error">Cancelled</div>
                                         @endif
-                                    </td>
-                                    <td>
-
                                     </td>
                                 </tr>
 

@@ -48,10 +48,13 @@ Route::prefix('user')
         Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
             ->name('logout');
         Route::get('/cameralog', [UserController::class, 'cameralog'])->name('cameralog');
-        Route::get('/guestlist', [UserController::class, 'guestlist'])->name('guestlist');
+        Route::get('/guestlist', [GuestController::class, 'guestlist'])->name('guestlist');
         Route::get('/verify-qr', [qrverify::class, 'verify'])->name('verify');
         Route::get('/addevent', [EventController::class, 'addevent'])->name('addevent');
         Route::get('/eventlist', [EventController::class, 'eventlist'])->name('eventlist');
-        Route::post('/guestadd', [UserController::class, 'guestadd'])->name('guestadd');
+        Route::get('/eventview/{id}', [EventController::class, 'eventview'])->name('eventview');
+        Route::post('/guestadd', [GuestController::class, 'guestadd'])->name('guestadd');
+        Route::post('/guest/{id}/update', [GuestController::class, 'guestupdate'])->name('guestupdate');
         Route::post('/eventadd', [EventController::class, 'eventadd'])->name('eventadd');
+        Route::post('/event/{id}/update', [EventController::class, 'eventupdate'])->name('eventupdate');
     });

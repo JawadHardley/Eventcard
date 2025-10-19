@@ -17,6 +17,7 @@
                         <button id="startCamera" class="btn btn-outline btn-primary">
                             <i class="fa fa-qrcode"></i> Scan
                         </button>
+                        <button id="flipCamera" class="btn btn-sm btn-primary">Flip Camera</button>
                         <button id="stopCamera" class="btn btn-secondary">
                             <i class="fa fa-stop"></i> Stop
                         </button>
@@ -93,7 +94,7 @@
         });
     </script> --}}
 
-    <script type="module">
+    {{-- <script type="module">
         const html5QrCode = new Html5Qrcode("reader");
         let currentQR = null;
 
@@ -245,6 +246,189 @@
                     console.log("Scanner resume ignored (probably already running)", err);
                 }
             }, 50); // 50ms is enough for modal to close
+        });
+    </script> --}}
+
+    <script type="module">
+        const html5QrCode = new Html5Qrcode("reader");
+        let currentQR = null;
+        let currentCameraId = null;
+        let allCameras = [];
+        let isRunning = false;
+
+        const startBtn = document.getElementById('startCamera');
+        const stopBtn = document.getElementById('stopCamera');
+        const flipBtn = document.getElementById('flipCamera'); // you must create this button in HTML
+        const cameraIcon = document.querySelector('.camera-icon');
+        const textQr = document.querySelector('.textqr');
+        const canvas = document.getElementById('reader');
+
+        // --- MODAL ELEMENTS ---
+        const qrModalCheckbox = document.getElementById('qrModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalMessage = document.getElementById('modalMessage');
+        const verifyBtn = document.getElementById('verifyBtn');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+
+        // --- HIDE STOP AND FLIP INITIALLY ---
+        stopBtn.style.display = "none";
+        if (flipBtn) flipBtn.style.display = "none";
+
+        // --- START CAMERA ---
+        startBtn.addEventListener("click", async () => {
+            if (cameraIcon) cameraIcon.style.display = "none";
+            if (textQr) textQr.style.display = "none";
+            startBtn.style.display = "none";
+            stopBtn.style.display = "inline-block";
+            if (flipBtn) flipBtn.style.display = "inline-block";
+            canvas.classList.remove("hidden");
+
+            try {
+                allCameras = await Html5Qrcode.getCameras();
+                if (!allCameras || allCameras.length === 0) {
+                    alert("No camera found 😢");
+                    return;
+                }
+
+                const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+                let selectedCamera;
+
+                if (isMobile) {
+                    // Prefer back camera
+                    selectedCamera = allCameras.find(cam =>
+                        /back|rear|environment/i.test(cam.label)
+                    );
+                    if (!selectedCamera) selectedCamera = allCameras[allCameras.length - 1];
+                } else {
+                    // Desktop — just use the first camera
+                    selectedCamera = allCameras[0];
+                }
+
+                currentCameraId = selectedCamera.id;
+                await startCamera(currentCameraId);
+            } catch (err) {
+                console.error("Camera error:", err);
+                alert("Could not access camera 😢");
+            }
+        });
+
+        async function startCamera(cameraId) {
+            await html5QrCode.start(
+                cameraId, {
+                    fps: 10,
+                    qrbox: {
+                        width: 250,
+                        height: 250
+                    }
+                },
+                onQRCodeScanned,
+                () => {} // ignore errors
+            );
+            isRunning = true;
+            console.log("Camera started:", cameraId);
+        }
+
+        // --- STOP CAMERA ---
+        stopBtn.addEventListener("click", async () => {
+            try {
+                await html5QrCode.stop();
+                isRunning = false;
+
+                if (cameraIcon) cameraIcon.style.display = "";
+                if (textQr) textQr.style.display = "";
+                startBtn.style.display = "";
+                stopBtn.style.display = "none";
+                if (flipBtn) flipBtn.style.display = "none";
+                canvas.classList.add("hidden");
+                console.log("Camera stopped");
+            } catch (err) {
+                console.error("Error stopping camera:", err);
+            }
+        });
+
+        // --- FLIP CAMERA BUTTON ---
+        if (flipBtn) {
+            flipBtn.addEventListener("click", async () => {
+                if (!allCameras.length) return;
+                try {
+                    let nextIndex = allCameras.findIndex(c => c.id === currentCameraId) + 1;
+                    if (nextIndex >= allCameras.length) nextIndex = 0;
+
+                    const nextCamera = allCameras[nextIndex];
+                    await html5QrCode.stop();
+                    await startCamera(nextCamera.id);
+                    currentCameraId = nextCamera.id;
+                    console.log("Switched to camera:", nextCamera.label);
+                } catch (err) {
+                    console.error("Error flipping camera:", err);
+                }
+            });
+        }
+
+        // --- QR SCANNED ---
+        async function onQRCodeScanned(decodedText) {
+            if (currentQR) return;
+            currentQR = decodedText;
+
+            try {
+                await html5QrCode.pause();
+
+                const response = await fetch(`/user/verify-qr?code=${encodeURIComponent(decodedText)}`);
+                const data = await response.json();
+
+                qrModalCheckbox.checked = true;
+
+                if (data.success) {
+                    modalTitle.textContent = "Guest Verified";
+                    modalMessage.textContent = `Name: ${data.name}`;
+                    verifyBtn.style.display = "inline-block";
+                } else {
+                    modalTitle.textContent = "QR Invalid";
+                    modalMessage.innerHTML = `
+                    <div class="badge badge-error">❌ Invalid</div>
+                    Card does not belong to this event
+                `;
+                    verifyBtn.style.display = "none";
+                }
+            } catch (err) {
+                modalTitle.textContent = "Error!";
+                modalMessage.textContent = "Could not verify guest.";
+                verifyBtn.style.display = "none";
+                console.error(err);
+            }
+        }
+
+        // --- VERIFY GUEST ---
+        verifyBtn.addEventListener("click", async () => {
+            if (!currentQR) return;
+
+            try {
+                const response = await fetch(`/user/verify-qr?code=${encodeURIComponent(currentQR)}&mark=1`);
+                const data = await response.json();
+
+                if (data.success) {
+                    modalMessage.innerHTML = `
+                    <div class="badge badge-success">✅ Checked In</div> ${data.name}
+                `;
+                } else {
+                    modalMessage.innerHTML = `❌ Could not mark attended`;
+                }
+            } catch (err) {
+                modalMessage.textContent = `❌ Error verifying guest`;
+                console.error(err);
+            }
+        });
+
+        // --- RESUME AFTER MODAL CLOSE ---
+        closeModalBtn.addEventListener("click", async () => {
+            currentQR = null;
+            setTimeout(async () => {
+                try {
+                    await html5QrCode.resume();
+                } catch (err) {
+                    console.log("Scanner resume ignored", err);
+                }
+            }, 100);
         });
     </script>
 @endsection
