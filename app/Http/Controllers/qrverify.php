@@ -11,25 +11,47 @@ class qrverify extends Controller
     {
         $code = $request->query('code');
 
-        if (!$code) return response()->json(['success' => false, 'message' => 'No QR code provided']);
+        if (!$code) {
+            return response()->json(['status' => 'error', 'message' => 'No QR code provided']);
+        }
+
+        // If link or full URL scanned, extract the actual code
         if (str_contains($code, '/')) {
             $code = basename(parse_url($code, PHP_URL_PATH));
         }
 
         $guest = Guest::where('qrcode', $code)->first();
 
-        if (!$guest) return response()->json(['success' => false, 'message' => 'QR not found']);
-
-        // Mark attended if requested
-        if ($request->query('mark')) {
-            $guest->update(['verified' => true]);
+        if (!$guest) {
+            return response()->json(['status' => 'invalid', 'message' => 'QR not found']);
         }
 
+        // If mark parameter is provided → mark guest as checked-in
+        if ($request->query('mark')) {
+            if (!$guest->verified) {
+                $guest->update(['verified' => 1]);
+                return response()->json([
+                    'status' => 'checked_in',
+                    'name' => $guest->full_name,
+                    'verified' => true,
+                    'message' => 'Guest checked in successfully'
+                ]);
+            } else {
+                return response()->json([
+                    'status' => 'already_checked',
+                    'name' => $guest->full_name,
+                    'verified' => true,
+                    'message' => 'Guest already checked in'
+                ]);
+            }
+        }
+
+        // Normal verification
         return response()->json([
-            'success' => true,
+            'status' => $guest->verified ? 'already_checked' : 'valid',
             'name' => $guest->full_name,
             'verified' => $guest->verified,
-            'message' => 'Guest found!'
+            'message' => 'Guest found'
         ]);
     }
 }

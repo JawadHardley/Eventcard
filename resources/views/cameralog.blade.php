@@ -4,22 +4,32 @@
         <div class="col-span-12">
             <div class="card bg-base-100 p-10 border-2 border-stone-700/10">
                 {{-- <div id="reader" style="width: 320px; margin: auto; border-radius: 12px; overflow: hidden;"></div> --}}
-                <div id="reader" class="mx-auto mt-5 w-full max-w-md border-2 border-dashed border-gray-300 rounded-lg">
-                    <figure class="p-10 camera-icon">
-                        <i class="fa fa-camera text-9xl inline"></i>
-                    </figure>
+                <div id="reader"
+                    class="hidden mx-auto mt-5 w-full max-w-md border-2 border-dashed border-gray-300 rounded-lg">
                 </div>
                 <div class="card-body items-center text-center">
                     <p class="textqr">
-                        If you already have your gestlist ready and accurate, fire the camera button and lets get scanning
+                    <div class="p-10 camera-icon text-center">
+                        <i class="fa fa-camera text-9xl inline"></i>
+                    </div>
+                    If you already have your gestlist ready and accurate, fire the camera button and lets get scanning
                     </p>
                     <div class="card-actions pt-10">
                         <button id="startCamera" class="btn btn-outline btn-primary">
                             <i class="fa fa-qrcode"></i> Scan
                         </button>
-                        <button id="flipCamera" class="btn btn-sm btn-primary">Flip Camera</button>
-                        <button id="stopCamera" class="btn btn-secondary">
-                            <i class="fa fa-stop"></i> Stop
+                        <button id="flipCamera" class="btn btn-outline btn-primary rounded p-2">
+                            <i class="fa fa-rotate mr-1"></i> Flip
+                        </button>
+                        <button id="stopCamera" class="btn btn-secondary rounded p-2">
+                            <i class="fa fa-stop mr-1"></i> Stop
+                        </button>
+                    </div>
+                    <div class="divider">OR</div>
+                    <div class="my-2">
+                        <input type="text" placeholder="****" class="input input-lg mb-4" />
+                        <button id="startCamera" class="btn btn-outline btn-success my-2">
+                            <i class="fa fa-circle-check"></i> Manual Verify
                         </button>
                     </div>
                 </div>
@@ -40,6 +50,65 @@
         </div>
     </div>
 
+    <!-- Open the modal using ID.showModal() method -->
+    <button class="btn" onclick="my_modal_2.showModal()">open modal</button>
+    <dialog id="my_modal_2" class="modal">
+        <div class="modal-box border-2 border-rose-800/30">
+            <h3 id="modalTitle" class="text-2xl font-bold text-center mb-4">QR Invalid</h3>
+            <h3 class="text-8xl text-center text-error">
+                <i class="fa fa-ban"></i>
+            </h3>
+            <p id="modalMessage" class="py-4 text-center">Card does not exist !!</p>
+            <form method="dialog" class="text-center">
+                <button class="btn btn-outline btn-error">close</button>
+            </form>
+        </div>
+    </dialog>
+
+    <!-- Open the modal using ID.showModal() method -->
+    <button class="btn" onclick="my_modal_3.showModal()">open modal 3</button>
+    <dialog id="my_modal_3" class="modal">
+        <div class="modal-box border-2 border-rose-800/30 flex items-center w-full flex-col">
+            <h3 id="modalTitle" class="text-2xl font-bold text-center mb-4">Valid Card</h3>
+            <h3 class="text-6xl text-center text-success">
+                <i class="fa fa-circle-check"></i>
+            </h3>
+            <p id="modalMessage" class="py-4 text-center text-xl fold-bold">James Maddison</p>
+            <span class="mb-8">
+                <div class="badge badge-soft badge-primary">Double</div>
+                <div class="badge badge-soft badge-success">Not checked-in</div>
+            </span>
+
+            <div class="divider w-full"></div>
+            <form method="dialog" class="text-center">
+                <button id="verifyBtn" class="btn btn-success">
+                    <i class="fa-solid fa-square-check mr-1"></i> Check-in
+                </button>
+                <button class="btn btn-outline btn-error">close</button>
+            </form>
+        </div>
+    </dialog>
+
+    <!-- Open the modal using ID.showModal() method -->
+    <button class="btn" onclick="my_modal_4.showModal()">open modal 4</button>
+    <dialog id="my_modal_4" class="modal">
+        <div class="modal-box border-2 border-rose-800/30 flex items-center w-full flex-col">
+            <h3 id="modalTitle" class="text-2xl font-bold text-center mb-4">Valid Card</h3>
+            <h3 class="text-6xl text-center text-accent">
+                <i class="fa fa-circle-check"></i>
+            </h3>
+            <p id="modalMessage" class="py-4 text-center text-xl fold-bold">James Maddison</p>
+            <span class="mb-8">
+                <div class="badge badge-soft badge-primary">Double</div>
+                <div class="badge badge-soft badge-secondary">Used</div>
+            </span>
+
+            <div class="divider w-full"></div>
+            <form method="dialog" class="text-center">
+                <button class="btn btn-outline btn-error">close</button>
+            </form>
+        </div>
+    </dialog>
 
     {{-- <script type="module">
         const html5QrCode = new Html5Qrcode("reader");
@@ -249,7 +318,7 @@
         });
     </script> --}}
 
-    <script type="module">
+    {{-- <script type="module">
         const html5QrCode = new Html5Qrcode("reader");
         let currentQR = null;
         let currentCameraId = null;
@@ -429,6 +498,569 @@
                     console.log("Scanner resume ignored", err);
                 }
             }, 100);
+        });
+    </script> --}}
+
+
+    {{-- <script type="module">
+        const html5QrCode = new Html5Qrcode("reader");
+        let currentQR = null;
+        let currentCameraId = null;
+        let allCameras = [];
+        let isRunning = false;
+
+        const startBtn = document.getElementById('startCamera');
+        const stopBtn = document.getElementById('stopCamera');
+        const flipBtn = document.getElementById('flipCamera');
+        const cameraIcon = document.querySelector('.camera-icon');
+        const textQr = document.querySelector('.textqr');
+        const canvas = document.getElementById('reader');
+
+        // Modals
+        const modalInvalid = document.getElementById("my_modal_2");
+        const modalValid = document.getElementById("my_modal_3");
+        const modalUsed = document.getElementById("my_modal_4");
+
+        const verifyBtn = document.getElementById("verifyBtn");
+
+        stopBtn.style.display = "none";
+        if (flipBtn) flipBtn.style.display = "none";
+
+        // START CAMERA
+        startBtn.addEventListener("click", async () => {
+            if (cameraIcon) cameraIcon.style.display = "none";
+            if (textQr) textQr.style.display = "none";
+            startBtn.style.display = "none";
+            stopBtn.style.display = "inline-block";
+            if (flipBtn) flipBtn.style.display = "inline-block";
+            canvas.classList.remove("hidden");
+
+            try {
+                allCameras = await Html5Qrcode.getCameras();
+                if (!allCameras || allCameras.length === 0) {
+                    alert("No camera found 😢");
+                    return;
+                }
+
+                const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+                let selectedCamera;
+
+                if (isMobile) {
+                    selectedCamera = allCameras.find(cam =>
+                        /back|rear|environment/i.test(cam.label)
+                    );
+                    if (!selectedCamera) selectedCamera = allCameras[allCameras.length - 1];
+                } else {
+                    selectedCamera = allCameras[0];
+                }
+
+                currentCameraId = selectedCamera.id;
+                await startCamera(currentCameraId);
+            } catch (err) {
+                console.error("Camera error:", err);
+                alert("Could not access camera 😢");
+            }
+        });
+
+        async function startCamera(cameraId) {
+            await html5QrCode.start(
+                cameraId, {
+                    fps: 10,
+                    qrbox: {
+                        width: 250,
+                        height: 250
+                    }
+                },
+                onQRCodeScanned,
+                () => {}
+            );
+            isRunning = true;
+            console.log("Camera started:", cameraId);
+        }
+
+        // STOP CAMERA
+        stopBtn.addEventListener("click", async () => {
+            try {
+                await html5QrCode.stop();
+                isRunning = false;
+                if (cameraIcon) cameraIcon.style.display = "";
+                if (textQr) textQr.style.display = "";
+                startBtn.style.display = "";
+                stopBtn.style.display = "none";
+                if (flipBtn) flipBtn.style.display = "none";
+                canvas.classList.add("hidden");
+                console.log("Camera stopped");
+            } catch (err) {
+                console.error("Error stopping camera:", err);
+            }
+        });
+
+        // FLIP CAMERA
+        if (flipBtn) {
+            flipBtn.addEventListener("click", async () => {
+                if (!allCameras.length) return;
+                try {
+                    let nextIndex = allCameras.findIndex(c => c.id === currentCameraId) + 1;
+                    if (nextIndex >= allCameras.length) nextIndex = 0;
+
+                    const nextCamera = allCameras[nextIndex];
+                    await html5QrCode.stop();
+                    await startCamera(nextCamera.id);
+                    currentCameraId = nextCamera.id;
+                    console.log("Switched to camera:", nextCamera.label);
+                } catch (err) {
+                    console.error("Error flipping camera:", err);
+                }
+            });
+        }
+
+        // --- QR SCANNED ---
+        async function onQRCodeScanned(decodedText) {
+            if (currentQR) return;
+            currentQR = decodedText;
+
+            try {
+                await html5QrCode.pause();
+                const response = await fetch(`/user/verify-qr?code=${encodeURIComponent(decodedText)}`);
+                const data = await response.json();
+
+                console.log("Response:", data);
+
+                if (data.status === "invalid") {
+                    modalInvalid.querySelector("#modalMessage").textContent = "Card does not exist !!";
+                    modalInvalid.showModal();
+                } else if (data.status === "valid") {
+                    modalValid.querySelector("#modalMessage").textContent = data.name;
+                    modalValid.showModal();
+
+                    verifyBtn.onclick = async () => {
+                        const markRes = await fetch(
+                            `/user/verify-qr?code=${encodeURIComponent(currentQR)}&mark=1`);
+                        const markData = await markRes.json();
+                        modalValid.close();
+                        if (markData.status === "checked_in") {
+                            modalUsed.querySelector("#modalMessage").textContent = markData.name;
+                            modalUsed.showModal();
+                        }
+                    };
+                } else if (data.status === "already_checked") {
+                    modalUsed.querySelector("#modalMessage").textContent = data.name;
+                    modalUsed.showModal();
+                }
+
+            } catch (err) {
+                console.error("Error verifying:", err);
+                modalInvalid.querySelector("#modalMessage").textContent = "Error verifying card";
+                modalInvalid.showModal();
+            }
+        }
+
+        // Resume scanning when any modal closes
+        document.querySelectorAll("dialog").forEach(modal => {
+            modal.addEventListener("close", async () => {
+                currentQR = null;
+                setTimeout(async () => {
+                    try {
+                        await html5QrCode.resume();
+                    } catch (err) {
+                        console.log("Scanner resume ignored:", err);
+                    }
+                }, 100);
+            });
+        });
+    </script> --}}
+
+    {{-- <script type="module">
+        const html5QrCode = new Html5Qrcode("reader");
+        let currentQR = null;
+        let currentCameraId = null;
+        let allCameras = [];
+        let isRunning = false;
+
+        const startBtn = document.getElementById('startCamera');
+        const stopBtn = document.getElementById('stopCamera');
+        const flipBtn = document.getElementById('flipCamera');
+        const cameraIcon = document.querySelector('.camera-icon');
+        const textQr = document.querySelector('.textqr');
+        const canvas = document.getElementById('reader');
+
+        // Modals
+        const modalInvalid = document.getElementById("my_modal_2");
+        const modalValid = document.getElementById("my_modal_3");
+        const modalUsed = document.getElementById("my_modal_4");
+
+        // Elements inside modalValid
+        const verifyBtn = modalValid.querySelector("#verifyBtn");
+        const modalValidMessage = modalValid.querySelector("#modalMessage");
+        const badgeContainer = modalValid.querySelector("span.mb-8");
+
+        stopBtn.style.display = "none";
+        if (flipBtn) flipBtn.style.display = "none";
+
+        // --- START CAMERA ---
+        startBtn.addEventListener("click", async () => {
+            if (cameraIcon) cameraIcon.style.display = "none";
+            if (textQr) textQr.style.display = "none";
+            startBtn.style.display = "none";
+            stopBtn.style.display = "inline-block";
+            if (flipBtn) flipBtn.style.display = "inline-block";
+            canvas.classList.remove("hidden");
+
+            try {
+                allCameras = await Html5Qrcode.getCameras();
+                if (!allCameras || allCameras.length === 0) {
+                    alert("No camera found 😢");
+                    return;
+                }
+
+                const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+                let selectedCamera;
+
+                if (isMobile) {
+                    selectedCamera = allCameras.find(cam =>
+                        /back|rear|environment/i.test(cam.label)
+                    );
+                    if (!selectedCamera) selectedCamera = allCameras[allCameras.length - 1];
+                } else {
+                    selectedCamera = allCameras[0];
+                }
+
+                currentCameraId = selectedCamera.id;
+                await startCamera(currentCameraId);
+            } catch (err) {
+                console.error("Camera error:", err);
+                alert("Could not access camera 😢");
+            }
+        });
+
+        async function startCamera(cameraId) {
+            await html5QrCode.start(
+                cameraId, {
+                    fps: 10,
+                    qrbox: {
+                        width: 250,
+                        height: 250
+                    }
+                },
+                onQRCodeScanned,
+                () => {}
+            );
+            isRunning = true;
+            console.log("Camera started:", cameraId);
+        }
+
+        // --- STOP CAMERA ---
+        stopBtn.addEventListener("click", async () => {
+            try {
+                await html5QrCode.stop();
+                isRunning = false;
+                if (cameraIcon) cameraIcon.style.display = "";
+                if (textQr) textQr.style.display = "";
+                startBtn.style.display = "";
+                stopBtn.style.display = "none";
+                if (flipBtn) flipBtn.style.display = "none";
+                canvas.classList.add("hidden");
+                console.log("Camera stopped");
+            } catch (err) {
+                console.error("Error stopping camera:", err);
+            }
+        });
+
+        // --- FLIP CAMERA ---
+        if (flipBtn) {
+            flipBtn.addEventListener("click", async () => {
+                if (!allCameras.length) return;
+                try {
+                    let nextIndex = allCameras.findIndex(c => c.id === currentCameraId) + 1;
+                    if (nextIndex >= allCameras.length) nextIndex = 0;
+
+                    const nextCamera = allCameras[nextIndex];
+                    await html5QrCode.stop();
+                    await startCamera(nextCamera.id);
+                    currentCameraId = nextCamera.id;
+                    console.log("Switched to camera:", nextCamera.label);
+                } catch (err) {
+                    console.error("Error flipping camera:", err);
+                }
+            });
+        }
+
+        // --- QR SCANNED ---
+        async function onQRCodeScanned(decodedText) {
+            if (currentQR) return;
+            currentQR = decodedText;
+
+            try {
+                await html5QrCode.pause();
+                const response = await fetch(`/user/verify-qr?code=${encodeURIComponent(decodedText)}`);
+                const data = await response.json();
+
+                console.log("Response:", data);
+
+                if (data.status === "invalid") {
+                    modalInvalid.querySelector("#modalMessage").textContent = "Card does not exist !!";
+                    modalInvalid.showModal();
+                } else if (data.status === "valid") {
+                    // Show modal with "not checked-in" state
+                    modalValidMessage.textContent = data.name;
+                    badgeContainer.innerHTML = `
+                    <div class="badge badge-soft badge-primary">Double</div>
+                    <div class="badge badge-soft badge-success">Not checked-in</div>
+                `;
+                    verifyBtn.style.display = "inline-block";
+                    modalValid.showModal();
+
+                    // --- WHEN CHECK-IN IS CLICKED ---
+                    verifyBtn.onclick = async () => {
+                        verifyBtn.disabled = true;
+                        verifyBtn.innerHTML = `<i class="fa fa-spinner fa-spin mr-1"></i> Checking...`;
+
+                        const markRes = await fetch(
+                            `/user/verify-qr?code=${encodeURIComponent(currentQR)}&mark=1`);
+                        const markData = await markRes.json();
+
+                        if (markData.status === "checked_in") {
+                            // Update modal contents dynamically
+                            modalValid.querySelector("h3.text-6xl").classList.remove("text-success");
+                            modalValid.querySelector("h3.text-6xl").classList.add("text-accent");
+
+                            modalValid.querySelector("i.fa-circle-check").classList.remove("text-success");
+                            modalValidMessage.textContent = markData.name;
+                            badgeContainer.innerHTML = `
+                            <div class="badge badge-soft badge-primary">Double</div>
+                            <div class="badge badge-soft badge-secondary">Used</div>
+                        `;
+                            verifyBtn.style.display = "none";
+                            modalValid.querySelector("#modalTitle").textContent = "Checked In ✅";
+                        } else {
+                            verifyBtn.disabled = false;
+                            verifyBtn.textContent = "Try Again";
+                        }
+                    };
+                } else if (data.status === "already_checked") {
+                    modalUsed.querySelector("#modalMessage").textContent = data.name;
+                    modalUsed.showModal();
+                }
+
+            } catch (err) {
+                console.error("Error verifying:", err);
+                modalInvalid.querySelector("#modalMessage").textContent = "Error verifying card";
+                modalInvalid.showModal();
+            }
+        }
+
+        // --- RESUME AFTER MODAL CLOSE ---
+        document.querySelectorAll("dialog").forEach(modal => {
+            modal.addEventListener("close", async () => {
+                currentQR = null;
+                setTimeout(async () => {
+                    try {
+                        await html5QrCode.resume();
+                    } catch (err) {
+                        console.log("Scanner resume ignored:", err);
+                    }
+                }, 100);
+            });
+        });
+    </script> --}}
+
+    <script type="module">
+        const html5QrCode = new Html5Qrcode("reader");
+        let currentQR = null;
+        let currentCameraId = null;
+        let allCameras = [];
+        let isRunning = false;
+
+        const startBtn = document.getElementById('startCamera');
+        const stopBtn = document.getElementById('stopCamera');
+        const flipBtn = document.getElementById('flipCamera');
+        const cameraIcon = document.querySelector('.camera-icon');
+        const textQr = document.querySelector('.textqr');
+        const canvas = document.getElementById('reader');
+
+        // Modals
+        const modalInvalid = document.getElementById("my_modal_2");
+        const modalValid = document.getElementById("my_modal_3");
+        const modalUsed = document.getElementById("my_modal_4");
+
+        // Elements inside modalValid
+        const verifyBtn = modalValid.querySelector("#verifyBtn");
+        const modalValidMessage = modalValid.querySelector("#modalMessage");
+        const badgeContainer = modalValid.querySelector("span.mb-8");
+        const modalTitle = modalValid.querySelector("#modalTitle");
+        const bigIcon = modalValid.querySelector("h3.text-6xl i");
+
+        stopBtn.style.display = "none";
+        if (flipBtn) flipBtn.style.display = "none";
+
+        // --- START CAMERA ---
+        startBtn.addEventListener("click", async () => {
+            if (cameraIcon) cameraIcon.style.display = "none";
+            if (textQr) textQr.style.display = "none";
+            startBtn.style.display = "none";
+            stopBtn.style.display = "inline-block";
+            if (flipBtn) flipBtn.style.display = "inline-block";
+            canvas.classList.remove("hidden");
+
+            try {
+                allCameras = await Html5Qrcode.getCameras();
+                if (!allCameras || allCameras.length === 0) {
+                    alert("No camera found 😢");
+                    return;
+                }
+
+                const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+                let selectedCamera;
+
+                if (isMobile) {
+                    selectedCamera = allCameras.find(cam => /back|rear|environment/i.test(cam.label));
+                    if (!selectedCamera) selectedCamera = allCameras[allCameras.length - 1];
+                } else {
+                    selectedCamera = allCameras[0];
+                }
+
+                currentCameraId = selectedCamera.id;
+                await startCamera(currentCameraId);
+            } catch (err) {
+                console.error("Camera error:", err);
+                alert("Could not access camera 😢");
+            }
+        });
+
+        async function startCamera(cameraId) {
+            await html5QrCode.start(
+                cameraId, {
+                    fps: 10,
+                    qrbox: {
+                        width: 250,
+                        height: 250
+                    }
+                },
+                onQRCodeScanned,
+                () => {}
+            );
+            isRunning = true;
+            console.log("Camera started:", cameraId);
+        }
+
+        // --- STOP CAMERA ---
+        stopBtn.addEventListener("click", async () => {
+            try {
+                await html5QrCode.stop();
+                isRunning = false;
+                if (cameraIcon) cameraIcon.style.display = "";
+                if (textQr) textQr.style.display = "";
+                startBtn.style.display = "";
+                stopBtn.style.display = "none";
+                if (flipBtn) flipBtn.style.display = "none";
+                canvas.classList.add("hidden");
+                console.log("Camera stopped");
+            } catch (err) {
+                console.error("Error stopping camera:", err);
+            }
+        });
+
+        // --- FLIP CAMERA ---
+        if (flipBtn) {
+            flipBtn.addEventListener("click", async () => {
+                if (!allCameras.length) return;
+                try {
+                    let nextIndex = allCameras.findIndex(c => c.id === currentCameraId) + 1;
+                    if (nextIndex >= allCameras.length) nextIndex = 0;
+
+                    const nextCamera = allCameras[nextIndex];
+                    await html5QrCode.stop();
+                    await startCamera(nextCamera.id);
+                    currentCameraId = nextCamera.id;
+                    console.log("Switched to camera:", nextCamera.label);
+                } catch (err) {
+                    console.error("Error flipping camera:", err);
+                }
+            });
+        }
+
+        // --- QR SCANNED ---
+        async function onQRCodeScanned(decodedText) {
+            if (currentQR) return;
+            currentQR = decodedText;
+
+            try {
+                await html5QrCode.pause();
+                const response = await fetch(`/user/verify-qr?code=${encodeURIComponent(decodedText)}`);
+                const data = await response.json();
+                console.log("Response:", data);
+
+                if (data.status === "invalid") {
+                    modalInvalid.querySelector("#modalMessage").textContent = "Card does not exist !!";
+                    modalInvalid.showModal();
+                } else if (data.status === "valid") {
+                    modalValidMessage.textContent = data.name;
+                    badgeContainer.innerHTML = `
+                    <div class="badge badge-soft badge-primary">Double</div>
+                    <div class="badge badge-soft badge-success">Not checked-in</div>
+                `;
+                    modalTitle.textContent = "Valid Card";
+                    bigIcon.className = "fa fa-circle-check text-success";
+                    verifyBtn.style.display = "inline-block";
+                    verifyBtn.disabled = false;
+                    verifyBtn.innerHTML = `<i class="fa-solid fa-square-check mr-1"></i> Check-in`;
+                    modalValid.showModal();
+
+                    verifyBtn.onclick = async () => {
+                        verifyBtn.disabled = true;
+                        verifyBtn.innerHTML = `<i class="fa fa-spinner fa-spin mr-1"></i> Checking...`;
+
+                        try {
+                            const markRes = await fetch(
+                                `/user/verify-qr?code=${encodeURIComponent(currentQR)}&mark=1`);
+                            const markData = await markRes.json();
+
+                            if (markData.status === "checked_in") {
+                                modalTitle.textContent = "Checked In";
+                                bigIcon.className = "fa fa-circle-check text-accent";
+                                modalValidMessage.textContent = markData.name;
+                                badgeContainer.innerHTML = `
+                                <div class="badge badge-soft badge-primary">Double</div>
+                                <div class="badge badge-soft badge-secondary">Used</div>
+                            `;
+                                verifyBtn.style.display = "none";
+                            } else {
+                                verifyBtn.disabled = false;
+                                verifyBtn.innerHTML = "Try Again";
+                            }
+                        } catch (error) {
+                            console.error("Error marking check-in:", error);
+                            verifyBtn.disabled = false;
+                            verifyBtn.innerHTML = "Try Again";
+                        }
+                    };
+                } else if (data.status === "already_checked") {
+                    modalUsed.querySelector("#modalMessage").textContent = data.name;
+                    modalUsed.showModal();
+                }
+
+            } catch (err) {
+                console.error("Error verifying:", err);
+                modalInvalid.querySelector("#modalMessage").textContent = "Error verifying card";
+                modalInvalid.showModal();
+            }
+        }
+
+        // --- RESUME AFTER MODAL CLOSE ---
+        document.querySelectorAll("dialog").forEach(modal => {
+            modal.addEventListener("close", async () => {
+                currentQR = null;
+                verifyBtn.disabled = false;
+                verifyBtn.innerHTML = `<i class="fa-solid fa-square-check mr-1"></i> Check-in`;
+
+                setTimeout(async () => {
+                    try {
+                        await html5QrCode.resume();
+                    } catch (err) {
+                        console.log("Scanner resume ignored:", err);
+                    }
+                }, 200);
+            });
         });
     </script>
 @endsection

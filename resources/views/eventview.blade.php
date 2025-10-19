@@ -18,12 +18,34 @@
                                 <h2 class="text-2xl">{{ $events->order_name }}</h2>
                                 <h2 class="text-lg opacity-60">{{ $events->event_host }}</h2>
                                 <p class="py-2">
-                                <div class="badge badge-soft badge-success mr-2">
-                                    <i class="fa fa-play"></i> Event Active
-                                </div>
-                                <div class="badge badge-soft badge-primary mr-2">
-                                    <i class="fa fa-money-check-dollar"></i> Pending Payment
-                                </div>
+                                    @if ($events->event_status == 'active')
+                                        <div class="badge badge-soft badge-success mr-2">
+                                            <i class="fa fa-play"></i> Event Active
+                                        </div>
+                                    @elseif($events->event_status == 'completed')
+                                        <div class="badge badge-success mr-2">
+                                            <i class="fa fa-circle-check"></i> Event Ended
+                                        </div>
+                                    @else
+                                        <div class="badge badge-soft badge-error mr-2">
+                                            <i class="fa fa-circle-stop"></i> Event Cancelled
+                                        </div>
+                                    @endif
+
+
+                                    @if ($events->payment_status == 'pending')
+                                        <div class="badge badge-soft badge-primary mr-2">
+                                            <i class="fa fa-money-check-dollar"></i> Pending Payment
+                                        </div>
+                                    @elseif($events->payment_status == 'paid')
+                                        <div class="badge badge-soft badge-success mr-2">
+                                            <i class="fa fa-money-check-dollar"></i> Paid
+                                        </div>
+                                    @else
+                                        <div class="badge badge-soft badge-error mr-2">
+                                            <i class="fa fa-money-check-dollar"></i> Cancelled Payment
+                                        </div>
+                                    @endif
                                 </p>
                             </div>
                             <div class="col-span-12 md:col-span-4 my-auto flex justify-end">
@@ -196,17 +218,10 @@
 
                                 <dialog id="qrmodal_{{ $counter }}" class="modal">
                                     <div class="modal-box">
-                                        <div class="modal-action">
-                                            <form method="dialog">
-                                                <!-- if there is a button in form, it will close the modal -->
-                                                <button class="btn btn-outline btn-error rounded-full">
-                                                    <i class="fa fa-xmark text-rose-700"></i>
-                                                </button>
-                                            </form>
-                                        </div>
-                                        <div class="divider">
-                                            <i class="fa fa-object-ungroup"></i>
-                                        </div>
+                                        <form method="dialog">
+                                            <button
+                                                class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+                                        </form>
                                         <h3 class="text-lg text-center font-bold">{{ $guest->full_name }}</h3>
                                         <div class="col">
                                             <p class="py-1 text-center">{{ $guest->qrcode }}</p>
@@ -217,6 +232,9 @@
                                                     <span class="text-red-500">No QR assigned</span>
                                                 @endif
                                             </p>
+                                        </div>
+                                        <div class="divider">
+                                            <i class="fa fa-object-ungroup"></i>
                                         </div>
                                         <form method="POST" action="{{ route('user.guestupdate', $guest->id) }}"
                                             class="w-full">
@@ -382,6 +400,9 @@
 
     <dialog id="editevent" class="modal w-full">
         <div class="modal-box">
+            <form method="dialog">
+                <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+            </form>
             <fieldset class="fieldset rounded-xl p-4 bg-base-100">
                 <h2 class="text-xl font-bold mb-3 text-center text-primary">
                     <i class="fa fa-edit mr-3"></i> Update Event
