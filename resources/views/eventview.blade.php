@@ -7,14 +7,14 @@
                 <div class="card mb-5 card-md">
                     <div class="card-body p-3">
                         <div class="grid grid-cols-12">
-                            <div class="col-span-1 m-auto">
+                            <div class="col-span-12 md:col-span-1 m-auto">
                                 <div class="avatar">
                                     <div class="rounded-xl bg-indigo-900/30 p-4 text-2xl">
                                         <i class="fa fa-calendar-days"></i>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-span-7">
+                            <div class="col-span-12 md:col-span-12 md:col-span-7">
                                 <h2 class="text-2xl">{{ $events->order_name }}</h2>
                                 <h2 class="text-lg opacity-60">{{ $events->event_host }}</h2>
                                 <p class="py-2">
@@ -26,7 +26,7 @@
                                 </div>
                                 </p>
                             </div>
-                            <div class="col-span-4 my-auto flex justify-end">
+                            <div class="col-span-12 md:col-span-4 my-auto flex justify-end">
 
                                 <button class="btn btn-outline btn-primary mx-1" popovertarget="popover-1"
                                     style="anchor-name:--anchor-1">
@@ -122,7 +122,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-span-8">
+        <div class="col-span-12 md:col-span-8">
             {{-- <div class="p-3 m-3 bg-base-100 border border-stone-900/10 rounded-lg">
                 <h3>{{ $events->order_name }}</h3>
             </div> --}}
@@ -295,7 +295,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-span-4">
+        <div class="col-span-12 md:col-span-4">
             <div class="p-3 m-3 bg-base-100 border border-stone-700/10 rounded-lg">
                 <h3 class="font-bold text-lg">Event Info</h3>
                 <ul class="list bg-base-100 rounded-box">
