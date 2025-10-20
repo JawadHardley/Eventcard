@@ -12,7 +12,7 @@ class qrverify extends Controller
     public function verify(Request $request)
     {
         $code = $request->query('code');
-        $event_id = $request->query('event_id')
+        $event_id = $request->query('event_id');
 
         if (!$code) {
             return response()->json(['status' => 'error', 'message' => 'No QR code provided']);
