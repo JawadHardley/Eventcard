@@ -125,7 +125,7 @@
                     </li>
                     <li class="">
                         <div tabindex="0" class="collapse">
-                            <a href="{{ route('user.cameralog') }}" class="rin">
+                            <a href="#" class="rin">
                                 <div class="collapse-title flex items-center py-1 gap-2">
                                     <i data-lucide="camera" class="h-6 w-6 inline"></i> camera
                                 </div>

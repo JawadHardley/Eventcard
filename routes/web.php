@@ -47,7 +47,7 @@ Route::prefix('user')
         Route::get('profile', [UserController::class, 'profile'])->name('profile');
         Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
             ->name('logout');
-        Route::get('/cameralog', [UserController::class, 'cameralog'])->name('cameralog');
+        Route::get('/{event}/cameralog', [UserController::class, 'cameralog'])->name('cameralog');
         Route::get('/guestlist', [GuestController::class, 'guestlist'])->name('guestlist');
         Route::get('/verify-qr', [qrverify::class, 'verify'])->name('verify');
         Route::get('/addevent', [EventController::class, 'addevent'])->name('addevent');

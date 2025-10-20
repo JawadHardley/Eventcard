@@ -68,7 +68,8 @@
                                     </li>
                                 </ul>
 
-                                <a href="{{ route('user.cameralog') }}" class="btn btn-outline btn-primary mx-1">
+                                <a href="{{ route('user.cameralog', ['event' => $events->id]) }}"
+                                    class="btn btn-outline btn-primary mx-1">
                                     <i class="fa fa-camera"></i>
                                 </a>
 

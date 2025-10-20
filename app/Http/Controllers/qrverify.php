@@ -12,6 +12,7 @@ class qrverify extends Controller
     public function verify(Request $request)
     {
         $code = $request->query('code');
+        $event_id = $request->query('event_id')
 
         if (!$code) {
             return response()->json(['status' => 'error', 'message' => 'No QR code provided']);
@@ -28,7 +29,7 @@ class qrverify extends Controller
             return response()->json(['status' => 'invalid', 'message' => 'QR not found']);
         }
 
-        $eventx = Event::where('id', $guest->order_id)->first();
+        $eventx = Event::where('id', $event_id)->first();
 
         if (!$eventx) {
             return response()->json(['status' => 'invalid', 'message' => 'QR not found']);

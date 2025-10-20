@@ -871,6 +871,7 @@
         let allCameras = [];
         let isRunning = false;
 
+        const eventId = "{{ $event->id }}";
         const startBtn = document.getElementById('startCamera');
         const stopBtn = document.getElementById('stopCamera');
         const flipBtn = document.getElementById('flipCamera');
@@ -986,7 +987,8 @@
 
             try {
                 await html5QrCode.pause();
-                const response = await fetch(`/user/verify-qr?code=${encodeURIComponent(decodedText)}`);
+                const response = await fetch(
+                    `/user/verify-qr?code=${encodeURIComponent(decodedText)}&event_id=${eventId}`);
                 const data = await response.json();
                 console.log("Response:", data);
 
