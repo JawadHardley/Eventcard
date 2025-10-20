@@ -78,7 +78,7 @@ class EventController extends Controller
         $event = Event::findOrFail($id);
 
         // Optional: ownership check
-        if ($event->user_id !== Auth::id()) {
+        if ($event->user_id != Auth::id()) {
             abort(403, 'Unauthorized action.');
         }
 
