@@ -36,7 +36,7 @@ class qrverify extends Controller
 
         // verify the event belongs to the logged in user
         if ($eventx->user_id != Auth::id()) {
-            return response()->json(['error' => 'Unauthorized'], 403);
+            return response()->json(['status' => 'invalid', 'message' => 'QR not found']);
         }
 
 
