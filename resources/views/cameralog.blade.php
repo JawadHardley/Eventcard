@@ -13,6 +13,7 @@
                         <i class="fa fa-camera text-9xl inline"></i>
                     </div>
                     If you already have your gestlist ready and accurate, fire the camera button and lets get scanning
+                    ({{ $event->id }})
                     </p>
                     <div class="card-actions pt-10">
                         <button id="startCamera" class="btn btn-outline btn-primary">
@@ -871,7 +872,8 @@
         let allCameras = [];
         let isRunning = false;
 
-        const eventId = "{{ $event->id }}";
+        // const eventId = "{{ $event->id }}";
+        const eventId = @json($event->id);
         const startBtn = document.getElementById('startCamera');
         const stopBtn = document.getElementById('stopCamera');
         const flipBtn = document.getElementById('flipCamera');
