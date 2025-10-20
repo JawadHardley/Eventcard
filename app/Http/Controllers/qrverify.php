@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Guest;
+use App\Models\Event;
+use Illuminate\Support\Facades\Auth;
 
 class qrverify extends Controller
 {
@@ -25,6 +27,18 @@ class qrverify extends Controller
         if (!$guest) {
             return response()->json(['status' => 'invalid', 'message' => 'QR not found']);
         }
+
+        $eventx = Event::where('id', $guest->order_id)->first();
+
+        if (!$eventx) {
+            return response()->json(['status' => 'invalid', 'message' => 'QR not found']);
+        }
+
+        // verify the event belongs to the logged in user
+        if ($eventx->user_id != Auth::id()) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
 
         // If mark parameter is provided → mark guest as checked-in
         if ($request->query('mark')) {
