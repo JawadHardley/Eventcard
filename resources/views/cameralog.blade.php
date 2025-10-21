@@ -43,7 +43,7 @@
     <div class="modal">
         <div class="modal-box">
             <h3 class="font-bold text-lg" id="modalTitle">Verify Guest</h3>
-            <p id="modalMessage" class="py-2">Guest Info</p>
+            <p id="qr_modal_message" class="py-2">Guest Info</p>
             <div class="modal-action" id="modalActions">
                 <button id="verifyBtn" class="btn btn-primary">Check-in</button>
                 <label for="qrModal" class="btn btn-outline btn-error" id="closeModalBtn">Close</label>
@@ -55,11 +55,11 @@
     <button class="btn" onclick="my_modal_2.showModal()">open modal</button>
     <dialog id="my_modal_2" class="modal">
         <div class="modal-box border-2 border-rose-800/30">
-            <h3 id="modalTitle" class="text-2xl font-bold text-center mb-4">QR Invalid</h3>
+            <h3 id="invalid_modal_title" class="text-2xl font-bold text-center mb-4">QR Invalid</h3>
             <h3 class="text-8xl text-center text-error">
                 <i class="fa fa-ban"></i>
             </h3>
-            <p id="modalMessage" class="py-4 text-center">Card does not exist !!</p>
+            <p id="invalid_modal_message" class="py-4 text-center">Card does not exist !!</p>
             <form method="dialog" class="text-center">
                 <button class="btn btn-outline btn-error">close</button>
             </form>
@@ -70,19 +70,19 @@
     <button class="btn" onclick="my_modal_3.showModal()">open modal 3</button>
     <dialog id="my_modal_3" class="modal">
         <div class="modal-box border-2 border-rose-800/30 flex items-center w-full flex-col">
-            <h3 id="modalTitle" class="text-2xl font-bold text-center mb-4">Valid Card</h3>
+            <h3 id="valid_modal_title" class="text-2xl font-bold text-center mb-4">Valid Card</h3>
             <h3 class="text-6xl text-center text-success">
-                <i class="fa fa-circle-check"></i>
+                <i id="valid_modal_big_icon" class="fa fa-circle-check"></i>
             </h3>
-            <p id="modalMessage" class="py-4 text-center text-xl fold-bold">James Maddison</p>
-            <span class="mb-8">
-                <div class="badge badge-soft badge-primary">Double</div>
+            <p id="valid_modal_message" class="py-4 text-center text-xl fold-bold">James Maddison</p>
+            <span class="mb-8" id="valid_badge_container">
+                <div class="badge badge-soft badge-primary">Doublex</div>
                 <div class="badge badge-soft badge-success">Not checked-in</div>
             </span>
 
             <div class="divider w-full"></div>
             <form method="dialog" class="text-center">
-                <button id="verifyBtn" class="btn btn-success">
+                <button id="valid_modal_verifyBtn" class="btn btn-success">
                     <i class="fa-solid fa-square-check mr-1"></i> Check-in
                 </button>
                 <button class="btn btn-outline btn-error">close</button>
@@ -94,13 +94,13 @@
     <button class="btn" onclick="my_modal_4.showModal()">open modal 4</button>
     <dialog id="my_modal_4" class="modal">
         <div class="modal-box border-2 border-rose-800/30 flex items-center w-full flex-col">
-            <h3 id="modalTitle" class="text-2xl font-bold text-center mb-4">Valid Card</h3>
+            <h3 id="used_modal_title" class="text-2xl font-bold text-center mb-4">Valid Card</h3>
             <h3 class="text-6xl text-center text-accent">
-                <i class="fa fa-circle-check"></i>
+                <i id="valid_modal_big_icon" class="fa fa-circle-check"></i>
             </h3>
-            <p id="modalMessage" class="py-4 text-center text-xl fold-bold">James Maddison</p>
-            <span class="mb-8">
-                <div class="badge badge-soft badge-primary">Double</div>
+            <p id="used_modal_message" class="py-4 text-center text-xl fold-bold">James Maddison</p>
+            <span class="mb-8" id="used_badge_container">
+                <div class="badge badge-soft badge-primary">Doubleyd</div>
                 <div class="badge badge-soft badge-secondary">Used</div>
             </span>
 
@@ -865,7 +865,7 @@
         });
     </script> --}}
 
-    <script type="module">
+    {{-- <script type="module">
         const html5QrCode = new Html5Qrcode("reader");
         let currentQR = null;
         let currentCameraId = null;
@@ -1000,14 +1000,14 @@
                 } else if (data.status === "valid") {
                     modalValidMessage.textContent = data.name;
                     badgeContainer.innerHTML = `
-                    <div class="badge badge-soft badge-primary">Double</div>
+                    <div class="badge badge-soft ${data.type == 'single' ? 'badge-primary' : 'badge-secondary'}">${data.type}</div>
                     <div class="badge badge-soft badge-success">Not checked-in</div>
                 `;
                     modalTitle.textContent = "Valid Card";
                     bigIcon.className = "fa fa-circle-check text-success";
                     verifyBtn.style.display = "inline-block";
                     verifyBtn.disabled = false;
-                    verifyBtn.innerHTML = `<i class="fa-solid fa-square-check mr-1"></i> Check-in`;
+                    verifyBtn.innerHTML = `<i class="fa-solid fa-square-check mr-1" > </i> Check-in`;
                     modalValid.showModal();
 
                     verifyBtn.onclick = async () => {
@@ -1016,7 +1016,7 @@
 
                         try {
                             const markRes = await fetch(
-                                `/user/verify-qr?code=${encodeURIComponent(currentQR)}&mark=1`);
+                                `/user/verify-card?code=${encodeURIComponent(currentQR)}&mark=1`);
                             const markData = await markRes.json();
 
                             if (markData.status === "checked_in") {
@@ -1024,7 +1024,7 @@
                                 bigIcon.className = "fa fa-circle-check text-accent";
                                 modalValidMessage.textContent = markData.name;
                                 badgeContainer.innerHTML = `
-                                <div class="badge badge-soft badge-primary">Double</div>
+                                <div class="badge badge-soft ${markData.type == 'single' ? 'badge-primary' : 'badge-secondary'}">Double</div>
                                 <div class="badge badge-soft badge-secondary">Used</div>
                             `;
                                 verifyBtn.style.display = "none";
@@ -1062,6 +1062,229 @@
                         await html5QrCode.resume();
                     } catch (err) {
                         console.log("Scanner resume ignored:", err);
+                    }
+                }, 200);
+            });
+        });
+    </script> --}}
+
+    <script type="module">
+        const html5QrCode = new Html5Qrcode("reader");
+        let currentQR = null;
+        let currentCameraId = null;
+        let allCameras = [];
+        let isRunning = false;
+
+        const eventId = @json($event->id);
+        const startBtn = document.getElementById('startCamera');
+        const stopBtn = document.getElementById('stopCamera');
+        const flipBtn = document.getElementById('flipCamera');
+        const cameraIcon = document.querySelector('.camera-icon');
+        const textQr = document.querySelector('.textqr');
+        const canvas = document.getElementById('reader');
+
+        // Modals (keep dialog elements, but use unique inner IDs)
+        const modalInvalid = document.getElementById("my_modal_2");
+        const modalValid = document.getElementById("my_modal_3");
+        const modalUsed = document.getElementById("my_modal_4");
+
+        // Elements inside modalValid (unique IDs)
+        const valid_verifyBtn = modalValid.querySelector("#valid_modal_verifyBtn");
+        const valid_message = modalValid.querySelector("#valid_modal_message");
+        const valid_badge_container = modalValid.querySelector("#valid_badge_container");
+        const used_badge_container = modalUsed.querySelector("#used_badge_container");
+        const valid_title = modalValid.querySelector("#valid_modal_title");
+        const valid_big_icon = modalValid.querySelector("#valid_modal_big_icon");
+
+        // Elements inside modalInvalid / modalUsed
+        const invalid_message = modalInvalid.querySelector("#invalid_modal_message");
+        const used_message = modalUsed.querySelector("#used_modal_message");
+        const used_title = modalUsed.querySelector("#used_modal_title");
+        // For the checkbox modal (if used elsewhere)
+        const qrModalCheckbox = document.getElementById('qrModal');
+        const qr_modal_verifyBtn = document.getElementById('qr_modal_verifyBtn');
+        const qr_modal_title = document.getElementById('qr_modal_title');
+        const qr_modal_message = document.getElementById('qr_modal_message');
+
+        stopBtn.style.display = "none";
+        if (flipBtn) flipBtn.style.display = "none";
+
+        // --- START CAMERA ---
+        startBtn.addEventListener("click", async () => {
+            if (cameraIcon) cameraIcon.style.display = "none";
+            if (textQr) textQr.style.display = "none";
+            startBtn.style.display = "none";
+            stopBtn.style.display = "inline-block";
+            if (flipBtn) flipBtn.style.display = "inline-block";
+            canvas.classList.remove("hidden");
+
+            try {
+                allCameras = await Html5Qrcode.getCameras();
+                if (!allCameras || allCameras.length === 0) {
+                    alert("No camera found 😢");
+                    return;
+                }
+
+                const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+                let selectedCamera;
+
+                if (isMobile) {
+                    selectedCamera = allCameras.find(cam => /back|rear|environment/i.test(cam.label));
+                    if (!selectedCamera) selectedCamera = allCameras[allCameras.length - 1];
+                } else {
+                    selectedCamera = allCameras[0];
+                }
+
+                currentCameraId = selectedCamera.id;
+                await startCamera(currentCameraId);
+            } catch (err) {
+                console.error("Camera error:", err);
+                alert("Could not access camera 😢");
+            }
+        });
+
+        async function startCamera(cameraId) {
+            await html5QrCode.start(
+                cameraId, {
+                    fps: 10,
+                    qrbox: {
+                        width: 250,
+                        height: 250
+                    }
+                },
+                onQRCodeScanned,
+                () => {}
+            );
+            isRunning = true;
+            console.log("Camera started:", cameraId);
+        }
+
+        // --- STOP CAMERA ---
+        stopBtn.addEventListener("click", async () => {
+            try {
+                await html5QrCode.stop();
+                isRunning = false;
+                if (cameraIcon) cameraIcon.style.display = "";
+                if (textQr) textQr.style.display = "";
+                startBtn.style.display = "";
+                stopBtn.style.display = "none";
+                if (flipBtn) flipBtn.style.display = "none";
+                canvas.classList.add("hidden");
+                console.log("Camera stopped");
+            } catch (err) {
+                console.error("Error stopping camera:", err);
+            }
+        });
+
+        // --- FLIP CAMERA ---
+        if (flipBtn) {
+            flipBtn.addEventListener("click", async () => {
+                if (!allCameras.length) return;
+                try {
+                    let nextIndex = allCameras.findIndex(c => c.id === currentCameraId) + 1;
+                    if (nextIndex >= allCameras.length) nextIndex = 0;
+
+                    const nextCamera = allCameras[nextIndex];
+                    await html5QrCode.stop();
+                    await startCamera(nextCamera.id);
+                    currentCameraId = nextCamera.id;
+                    console.log("Switched to camera:", nextCamera.label);
+                } catch (err) {
+                    console.error("Error flipping camera:", err);
+                }
+            });
+        }
+
+        // --- QR SCANNED ---
+        async function onQRCodeScanned(decodedText) {
+            if (currentQR) return;
+            currentQR = decodedText;
+
+            try {
+                await html5QrCode.pause();
+                const response = await fetch(
+                    `/user/verify-qr?code=${encodeURIComponent(decodedText)}&event_id=${eventId}`);
+                const data = await response.json();
+                console.log("Response:", data);
+
+                if (data.status === "invalid") {
+                    invalid_message.textContent = "Card does not exist !!";
+                    modalInvalid.showModal();
+                } else if (data.status === "valid") {
+                    valid_message.textContent = data.name;
+                    valid_badge_container.innerHTML = `
+                    <div class="badge badge-soft ${data.type == 'single' ? 'badge-primary' : 'badge-secondary'}">${data.type}</div>
+                    <div class="badge badge-soft badge-success">Not checked-in</div>
+                `;
+                    valid_title.textContent = "Valid Card";
+                    valid_big_icon.className = "fa fa-circle-check text-success";
+                    valid_verifyBtn.style.display = "inline-block";
+                    valid_verifyBtn.disabled = false;
+                    valid_verifyBtn.innerHTML = `<i class="fa-solid fa-square-check mr-1" > </i> Check-in`;
+                    modalValid.showModal();
+
+                    valid_verifyBtn.onclick = async () => {
+                        valid_verifyBtn.disabled = true;
+                        valid_verifyBtn.innerHTML = `<i class="fa fa-spinner fa-spin mr-1"></i> Checking...`;
+
+                        try {
+                            const markRes = await fetch(
+                                `/user/verify-card?code=${encodeURIComponent(currentQR)}&mark=1`);
+                            const markData = await markRes.json();
+
+                            if (markData.status === "checked_in") {
+                                valid_title.textContent = "Checked In";
+                                valid_big_icon.className = "fa fa-circle-check text-accent";
+                                valid_message.textContent = markData.name;
+                                valid_badge_container.innerHTML = `
+                                <div class="badge badge-soft ${markData.type == 'single' ? 'badge-primary' : 'badge-secondary'}">${markData.type}</div>
+                                <div class="badge badge-soft badge-secondary">Used</div>
+                                <p class="p-2">Card Checked in </p>
+                            `;
+                                valid_verifyBtn.style.display = "none";
+                            } else {
+                                valid_verifyBtn.disabled = false;
+                                valid_verifyBtn.innerHTML = "Try Again";
+                            }
+                        } catch (error) {
+                            console.error("Error marking check-in:", error);
+                            valid_verifyBtn.disabled = false;
+                            valid_verifyBtn.innerHTML = "Try Again";
+                        }
+                    };
+                } else if (data.status === "already_checked") {
+                    used_message.textContent = data.name;
+                    used_badge_container.innerHTML = `
+                                <div class="badge badge-soft ${data.type == 'single' ? 'badge-primary' : 'badge-secondary'}">${data.type}</div>
+                                <div class="badge badge-soft badge-secondary">Used</div>
+                                <p class="p-2">Card Checked in </p>`;
+                    modalUsed.showModal();
+                }
+
+            } catch (err) {
+                console.error("Error verifying:", err);
+                invalid_message.textContent = "Error verifying card";
+                modalInvalid.showModal();
+            }
+        }
+
+        // --- RESUME AFTER MODAL CLOSE ---
+        document.querySelectorAll("dialog").forEach(modal => {
+            modal.addEventListener("close", async () => {
+                currentQR = null;
+
+                // reset valid modal verify button if it exists
+                if (valid_verifyBtn) {
+                    valid_verifyBtn.disabled = false;
+                    valid_verifyBtn.innerHTML =
+                        ` < i class = "fa-solid fa-square-check mr-1" > < /i> Check-in`;
+                }
+
+                setTimeout(async () => {
+                    try {
+                        await html5QrCode.resume();
+                    } catch (err) {
+                        console.log("Scanner resume ignored", err);
                     }
                 }, 200);
             });

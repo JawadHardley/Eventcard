@@ -50,6 +50,7 @@ Route::prefix('user')
         Route::get('/{event}/cameralog', [UserController::class, 'cameralog'])->name('cameralog');
         Route::get('/guestlist', [GuestController::class, 'guestlist'])->name('guestlist');
         Route::get('/verify-qr', [qrverify::class, 'verify'])->name('verify');
+        Route::get('/verify-card', [qrverify::class, 'markfield'])->name('markfield');
         Route::get('/addevent', [EventController::class, 'addevent'])->name('addevent');
         Route::get('/eventlist', [EventController::class, 'eventlist'])->name('eventlist');
         Route::get('/eventview/{id}', [EventController::class, 'eventview'])->name('eventview');

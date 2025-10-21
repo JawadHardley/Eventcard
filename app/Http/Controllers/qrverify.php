@@ -18,7 +18,7 @@ class qrverify extends Controller
             return response()->json(['status' => 'error', 'message' => 'No QR code provided']);
         }
 
-        // If link or full URL scanned, extract the actual code
+        // If link or full URL scanned, extract the actual code  
         if (str_contains($code, '/')) {
             $code = basename(parse_url($code, PHP_URL_PATH));
         }
@@ -42,7 +42,25 @@ class qrverify extends Controller
             return response()->json(['status' => 'invalid', 'message' => 'QR not found']);
         }
 
+        // Normal verification
+        return response()->json([
+            'status' => $guest->verified ? 'already_checked' : 'valid',
+            'name' => $guest->full_name,
+            'verified' => $guest->verified,
+            'type' => $guest->title,
+            'message' => 'Guest found'
+        ]);
+    }
 
+    public function markfield(Request $request)
+    {
+
+        $code = $request->query('code');
+        // If link or full URL scanned, extract the actual code  
+        if (str_contains($code, '/')) {
+            $code = basename(parse_url($code, PHP_URL_PATH));
+        }
+        $guest = Guest::where('qrcode', $code)->first();
         // If mark parameter is provided → mark guest as checked-in
         if ($request->query('mark')) {
             if (!$guest->verified) {
@@ -51,24 +69,18 @@ class qrverify extends Controller
                     'status' => 'checked_in',
                     'name' => $guest->full_name,
                     'verified' => true,
-                    'message' => 'Guest checked in successfully'
+                    'message' => 'Guest checked in successfully',
+                    'type' => $guest->title
                 ]);
             } else {
                 return response()->json([
                     'status' => 'already_checked',
                     'name' => $guest->full_name,
                     'verified' => true,
-                    'message' => 'Guest already checked in'
+                    'message' => 'Guest already checked in',
+                    'type' => $guest->title
                 ]);
             }
         }
-
-        // Normal verification
-        return response()->json([
-            'status' => $guest->verified ? 'already_checked' : 'valid',
-            'name' => $guest->full_name,
-            'verified' => $guest->verified,
-            'message' => 'Guest found'
-        ]);
     }
 }
