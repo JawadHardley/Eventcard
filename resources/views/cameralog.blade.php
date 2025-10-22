@@ -12,7 +12,7 @@
                     <div class="p-10 camera-icon text-center">
                         <i class="fa fa-camera text-9xl inline"></i>
                     </div>
-                    If you already have your gestlist ready and accurate, fire the camera button and lets get scanning
+                    If you already have your gestlist ready and accurate, fire the camera button and lets get scanning.
                     ({{ $event->id }})
                     </p>
                     <div class="card-actions pt-10">
@@ -1236,7 +1236,8 @@
                                 valid_title.textContent = "Checked In";
                                 valid_big_icon.className = "fa fa-circle-check text-accent";
                                 valid_message.textContent = markData.name;
-                                valid_badge_container.innerHTML = `
+                                valid_badge_container.innerHTML =
+                                    `
                                 <div class="badge badge-soft ${markData.type == 'single' ? 'badge-primary' : 'badge-secondary'}">${markData.type}</div>
                                 <div class="badge badge-soft badge-secondary">Used</div>
                                 <p class="p-2">Card Checked in </p>
