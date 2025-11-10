@@ -37,32 +37,38 @@
                         <i class="fa fa-user rounded-full text-indigo-900 border-2 border-blue-700/20 p-2"></i>
                     </div>
                     <p class="text-2xl text-center">
-                        Welcome, <b>{{ $guest->full_name ?? 'Guest' }}</b>
+                        Karibu, <b>{{ $guest->full_name ?? 'Guest' }}</b>
                     </p>
                     <p class="p-5">
+
+                    @php
+                        // Combine date and time into a single Carbon datetime
+                        $eventDateTime = \Carbon\Carbon::parse($event->event_date . ' ' . $event->arrival_time);
+                    @endphp
+                
                     <div
                         class="grid text-gray-500 auto-cols-max grid-flow-col gap-5 text-center items-center justify-center">
                         <div class="flex flex-col">
                             <span class="countdown font-mono text-5xl">
-                                <span id="days" style="--value:8;"></span>
+                                <span id="days" style="--value:0;"></span>
                             </span>
                             days
                         </div>
                         <div class="flex flex-col">
                             <span class="countdown font-mono text-5xl">
-                                <span id="hours" style="--value:12;"></span>
+                                <span id="hours" style="--value:0;"></span>
                             </span>
                             hours
                         </div>
                         <div class="flex flex-col">
                             <span class="countdown font-mono text-5xl">
-                                <span id="minutes" style="--value:02;"></span>
+                                <span id="minutes" style="--value:0;"></span>
                             </span>
                             min
                         </div>
                         <div class="flex flex-col">
                             <span class="countdown font-mono text-5xl">
-                                <span id="seconds" style="--value:59;"></span>
+                                <span id="seconds" style="--value:0;"></span>
                             </span>
                             sec
                         </div>
@@ -74,7 +80,7 @@
 
     </div>
 
-    <script>
+    <!-- <script>
         // ⏳ Start countdown (e.g. 15 days from now)
         let totalSeconds = (15 * 24 * 60 * 60) + (10 * 60 * 60) + (24 * 60) + 59;
 
@@ -103,5 +109,39 @@
             m.style.setProperty("--value", minutes);
             s.style.setProperty("--value", seconds);
         }, 1000);
-    </script>
+    </script> -->
+
+    <script>
+    // 🕒 Get event datetime from PHP
+    const eventTime = new Date("{{ $eventDateTime->format('Y-m-d H:i:s') }}").getTime();
+
+    const d = document.getElementById("days");
+    const h = document.getElementById("hours");
+    const m = document.getElementById("minutes");
+    const s = document.getElementById("seconds");
+
+    const timer = setInterval(() => {
+        const now = new Date().getTime();
+        let totalSeconds = Math.floor((eventTime - now) / 1000);
+
+        if (totalSeconds <= 0) {
+            clearInterval(timer);
+            d.style.setProperty("--value", 0);
+            h.style.setProperty("--value", 0);
+            m.style.setProperty("--value", 0);
+            s.style.setProperty("--value", 0);
+            return;
+        }
+
+        const days = Math.floor(totalSeconds / (24 * 3600));
+        const hours = Math.floor((totalSeconds % (24 * 3600)) / 3600);
+        const minutes = Math.floor((totalSeconds % 3600) / 60);
+        const seconds = totalSeconds % 60;
+
+        d.style.setProperty("--value", days);
+        h.style.setProperty("--value", hours);
+        m.style.setProperty("--value", minutes);
+        s.style.setProperty("--value", seconds);
+    }, 1000);
+</script>
 @endsection
