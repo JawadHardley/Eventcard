@@ -67,9 +67,9 @@
                                         </a>
                                     </li>
                                     <li>
-                                        <!-- <a href="{{ route('user.cardview', ['event' => $events->id]) }}">
+                                        <a href="#">
                                             <i class="fa fa-eye"></i> See Card
-                                        </a> -->
+                                        </a>
                                     </li>
                                     <li>
                                         <a onclick="csvmodal.showModal()">
