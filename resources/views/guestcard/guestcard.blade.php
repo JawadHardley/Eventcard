@@ -15,16 +15,18 @@
                     alt="Shoes" class="rounded-xl border border-blue-700/10" />
             </figure>
             <div class="card-body">
-                <h2 class="card-title mb-5 font-bold text-xl">
+                <h2 class="card-title text-center mb-5 font-bold text-xl">
                     {{ $event->order_name }}
                 </h2>
                 <p class="teal">
                     <i class="fa fa-map-location-dot text-xl mr-3 dark:text-indigo-900"></i>
-                    {{ $event->event_location ?? 'missing' }}
+                    {{ $event->event_location }}, {{ $event->event_desc }}
                 </p>
                 <p class="teal">
                     <i class="fa fa-calendar-day text-xl mr-3 dark:text-indigo-900"></i>
-                    {{ $event->event_date ?? 'xxx, xx-xx-2xx  | x:xx PM' }}
+                    {{ $event->event_date ? \Carbon\Carbon::parse($event->event_date)->format('l, d-M-Y') : 'missing' }}
+                                            |
+                    {{ $event->arrival_time ? \Carbon\Carbon::parse($event->arrival_time)->format('g:i A') : 'missing PM' }}
                 </p>
                 <p class="teal">
                     <i class="fa fa-shirt text-xl mr-3 text-[rgb(183,110,121)] dark:text-indigo-900"></i>
