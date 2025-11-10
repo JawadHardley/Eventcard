@@ -36,8 +36,8 @@
                         <div class="flex w-full flex-col">
                             <div class="divider divider-[rgba(183,110,121,1)] mt-0"> </div>
                         </div>
-                        <p class="p-0 text-base text-center">
-                            Familia ya Anyosisye B. Mwandumbya wa Magomeni Kagera, Wanapenda kukualika <br /> <span class="font-bold text-indigo-900">{{ strtoupper($guest->full_name) }}</span> <br />  Kwenye sendoff ya binti yao mpendwa  <br /> <span class="font-bold">{{ $event->event_host }}</span>
+                        <p class="p-0 text-base text-center mt-1">
+                            Familia ya Anyosisye B. Mwandumbya wa Magomeni Kagera, Wanapenda kukualika <br /> <span class="inline-block font-bold text-indigo-900 my-2">{{ strtoupper($guest->full_name) }}</span> <br />  Kwenye sendoff ya binti yao mpendwa  <br /> <span class="font-bold">{{ $event->event_host }}</span>
                         </p>
 
                         <div class="w-full max-w-full mt-4 p-0">
