@@ -39,11 +39,11 @@ class UserController extends Controller
         ]);
     }
 
-    public function cardview($event, Request $request)
+    public function cardview($event, $guest, Request $request)
     {
         // find event by id
         $eventModel = Event::find($event);
-        $guest = Guest::where('qrcode', "GUEST-YYZGVRBYPR")->first();
+        $guests = Guest::where('id', $guest->id)->first();
 
         if (!$eventModel) {
             // not found -> 404 or you can customize
@@ -58,7 +58,7 @@ class UserController extends Controller
         return view('cardview', [
             'user' => $request->user(),
             'event' => $eventModel,
-            'guest' => $guest,
+            'guest' => $guests,
         ]);
     }
 }

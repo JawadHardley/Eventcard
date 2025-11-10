@@ -67,9 +67,9 @@
                                         </a>
                                     </li>
                                     <li>
-                                        <a href="{{ route('user.cardview', ['event' => $events->id]) }}">
+                                        <!-- <a href="{{ route('user.cardview', ['event' => $events->id]) }}">
                                             <i class="fa fa-eye"></i> See Card
-                                        </a>
+                                        </a> -->
                                     </li>
                                     <li>
                                         <a onclick="csvmodal.showModal()">
@@ -281,6 +281,10 @@
                                         </div>
                                         <div class="dd">
                                             <a href="{{ route('user.generateCardImage', ['code' => $events->id, 'guest' => $guest->id]) }}"
+                                                id="downloadBtn" class="btn btn-primary">Download Card</a>
+
+                                                
+                                            <a href="{{ route('user.cardview', ['event' => $events->id, 'guest' => $guest->id]) }}"
                                                 id="downloadBtn" class="btn btn-primary">Download Card</a>
                                         </div>
                                         <form method="POST" action="{{ route('user.guestupdate', $guest->id) }}"
