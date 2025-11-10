@@ -39,7 +39,7 @@ class UserController extends Controller
         ]);
     }
 
-    public function cardview($event, $guest, Request $request)
+    public function cardview(Request $request, $event, $guest)
     {
         // find event by id
         $eventModel = Event::find($event);
