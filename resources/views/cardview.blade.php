@@ -4,11 +4,6 @@
         <div class="col-span-12">
             <div class="flex justify-center py-10">
 
-                <div class="flex justify-center my-5">
-                    <a href="{{ route('user.generateCardImage', ['code' => $event->id, 'guest' => $guest->id]) }}"
-                        id="downloadBtn" class="btn btn-primary">Download Card</a>
-                </div>
-
                 <div id="idcard" class="card bg-base-100 w-96 shadow-lg border-2 border-indigo-900/20">
                     <div class="relative">
                         @php

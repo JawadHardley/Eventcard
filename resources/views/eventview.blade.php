@@ -285,7 +285,7 @@
 
                                                 
                                             <a href="{{ route('user.cardview', ['event' => $events->id, 'guest' => $guest->id]) }}"
-                                                id="downloadBtn" class="btn btn-primary">Download Card</a>
+                                                id="downloadBtn" target="_blank" class="btn btn-success">View Card</a>
                                         </div>
                                         <form method="POST" action="{{ route('user.guestupdate', $guest->id) }}"
                                             class="w-full">
@@ -374,13 +374,13 @@
                                                     S/N: {{ $guest->invitation_code ?? 'missing' }} <br /> <br />
 
                                                     Location: https://maps.app.goo.gl/JqaKFPZhVwuCUURo6
-                                                    <br />
-                                                    Designed by TapEventCard 0778515202
 
                                                     <br /> <br />
 
                                                     Asante na Karibu Sana <br />
                                                     {{ $guest->more }}
+                                                    <br /><br />
+                                                    Designed by TapEventCard 0778515202
 
                                                 </div>
 
