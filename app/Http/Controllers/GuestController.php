@@ -262,17 +262,17 @@ class GuestController extends Controller
             mkdir($dir, 0755, true);
         }
 
-        $instance = "wss://chrome.browserless.io?token=2TOfQNijXLG60ghe2fdcf267cfee41c6251afb191c8f39aeb";
+        $remote = env('BROWSERLESS_URL');
 
         Browsershot::html($html)
-            ->setRemoteInstance($instance)
+            ->setRemoteInstance($remote) // 👈 THIS forces cloud chromium
             ->windowSize(650, 1000)
             ->deviceScaleFactor(2)
             ->waitUntilNetworkIdle()
             ->select('#idcard')
             ->timeout(60)
             ->setDelay(300)
-            ->noSandbox()
+            ->noSandbox() 
             ->save($path);
 
         return response()->download($path, $fileName);
