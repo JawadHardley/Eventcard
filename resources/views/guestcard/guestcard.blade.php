@@ -15,20 +15,20 @@
                     alt="Shoes" class="rounded-xl border border-blue-700/10" />
             </figure>
             <div class="card-body">
-                <h2 class="card-title mb-5 font-bold text-xl">SARAH <span class="dark:text-indigo-900">&</span> JOHN's
-                    Wedding
+                <h2 class="card-title mb-5 font-bold text-xl">
+                    {{ $event->order_name }}
                 </h2>
                 <p class="teal">
                     <i class="fa fa-map-location-dot text-xl mr-3 dark:text-indigo-900"></i>
-                    {{ $order->location ?? 'Serena Hotel, Dar es salaam' }}
+                    {{ $event->event_location ?? 'missing' }}
                 </p>
                 <p class="teal">
                     <i class="fa fa-calendar-day text-xl mr-3 dark:text-indigo-900"></i>
-                    {{ $order->date ?? 'Saturday, 20-Oct-2025  |  6:00 PM' }}
+                    {{ $event->event_date ?? 'xxx, xx-xx-2xx  | x:xx PM' }}
                 </p>
                 <p class="teal">
-                    <i class="fa fa-shirt text-xl mr-3 dark:text-indigo-900"></i>
-                    {{ $order->dresscode ?? 'Navy Blue' }}
+                    <i class="fa fa-shirt text-xl mr-3 text-[rgb(183,110,121)] dark:text-indigo-900"></i>
+                    {{ $event->dresscode ?? 'Navy Blue' }}
                 </p>
                 <div class="items-center">
                     <div class="divider divider-primary">

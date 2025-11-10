@@ -24,13 +24,21 @@ class GuestController extends Controller
 
         if (!$guest) {
             // If code is invalid or not found
-            return view('guestcard.notguestcard'); // we’ll create this view too
+            return view('guestcard.notguestcard'); // fallback view
         }
 
-        // If guest found, pass data to the view
+        // Load the event related to this guest
+        $event = Event::find($guest->order_id);
+
+        if (!$event) {
+            // Optional: handle if event not found
+            return view('guestcard.notguestcard')->with('message', 'Event not found.');
+        }
+
+        // Pass both guest and event data to the view
         return view('guestcard.guestcard', [
             'guest' => $guest,
-            'order' => $guest->order_id, // order = event details
+            'event' => $event, // now you have all event fields
         ]);
     }
 
