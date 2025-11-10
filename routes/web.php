@@ -52,7 +52,7 @@ Route::prefix('user')
             ->name('logout');
         Route::get('/{event}/cameralog', [UserController::class, 'cameralog'])->name('cameralog');
         Route::get('/card/export-image/{code}/{guest}', [GuestController::class, 'generateCardImage'])->name('generateCardImage');
-        Route::get('/{event}/card', [UserController::class, 'cardview'])->name('cardview');
+        Route::get('/{event}/{guest}/card', [UserController::class, 'cardview'])->name('cardview');
         Route::get('/guestlist', [GuestController::class, 'guestlist'])->name('guestlist');
         Route::get('/verify-qr', [qrverify::class, 'verify'])->name('verify');
         Route::get('/verify-card', [qrverify::class, 'markfield'])->name('markfield');
