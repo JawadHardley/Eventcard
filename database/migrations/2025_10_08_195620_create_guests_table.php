@@ -28,6 +28,7 @@ return new class extends Migration
             $table->text('more')->nullable();
             $table->enum('attendance_status', ['active', 'onhold', 'complete'])->default('active');
             $table->string('qrcode', 255)->nullable();
+            $table->text('counter')->nullable();
             $table->string('invitation_code', 6)->nullable();
             $table->timestamps();
         });

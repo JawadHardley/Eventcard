@@ -66,6 +66,16 @@
                                             <i class="fa fa-trash text-rose-800"></i> Delete Event
                                         </a>
                                     </li>
+                                    <li>
+                                        <a href="{{ route('user.cardview', ['event' => $events->id]) }}">
+                                            <i class="fa fa-eye"></i> See Card
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a onclick="csvmodal.showModal()">
+                                            <i class="fa fa-table text-teal-800"></i> Multi-upload Guests
+                                        </a>
+                                    </li>
                                 </ul>
 
                                 <a href="{{ route('user.cameralog', ['event' => $events->id]) }}"
@@ -157,6 +167,7 @@
                             <tr>
                                 <th>s/n</th>
                                 <th>Guest name</th>
+                                <th>Contact Validity</th>
                                 <th>Qr/Code</th>
                                 <th>Method</th>
                                 <th>Card</th>
@@ -180,7 +191,27 @@
                                             <div class="font-normal text-gray-500">{{ $guest->phone }}</div>
                                         </div>
                                     </td>
-                                    <td>{{ $guest->qrcode }}</td>
+                                    @php
+                                        $digits = preg_replace('/\D/', '', $guest->phone);
+                                    @endphp
+
+                                    <td>
+                                        @if (strlen($digits) == 10)
+                                            <span class="text-success">
+                                                <div class="badge badge-dash badge-accent">Valid</div>
+                                            </span>
+                                        @elseif(strlen($digits) < 10)
+                                            <span class="text-danger">
+                                                <div class="badge badge-dash badge-warning">invalid--</div>
+                                            </span>
+                                        @else
+                                            <span class="text-danger">
+                                                <div class="badge badge-dash badge-error">invalid++</div>
+                                            </span>
+                                        @endif
+                                    </td>
+
+                                    <td>{{ $guest->invitation_code }}</td>
                                     <td>
 
                                         @if ($guest->delivery_method == 'sms')
@@ -203,11 +234,22 @@
                                         @endif
                                     </td>
                                     <td>
-                                        @if ($guest->verified == 1)
-                                            <div class="badge badge-soft badge-success">used</div>
+                                        @if ($guest->title == 'double')
+                                            @if ($guest->verified == 0 && $guest->counter == '[0/2]')
+                                                <div class="badge badge-soft badge-error">pending</div>
+                                            @elseif($guest->verified == 1 && $guest->counter == '[1/2]')
+                                                <div class="badge badge-soft badge-warning">used [1/2]</div>
+                                            @elseif($guest->verified == 1 && $guest->counter == '[2/2]')
+                                                <div class="badge badge-soft badge-success">used [2/2]</div>
+                                            @endif
                                         @else
-                                            <div class="badge badge-soft badge-error">pending</div>
+                                            @if ($guest->verified == 1)
+                                                <div class="badge badge-soft badge-success">used</div>
+                                            @else
+                                                <div class="badge badge-soft badge-error">pending</div>
+                                            @endif
                                         @endif
+
                                     </td>
                                     <td>
                                         <a href="#" class="text-blue-500/90"
@@ -236,6 +278,10 @@
                                         </div>
                                         <div class="divider">
                                             <i class="fa fa-object-ungroup"></i>
+                                        </div>
+                                        <div class="dd">
+                                            <a href="{{ route('user.generateCardImage', ['code' => $events->id, 'guest' => $guest->id]) }}"
+                                                id="downloadBtn" class="btn btn-primary">Download Card</a>
                                         </div>
                                         <form method="POST" action="{{ route('user.guestupdate', $guest->id) }}"
                                             class="w-full">
@@ -297,6 +343,42 @@
                                                 <label class="text-base mt-5">Address</label>
                                                 <textarea class="textarea w-full" name="address" placeholder="Bio">{{ $guest->address }}
                                                 </textarea>
+
+                                                <label class="text-base mt-5">Invitation Text</label>
+
+                                                <div class="text-base">
+                                                    <h3 class="font-bold">{{ $events->order_name }}</h3>
+                                                    <br />
+
+                                                    <p class="py-3">
+                                                        Habari <span class="font-bold">{{ $guest->full_name }}</span>,
+                                                        tunayo
+                                                        furaha kukualika kwenye send-off
+                                                        ya <span class="font-bold">{{ $events->event_host }}</span>
+
+                                                    </p>
+
+                                                    Tarehe:
+                                                    {{ $events->event_date ? \Carbon\Carbon::parse($events->event_date)->format('l, d-M-Y') : 'missing' }}
+                                                    |
+                                                    {{ $events->arrival_time ? \Carbon\Carbon::parse($events->arrival_time)->format('g:i A') : 'missing PM' }}
+                                                    <br />
+                                                    Ukumbi: {{ $events->event_location ?? 'missing' }} <br />
+                                                    Mahali (location): {{ $events->event_desc ?? 'missing' }} <br />
+                                                    dresscode: Rosegold <br />
+                                                    Aina: {{ $guest->title ?? 'missing' }} <br />
+                                                    S/N: {{ $guest->invitation_code ?? 'missing' }} <br /> <br />
+
+                                                    Location: https://maps.app.goo.gl/JqaKFPZhVwuCUURo6
+                                                    <br />
+                                                    Designed by TapEventCard 0778515202
+
+                                                    <br /> <br />
+
+                                                    Asante na Karibu Sana <br />
+                                                    {{ $guest->more }}
+
+                                                </div>
 
                                                 <div class="pt-4">
                                                     <button type="submit" class="btn btn-primary w-full">Save</button>
@@ -502,6 +584,35 @@
                     </button>
                 </form>
             </fieldset>
+        </div>
+    </dialog>
+
+
+    <!-- Open the modal for excel upload -->
+    <dialog id="csvmodal" class="modal">
+        <div class="modal-box">
+            <h3 class="text-lg font-bold text-center mb-10">
+                <i class="fa fa-table mx-1 text-teal-900"></i> Multi-upload Guests with Excel/CSV
+            </h3>
+            <form method="POST" action="{{ route('user.importGuests') }}" enctype="multipart/form-data">
+                @csrf
+                <div class="grid grid-cols-1 md:grid-cols-1 gap-4 p-2">
+                    <div>
+                        <label class="label font-semibold mb-5">Upload Excel file</label>
+                        <input type="file" name="file" class="input input-bordered w-full" />
+                        <input type="hidden" name="event_id" value="{{ $events->id }}" />
+                    </div>
+                </div>
+
+                <div class="divider"></div>
+                <div class="modal-action">
+                    <form method="dialog">
+                        <!-- if there is a button in form, it will close the modal -->
+                        <button class="btn">Close</button>
+                        <button type="submit" class="btn btn-success"><i class="fa fa-arrow-up"></i> Save</button>
+                    </form>
+                </div>
+            </form>
         </div>
     </dialog>
 @endsection

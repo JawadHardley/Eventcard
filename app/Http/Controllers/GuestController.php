@@ -4,8 +4,16 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Guest;
+use App\Models\Event;
+use App\Imports\GuestImport;
 use Illuminate\Support\Str;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use AfricasTalking\SDK\AfricasTalking;
+use Spatie\Browsershot\Browsershot;
+use Illuminate\Support\Facades\Storage;
+use Maatwebsite\Excel\Facades\Excel;
+use Maatwebsite\Excel\Concerns\ToCollection;
+use Maatwebsite\Excel\Concerns\WithHeadingRow;
 
 class GuestController extends Controller
 {
@@ -122,6 +130,15 @@ class GuestController extends Controller
         $cleanPhone = $this->normalizePhone($validated['phone']);
         $validated['full_name'] = Str::title(strtolower($validated['full_name']));
 
+        // Generate unique 4-digit short code for this event
+        $eventId = $validated['event_id'];
+        do {
+            $shortCode = str_pad(rand(0, 9999), 4, '0', STR_PAD_LEFT);
+            $exists = Guest::where('order_id', $eventId)
+                ->where('invitation_code', $shortCode)
+                ->exists();
+        } while ($exists);
+
         $guest = Guest::create([
             'full_name' => $validated['full_name'],
             'title' => $validated['title'] ?? null,
@@ -130,7 +147,10 @@ class GuestController extends Controller
             'address' => $validated['address'] ?? null,
             'delivery_method' => $validated['delivery_method'],
             'order_id' => $validated['event_id'],
+            'counter' => '[0/2]',
+            'invitation_code' => $shortCode,
         ]);
+
 
         // Generate unique code
         $code = 'GUEST-' . strtoupper(Str::random(10));
@@ -234,5 +254,208 @@ class GuestController extends Controller
                 'status' => 'success',
                 'message' => 'Guest updated successfully!',
             ]);
+    }
+
+    public function testSms()
+    {
+        $username   = "eventcards";
+        $apiKey     = "atsk_6828b786a46709868d8d49d106e07ad1287e6646b6e172f07284bc1ba4572fbfcfcabee0";
+
+        $AT = new AfricasTalking($username, $apiKey);
+        $sms = $AT->sms();
+
+        $recipients = "+255778515202"; // your phone number
+        $message    = "Sendoff SMS test message from EventCard App.";
+        $from       = "AFRICASTALKING";    // your approved senderId
+
+        try {
+            $result = $sms->send([
+                'to'      => $recipients,
+                'message' => $message,
+                'from'    => $from
+            ]);
+
+            return response()->json($result);
+        } catch (Exception $e) {
+            return response()->json(['error' => $e->getMessage()]);
+        }
+    }
+
+    // public function testSms()
+    // {
+    //     $username   = "sandbox";
+    //     $apiKey     = "atsk_cefff8c1e236e0df3dce2fe07271ccdbab83f4cc9c6a755174b48dd36195f87c74bbf70a";
+
+    //     $AT  = new AfricasTalking($username, $apiKey, 'sandbox');
+    //     $sms = $AT->sms();
+
+    //     $recipients = "+255778515202"; // sandbox test number
+    //     $message    = "Sendoff SMS test message from EventCard App.";
+    //     $from       = "AFRICASTALKING"; // default sandbox sender
+
+    //     try {
+    //         $result = $sms->send([
+    //             'to'      => $recipients,
+    //             'message' => $message,
+    //             'from'    => $from
+    //         ]);
+
+    //         return response()->json($result);
+    //     } catch (\Exception $e) {
+    //         return response()->json(['error' => $e->getMessage()]);
+    //     }
+    // }
+
+    public function generateCardImage($events, $guests, Request $request)
+    {
+        // find event by id 
+        $event = Event::find($events);
+        $guest = Guest::where('id', $guests)->first();
+
+        $html = view('cardview', compact('event', 'guest'))->render();
+
+        $fileName = 'event-card-' . time() . '.png';
+        $path = storage_path('app/public/cards/' . $fileName);
+
+        $dir = storage_path('app/public/cards');
+
+        if (!file_exists($dir)) {
+            mkdir($dir, 0755, true);
+        }
+
+        Browsershot::html($html)
+            ->windowSize(650, 1000) // adjust to your card design dimensions
+            ->deviceScaleFactor(2) // HD quality
+            ->waitUntilNetworkIdle()
+            ->select('#idcard')
+            ->save($path);
+
+        return response()->download($path, $fileName);
+    }
+
+    public function importGuests(Request $request)
+    {
+        ini_set('memory_limit', '512M');
+        set_time_limit(300);
+
+        $request->validate([
+            'file' => 'required|file|mimes:xlsx,xls,csv|max:20480',
+            'event_id' => 'required|numeric',
+        ]);
+
+        $requiredHeaders = [
+            's/n',
+            'full name',
+            'card type',
+            'method',
+            'phone',
+            'email',
+            'address',
+        ];
+
+        try {
+            // Read raw Excel to array
+            $rows = Excel::toArray([], $request->file('file'))[0];
+
+            if (empty($rows) || count($rows) < 2) {
+                return back()->withErrors(['file' => 'Excel file is empty or missing data.']);
+            }
+
+            // Extract headers from first row
+            $headers = array_map('trim', $rows[0]);
+
+            // Map headers to lowercase for comparison
+            $headersLower = array_map('strtolower', $headers);
+
+            // Check all required columns exist
+            foreach ($requiredHeaders as $header) {
+                if (!in_array($header, $headersLower)) {
+                    throw new \Exception("Missing required column: $header");
+                }
+            }
+
+            // Slice out data rows
+            $dataRows = array_slice($rows, 1);
+
+            // Filter out completely empty rows and reindex
+            $dataRows = array_values(array_filter($dataRows, function ($row) {
+                return array_filter($row, fn($val) => trim($val) !== '');
+            }));
+
+            $usedPhones = [];
+            $emptyRowCount = 0;
+
+            foreach ($dataRows as $rowIndex => $row) {
+                // Stop if 2 empty rows in a row
+                if (!array_filter($row, fn($val) => trim($val) !== '')) {
+                    $emptyRowCount++;
+                    if ($emptyRowCount >= 2) break;
+                    continue;
+                }
+                $emptyRowCount = 0;
+
+                // Combine headers with row
+                $rowAssoc = array_combine($headersLower, $row);
+
+                // Normalize data
+                $fullName = Str::title(strtolower(trim($rowAssoc['full name'])));
+                $phone = strtolower(trim($rowAssoc['phone'] ?? ''));
+                $method = strtolower(trim($rowAssoc['method'] ?? ''));
+                $email = strtolower(trim($rowAssoc['email'] ?? ''));
+                $address = strtolower(trim($rowAssoc['address'] ?? ''));
+                $cardType = strtolower(trim($rowAssoc['card type'] ?? ''));
+
+                if (!$fullName || !$phone || !$method) {
+                    continue; // skip invalid row
+                }
+
+                // Check duplicates in Excel
+                if (in_array($phone, $usedPhones)) {
+                    throw new \Exception("Duplicate phone found in Excel: $phone (row " . ($rowIndex + 2) . ")");
+                }
+                $usedPhones[] = $phone;
+
+                // Normalize phone using your controller method
+                $cleanPhone = $this->normalizePhone($phone);
+
+                // Generate unique 4-digit code per event
+                do {
+                    $shortCode = str_pad(rand(0, 9999), 4, '0', STR_PAD_LEFT);
+                    $exists = Guest::where('order_id', $request->event_id)
+                        ->where('invitation_code', $shortCode)
+                        ->exists();
+                } while ($exists);
+
+                // Create guest
+                $guest = Guest::create([
+                    'full_name' => $fullName,
+                    'title' => strtolower($cardType),
+                    'email' => $email ?: null,
+                    'phone' => $cleanPhone,
+                    'address' => $address ?: null,
+                    'delivery_method' => $method,
+                    'order_id' => $request->event_id,
+                    'counter' => '[0/2]',
+                    'invitation_code' => $shortCode,
+                ]);
+
+                // Generate public guest code & URL
+                $code = 'GUEST-' . strtoupper(Str::random(10));
+                $publicUrl = url('/guest/' . $code);
+
+                // Update guest record
+                $guest->update([
+                    'qrcode' => $code,
+                    'more' => $publicUrl,
+                ]);
+
+                // Generate QR code SVG (optional storage)
+                QrCode::format('svg')->size(300)->generate($publicUrl);
+            }
+
+            return back()->with('status', 'success')->with('message', 'Guests imported successfully 🎉');
+        } catch (\Exception $e) {
+            return back()->with('status', 'invalid')->with('message', $e->getMessage());
+        }
     }
 }

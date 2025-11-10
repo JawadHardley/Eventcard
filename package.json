@@ -21,6 +21,7 @@
     },
     "dependencies": {
         "@tabler/core": "^1.4.0",
-        "html5-qrcode": "^2.3.8"
+        "html5-qrcode": "^2.3.8",
+        "puppeteer": "^24.29.1"
     }
 }

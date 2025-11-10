@@ -28,8 +28,8 @@
                     </div>
                     <div class="divider">OR</div>
                     <div class="my-2">
-                        <input type="text" placeholder="****" class="input input-lg mb-4" />
-                        <button id="startCamera" class="btn btn-outline btn-success my-2">
+                        <input type="text" placeholder="****" name="invitation_code" class="input input-lg mb-4" />
+                        <button id="startInput" class="btn btn-outline btn-success my-2">
                             <i class="fa fa-circle-check"></i> Manual Verify
                         </button>
                     </div>
@@ -1083,6 +1083,10 @@
         const textQr = document.querySelector('.textqr');
         const canvas = document.getElementById('reader');
 
+        // for manual input
+        const startInputBtn = document.getElementById('startInput');
+        const inputField = document.querySelector('input[name="invitation_code"]'); // matches your template typo
+
         // Modals (keep dialog elements, but use unique inner IDs)
         const modalInvalid = document.getElementById("my_modal_2");
         const modalValid = document.getElementById("my_modal_3");
@@ -1212,10 +1216,12 @@
                     modalInvalid.showModal();
                 } else if (data.status === "valid") {
                     valid_message.textContent = data.name;
+                    // show counter only for double tickets
+                    const counterText = (data.type === 'double' && data.counter) ? ` ${data.counter}` : '';
                     valid_badge_container.innerHTML = `
-                    <div class="badge badge-soft ${data.type == 'single' ? 'badge-primary' : 'badge-secondary'}">${data.type}</div>
-                    <div class="badge badge-soft badge-success">Not checked-in</div>
-                `;
+                        <div class="badge badge-soft ${data.type == 'single' ? 'badge-primary' : 'badge-secondary'}">${data.type}${counterText}</div>
+                        <div class="badge badge-soft badge-success">Not checked-in</div>
+                    `;
                     valid_title.textContent = "Valid Card";
                     valid_big_icon.className = "fa fa-circle-check text-success";
                     valid_verifyBtn.style.display = "inline-block";
@@ -1236,12 +1242,13 @@
                                 valid_title.textContent = "Checked In";
                                 valid_big_icon.className = "fa fa-circle-check text-accent";
                                 valid_message.textContent = markData.name;
-                                valid_badge_container.innerHTML =
-                                    `
-                                <div class="badge badge-soft ${markData.type == 'single' ? 'badge-primary' : 'badge-secondary'}">${markData.type}</div>
-                                <div class="badge badge-soft badge-secondary">Used</div>
-                                <p class="p-2">Card Checked in </p>
-                            `;
+                                const markCounterText = (markData.type === 'double' && markData.counter) ?
+                                    ` ${markData.counter}` : '';
+                                valid_badge_container.innerHTML = `
+                                    <div class="badge badge-soft ${markData.type == 'single' ? 'badge-primary' : 'badge-secondary'}">${markData.type}${markCounterText}</div>
+                                    <div class="badge badge-soft badge-secondary">Used</div>
+                                    <p class="p-2">Card Checked in </p>
+                                `;
                                 valid_verifyBtn.style.display = "none";
                             } else {
                                 valid_verifyBtn.disabled = false;
@@ -1255,10 +1262,11 @@
                     };
                 } else if (data.status === "already_checked") {
                     used_message.textContent = data.name;
+                    const usedCounterText = (data.type === 'double' && data.counter) ? ` ${data.counter}` : '';
                     used_badge_container.innerHTML = `
-                                <div class="badge badge-soft ${data.type == 'single' ? 'badge-primary' : 'badge-secondary'}">${data.type}</div>
-                                <div class="badge badge-soft badge-secondary">Used</div>
-                                <p class="p-2">Card Checked in </p>`;
+                        <div class="badge badge-soft ${data.type == 'single' ? 'badge-primary' : 'badge-secondary'}">${data.type}${usedCounterText}</div>
+                        <div class="badge badge-soft badge-secondary">Used</div>
+                        <p class="p-2">Card Checked in </p>`;
                     modalUsed.showModal();
                 }
 
@@ -1268,6 +1276,109 @@
                 modalInvalid.showModal();
             }
         }
+
+        // helper to handle server response (same as QR flow)
+        async function handleVerifyResponse(resp) {
+            let data;
+            try {
+                data = await resp.json();
+            } catch (e) {
+                console.error('Invalid JSON from server', e);
+                invalid_message.textContent = "Server error verifying card";
+                modalInvalid.showModal();
+                return;
+            }
+
+            if (data.status === 'invalid') {
+                invalid_message.textContent = data.message || "Card does not exist !!";
+                modalInvalid.showModal();
+            } else if (data.status === 'valid') {
+                valid_message.textContent = data.name || '';
+                const counterText2 = (data.type === 'double' && data.counter) ? ` ${data.counter}` : '';
+                valid_badge_container.innerHTML = `
+                    <div class="badge badge-soft ${data.type == 'single' ? 'badge-primary' : 'badge-secondary'}">${data.type}${counterText2}</div>
+                    <div class="badge badge-soft badge-success">Not checked-in</div>
+                `;
+                valid_title.textContent = "Valid Card";
+                valid_big_icon.className = "fa fa-circle-check text-success";
+                valid_verifyBtn.style.display = "inline-block";
+                valid_verifyBtn.disabled = false;
+                valid_verifyBtn.innerHTML = `<i class="fa-solid fa-square-check mr-1"></i> Check-in`;
+                modalValid.showModal();
+
+                valid_verifyBtn.onclick = async () => {
+                    valid_verifyBtn.disabled = true;
+                    valid_verifyBtn.innerHTML = `<i class="fa fa-spinner fa-spin mr-1"></i> Checking...`;
+
+                    try {
+                        const markRes = await fetch(
+                            `/user/verify-card?code=${encodeURIComponent(currentQR || inputField.value.trim())}&mark=1&event_id=${eventId}`
+                        );
+                        const markData = await markRes.json();
+                        if (markData.status === "checked_in") {
+                            valid_title.textContent = "Checked In";
+                            valid_big_icon.className = "fa fa-circle-check text-accent";
+                            valid_message.textContent = markData.name;
+                            valid_badge_container.innerHTML = `
+                                <div class="badge badge-soft ${markData.type == 'single' ? 'badge-primary' : 'badge-secondary'}">${markData.type} ${markData.counter ?? ''}</div>
+                                <div class="badge badge-soft badge-secondary">Used</div>
+                                <p class="p-2">Card Checked in </p>
+                            `;
+                            valid_verifyBtn.style.display = "none";
+                        } else {
+                            valid_verifyBtn.disabled = false;
+                            valid_verifyBtn.innerHTML = "Try Again";
+                        }
+                    } catch (error) {
+                        console.error("Error marking check-in:", error);
+                        valid_verifyBtn.disabled = false;
+                        valid_verifyBtn.innerHTML = "Try Again";
+                    }
+                };
+            } else if (data.status === 'already_checked') {
+                used_message.textContent = data.name || '';
+                const usedCounterText2 = (data.type === 'double' && data.counter) ? ` ${data.counter}` : '';
+                used_badge_container.innerHTML = `
+                    <div class="badge badge-soft ${data.type == 'single' ? 'badge-primary' : 'badge-secondary'}">${data.type}${usedCounterText2}</div>
+                    <div class="badge badge-soft badge-secondary">Used</div>
+                    <p class="p-2">Card Checked in </p>`;
+                modalUsed.showModal();
+            } else {
+                invalid_message.textContent = data.message || 'Unhandled response';
+                modalInvalid.showModal();
+            }
+        }
+
+        // manual input verify
+        startInputBtn.addEventListener('click', async () => {
+            const code = inputField.value.trim();
+            if (!code || code.length === 0) {
+                alert('Enter code to verify');
+                return;
+            }
+
+            // if scanner running pause it (so camera doesn't keep scanning)
+            try {
+                if (isRunning) {
+                    await html5QrCode.pause();
+                }
+            } catch (e) {
+                // ignore
+            }
+
+            // mark currentQR for verify button use
+            currentQR = code;
+
+            try {
+                const resp = await fetch(
+                    `/user/verify-qr?code=${encodeURIComponent(code)}&event_id=${eventId}`);
+                await handleVerifyResponse(resp);
+            } catch (err) {
+                console.error("Error verifying manual code:", err);
+                invalid_message.textContent = "Error verifying code";
+                modalInvalid.showModal();
+            }
+        });
 
         // --- RESUME AFTER MODAL CLOSE ---
         document.querySelectorAll("dialog").forEach(modal => {
@@ -1283,7 +1394,7 @@
 
                 setTimeout(async () => {
                     try {
-                        await html5QrCode.resume();
+                        if (isRunning) await html5QrCode.resume();
                     } catch (err) {
                         console.log("Scanner resume ignored", err);
                     }

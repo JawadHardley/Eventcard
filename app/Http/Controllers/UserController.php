@@ -38,4 +38,27 @@ class UserController extends Controller
             'event' => $eventModel,
         ]);
     }
+
+    public function cardview($event, Request $request)
+    {
+        // find event by id
+        $eventModel = Event::find($event);
+        $guest = Guest::where('qrcode', "GUEST-YYZGVRBYPR")->first();
+
+        if (!$eventModel) {
+            // not found -> 404 or you can customize
+            abort(404, 'Event not found.');
+        }
+
+        // check ownership
+        if ($eventModel->user_id != Auth::id()) {
+            abort(403, 'Unauthorized — you do not own this event.');
+        }
+
+        return view('cardview', [
+            'user' => $request->user(),
+            'event' => $eventModel,
+            'guest' => $guest,
+        ]);
+    }
 }

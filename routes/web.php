@@ -14,6 +14,9 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [MasterController::class, 'index'])->name('landing');
 Route::get('/guest/{code}', [GuestController::class, 'showpublic'])->name('showpublic');
 
+
+Route::get('/test-sms', [GuestController::class, 'testSms']);
+
 Route::middleware(['auth'])->group(function () {
     // Route::get('/dashboard', function () {
     //     return view('dashboard');
@@ -48,6 +51,8 @@ Route::prefix('user')
         Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
             ->name('logout');
         Route::get('/{event}/cameralog', [UserController::class, 'cameralog'])->name('cameralog');
+        Route::get('/card/export-image/{code}/{guest}', [GuestController::class, 'generateCardImage'])->name('generateCardImage');
+        Route::get('/{event}/card', [UserController::class, 'cardview'])->name('cardview');
         Route::get('/guestlist', [GuestController::class, 'guestlist'])->name('guestlist');
         Route::get('/verify-qr', [qrverify::class, 'verify'])->name('verify');
         Route::get('/verify-card', [qrverify::class, 'markfield'])->name('markfield');
@@ -58,4 +63,5 @@ Route::prefix('user')
         Route::post('/guest/{id}/update', [GuestController::class, 'guestupdate'])->name('guestupdate');
         Route::post('/eventadd', [EventController::class, 'eventadd'])->name('eventadd');
         Route::post('/event/{id}/update', [EventController::class, 'eventupdate'])->name('eventupdate');
+        Route::post('/guests/import', [GuestController::class, 'importGuests'])->name('importGuests');
     });
