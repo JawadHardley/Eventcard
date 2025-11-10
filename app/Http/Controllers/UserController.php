@@ -43,11 +43,15 @@ class UserController extends Controller
     {
         // find event by id
         $eventModel = Event::find($event);
-        $guests = Guest::where('id', $guest->id)->first();
+        // $guests = Guest::where('id', $guest->id)->first();
+        $guests = Guest::find($guest);
 
         if (!$eventModel) {
-            // not found -> 404 or you can customize
             abort(404, 'Event not found.');
+        }
+
+        if (!$guests) {
+            abort(404, 'Guest not found.');
         }
 
         // check ownership
