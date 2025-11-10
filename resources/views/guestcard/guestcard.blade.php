@@ -4,7 +4,14 @@
 
         <div class="card bg-base-100 w-96 shadow-lg border-2 border-indigo-900/20">
             <figure class="px-5 pt-5">
-                <img src="https://joshuastruth.com/wp-content/uploads/2020/08/one-zone-studio-MwzvSYNccWk-unsplash-scaled.jpg"
+
+                @php
+                    $path = storage_path('app/public/event1x.jpeg'); // full filesystem path
+                    $imageData = base64_encode(file_get_contents($path));
+                    $mime = mime_content_type($path);
+                @endphp
+
+                <img src="data:{{ $mime }};base64,{{ $imageData }}"
                     alt="Shoes" class="rounded-xl border border-blue-700/10" />
             </figure>
             <div class="card-body">
