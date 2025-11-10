@@ -12,7 +12,7 @@
                 <div id="idcard" class="card bg-base-100 w-96 shadow-lg border-2 border-indigo-900/20">
                     <div class="relative">
                         @php
-                            $path = storage_path('app/public/event1x.jpg'); // full filesystem path
+                            $path = storage_path('app/public/event1x.jpeg'); // full filesystem path
                             $imageData = base64_encode(file_get_contents($path));
                             $mime = mime_content_type($path);
                         @endphp

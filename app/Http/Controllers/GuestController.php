@@ -262,11 +262,17 @@ class GuestController extends Controller
             mkdir($dir, 0755, true);
         }
 
+        $instance = "wss://chrome.browserless.io?token=2TOfQNijXLG60ghe2fdcf267cfee41c6251afb191c8f39aeb";
+
         Browsershot::html($html)
-            ->windowSize(650, 1000) // adjust to your card design dimensions
-            ->deviceScaleFactor(2) // HD quality
+            ->setRemoteInstance($instance)
+            ->windowSize(650, 1000)
+            ->deviceScaleFactor(2)
             ->waitUntilNetworkIdle()
             ->select('#idcard')
+            ->timeout(60)
+            ->setDelay(300)
+            ->noSandbox()
             ->save($path);
 
         return response()->download($path, $fileName);
