@@ -3,7 +3,7 @@
     <div class="flex justify-center py-10">
 
         <div class="card bg-base-100 w-96 shadow-lg border-2 border-indigo-900/20">
-            <figure class="px-5 pt-5">
+            <!-- <figure class="px-5 pt-5">
 
                 @php
                     $path = storage_path('app/public/event1x.jpeg'); // full filesystem path
@@ -13,7 +13,50 @@
 
                 <img src="data:{{ $mime }};base64,{{ $imageData }}"
                     alt="Shoes" class="rounded-xl border border-blue-700/10" />
+            </figure> -->
+
+            <figure class="px-5 pt-5 relative overflow-hidden rounded-xl border border-blue-700/10">
+
+                @php
+                    $images = [
+                        storage_path('app/public/event1x.jpeg'),
+                        storage_path('app/public/event2x.jpeg'),
+                        storage_path('app/public/event3x.jpeg'),
+                    ];
+
+                    $imageBlobs = [];
+
+                    foreach ($images as $path) {
+                        $imageBlobs[] = "data:" . mime_content_type($path) . ";base64," . base64_encode(file_get_contents($path));
+                    }
+                @endphp
+
+                <div id="slideshow" class="relative w-full h-64">
+                    @foreach ($imageBlobs as $index => $src)
+                        <img 
+                            src="{{ $src }}" 
+                            class="absolute inset-0 w-full h-full object-cover rounded-xl transition-opacity duration-1000 {{ $index === 0 ? 'opacity-100' : 'opacity-0' }}"
+                        >
+                    @endforeach
+                </div>
+
             </figure>
+
+            <script>
+            document.addEventListener("DOMContentLoaded", () => {
+                const slides = document.querySelectorAll("#slideshow img");
+                let current = 0;
+                setInterval(() => {
+                    slides[current].classList.remove("opacity-100");
+                    slides[current].classList.add("opacity-0");
+
+                    current = (current + 1) % slides.length;
+
+                    slides[current].classList.remove("opacity-0");
+                    slides[current].classList.add("opacity-100");
+                }, 5000); // 5 seconds per slide
+            });
+            </script>
             <div class="card-body">
                 <h2 class="card-title text-center mb-5 font-bold text-xl">
                     {{ $event->order_name }}
