@@ -35,7 +35,7 @@
                     @foreach ($imageBlobs as $index => $src)
                         <img 
                             src="{{ $src }}" 
-                            class="absolute inset-0 w-full h-full object-cover rounded-xl transition-opacity duration-1000 {{ $index === 0 ? 'opacity-100' : 'opacity-0' }}"
+                            class="rounded-xl transition-opacity duration-1000 {{ $index === 0 ? 'opacity-100' : 'opacity-0' }}"
                         >
                     @endforeach
                 </div>
