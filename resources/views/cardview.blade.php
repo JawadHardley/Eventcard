@@ -136,7 +136,7 @@
         </div>
     </div>
     <button onclick="captureCard()" 
-        class="fixed bottom-4 right-4 px-3 py-2 rounded-lg shadow-lg">
+        class="fixed bg-indigo-900/20 px-3 py-2 rounded-lg shadow-lg">
     Capture 💎
     </button>
 
