@@ -135,6 +135,17 @@
 
         </div>
     </div>
+    <button onclick="captureCard()" 
+        class="fixed bottom-4 right-4 z-[9999] bg-indigo-600 text-white px-3 py-2 rounded-lg shadow-lg">
+    Capture 💎
+    </button>
+
+    <script>
+        function captureCard() {
+        const el = document.querySelector('#idcard');
+        console.log(el); // highlight in DevTools Elements panel
+        }
+    </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/css-color-parser-js/1.0.3/css-color-parser.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
