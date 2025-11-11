@@ -15,48 +15,58 @@
                     alt="Shoes" class="rounded-xl border border-blue-700/10" />
             </figure> -->
 
-            <figure class="px-5 pt-5 relative overflow-hidden rounded-xl border border-blue-700/10">
+            <style>
+                .slider-container {
+                    width: 100%;
+                    height: auto;
+                    position: relative;
+                    aspect-ratio: 16/9; /* Keeps same shape nicely; can adjust */
+                }
 
-                @php
-                    $images = [
-                        storage_path('app/public/event1x.jpeg'),
-                        storage_path('app/public/event2x.jpeg'),
-                        storage_path('app/public/event3x.jpeg'),
-                    ];
+                .slider-image {
+                    transition: opacity 1.3s ease-in-out;
+                }
+            </style>
 
-                    $imageBlobs = [];
+            <figure class="px-5 pt-5 relative overflow-hidden">
 
-                    foreach ($images as $path) {
-                        $imageBlobs[] = "data:" . mime_content_type($path) . ";base64," . base64_encode(file_get_contents($path));
-                    }
-                @endphp
+                <div class="slider-container relative rounded-xl border border-blue-700/10">
 
-                <div id="slideshow" class="relative w-full h-64">
-                    @foreach ($imageBlobs as $index => $src)
+                    @php
+                        $images = [
+                            storage_path('app/public/event1x.jpeg'),
+                            storage_path('app/public/event2x.jpeg'),
+                            storage_path('app/public/event3x.jpeg'),
+                        ];
+                    @endphp
+
+                    @foreach ($images as $index => $path)
+                        @php
+                            $imageData = base64_encode(file_get_contents($path));
+                            $mime = mime_content_type($path);
+                        @endphp
+
                         <img 
-                            src="{{ $src }}" 
-                            class="rounded-xl transition-opacity duration-1000 {{ $index === 0 ? 'opacity-100' : 'opacity-0' }}"
-                        >
+                            src="data:{{ $mime }};base64,{{ $imageData }}"
+                            class="slider-image absolute top-0 left-0 w-full h-full object-cover rounded-xl border border-blue-700/10
+                            @if($index === 0) opacity-100 @else opacity-0 @endif"
+                        />
                     @endforeach
-                </div>
 
+                </div>
             </figure>
 
             <script>
-            document.addEventListener("DOMContentLoaded", () => {
-                const slides = document.querySelectorAll("#slideshow img");
-                let current = 0;
+                let slideIndex = 0;
+                const slides = document.querySelectorAll('.slider-image');
+
                 setInterval(() => {
-                    slides[current].classList.remove("opacity-100");
-                    slides[current].classList.add("opacity-0");
-
-                    current = (current + 1) % slides.length;
-
-                    slides[current].classList.remove("opacity-0");
-                    slides[current].classList.add("opacity-100");
-                }, 5000); // 5 seconds per slide
-            });
+                    slides[slideIndex].style.opacity = 0;
+                    slideIndex = (slideIndex + 1) % slides.length;
+                    slides[slideIndex].style.opacity = 1;
+                }, 5000);
             </script>
+            
             <div class="card-body">
                 <h2 class="card-title text-center mb-5 font-bold text-xl">
                     {{ $event->order_name }}
