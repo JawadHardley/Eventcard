@@ -1,6 +1,6 @@
 @extends('layouts.guest')
 @section('content')
-    <div class="flex justify-center py-5">
+    <div class="flex justify-center py-3">
 
         <div class="card bg-base-100 w-96 shadow-lg border-2 border-indigo-900/20">
             <!-- <figure class="px-5 pt-5">
