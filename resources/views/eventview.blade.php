@@ -168,11 +168,12 @@
                         class="input input-bordered w-full"
                     />
                 </div>
+                <hr/>
                 <div class="overflow-x-auto">
                     <table class="table">
                         <!-- head -->
                         <thead class="bg-base-100">
-                            <tr class="my-4 guest-row">
+                            <tr>
                                 <th>s/n</th>
                                 <th>Guest name</th>
                                 <th>Contact Validity</th>
