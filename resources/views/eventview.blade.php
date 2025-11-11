@@ -359,12 +359,12 @@
                                                 <label class="text-base mt-5">Invitation Text</label>
 
                                                 <div class="text-base">
-                                                    <h3 class="font-bold">{{ $events->order_name }}</h3>
+                                                    *<h3 class="font-bold">{{ $events->order_name }}</h3>*
                                                     <br />
 
                                                     <p class="py-3">
 
-                                                        Familia ya Anyosisye B. Mwandumbya wa Magomeni Kagera, Wanapenda kukualika <span class="font-bold">{{ $guest->full_name }}</span> Kwenye sendoff ya binti yao mpendwa <span class="font-bold">{{ $events->event_host }}</span>
+                                                        Familia ya Anyosisye B. Mwandumbya wa Magomeni Kagera, Wanapenda kukualika *<span class="font-bold">{{ $guest->full_name }}</span>* Kwenye sendoff ya binti yao mpendwa *<span class="font-bold">{{ $events->event_host }}</span>*
 
                                                     </p>
 
