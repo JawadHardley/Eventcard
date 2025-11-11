@@ -359,7 +359,7 @@
                                                 <label class="text-base mt-5">Invitation Text</label>
 
                                                 <div class="text-base">
-                                                    *<h3 class="font-bold">{{ $events->order_name }}</h3>*
+                                                    <h3 class="font-bold">*{{ $events->order_name }}*</h3>
                                                     <br />
 
                                                     <p class="py-3">
