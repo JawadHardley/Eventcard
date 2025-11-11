@@ -53,6 +53,79 @@ class GuestController extends Controller
         ]);
     }
 
+    // public function guestadd(Request $request)
+    // {
+    //     $validated = $request->validate([
+    //         'full_name' => [
+    //             'required',
+    //             'string',
+    //             'max:100',
+    //             'regex:/^[A-Za-z\s\-\'\.]+$/',
+    //         ],
+    //         'title' => ['required', 'string', 'max:900'],
+    //         'event_id' => ['required', 'numeric', 'max:900'],
+    //         'address' => ['required', 'string', 'max:900'],
+    //         'delivery_method' => ['required', 'in:sms,email,whatsapp'],
+    //         'email' => ['required', 'email'],
+    //         'phone' => [
+    //             'required',
+    //             'string',
+    //             'regex:/^(\+?255|0)[0-9]{9}$/',
+    //         ],
+    //     ]);
+
+    //     $cleanPhone = $this->normalizePhone($validated['phone']);
+    //     $validated['full_name'] = Str::title(strtolower($validated['full_name']));
+
+    //     // Generate unique 4-digit short code for this event
+    //     $eventId = $validated['event_id'];
+    //     do {
+    //         $shortCode = str_pad(rand(0, 9999), 4, '0', STR_PAD_LEFT);
+    //         $exists = Guest::where('order_id', $eventId)
+    //             ->where('invitation_code', $shortCode)
+    //             ->exists();
+    //     } while ($exists);
+
+    //     $guest = Guest::create([
+    //         'full_name' => $validated['full_name'],
+    //         'title' => $validated['title'] ?? null,
+    //         'email' => $validated['email'] ?? null,
+    //         'phone' => $cleanPhone,
+    //         'address' => $validated['address'] ?? null,
+    //         'delivery_method' => $validated['delivery_method'],
+    //         'order_id' => $validated['event_id'],
+    //         'counter' => '[0/2]',
+    //         'invitation_code' => $shortCode,
+    //     ]);
+
+
+    //     // Generate unique code
+    //     $code = 'GUEST-' . strtoupper(Str::random(10));
+
+    //     // 🔥 Build the public URL for that guest
+    //     $publicUrl = url('/guest/' . $code);
+
+    //     // Update guest record with both code and link
+    //     $guest->update([
+    //         'qrcode' => $code,
+    //         'more' => $publicUrl,
+    //     ]);
+
+    //     // ✅ Generate QR code based on the URL, not the random code
+    //     $qrImage = QrCode::format('svg')
+    //         ->size(300)
+    //         ->generate($publicUrl);
+
+    //     // Optional: Save if you want (not required)
+    //     // Storage::put("public/qrcodes/{$guest->id}.svg", $qrImage);
+
+    //     return redirect()
+    //         ->back()->with([
+    //             'status' => 'success',
+    //             'message' => 'Registered Guest successfully.',
+    //         ]);
+    // }
+
     public function guestadd(Request $request)
     {
         $validated = $request->validate([
@@ -60,7 +133,6 @@ class GuestController extends Controller
                 'required',
                 'string',
                 'max:100',
-                'regex:/^[A-Za-z\s\-\'\.]+$/',
             ],
             'title' => ['required', 'string', 'max:900'],
             'event_id' => ['required', 'numeric', 'max:900'],
@@ -76,55 +148,71 @@ class GuestController extends Controller
 
         $cleanPhone = $this->normalizePhone($validated['phone']);
         $validated['full_name'] = Str::title(strtolower($validated['full_name']));
-
-        // Generate unique 4-digit short code for this event
         $eventId = $validated['event_id'];
-        do {
-            $shortCode = str_pad(rand(0, 9999), 4, '0', STR_PAD_LEFT);
-            $exists = Guest::where('order_id', $eventId)
-                ->where('invitation_code', $shortCode)
-                ->exists();
-        } while ($exists);
 
-        $guest = Guest::create([
-            'full_name' => $validated['full_name'],
-            'title' => $validated['title'] ?? null,
-            'email' => $validated['email'] ?? null,
-            'phone' => $cleanPhone,
-            'address' => $validated['address'] ?? null,
-            'delivery_method' => $validated['delivery_method'],
-            'order_id' => $validated['event_id'],
-            'counter' => '[0/2]',
-            'invitation_code' => $shortCode,
-        ]);
+        // ✅ Prevent same number registering twice in same event
+        $exists = Guest::where('order_id', $eventId)
+            ->where('phone', $cleanPhone)
+            ->exists();
 
-
-        // Generate unique code
-        $code = 'GUEST-' . strtoupper(Str::random(10));
-
-        // 🔥 Build the public URL for that guest
-        $publicUrl = url('/guest/' . $code);
-
-        // Update guest record with both code and link
-        $guest->update([
-            'qrcode' => $code,
-            'more' => $publicUrl,
-        ]);
-
-        // ✅ Generate QR code based on the URL, not the random code
-        $qrImage = QrCode::format('svg')
-            ->size(300)
-            ->generate($publicUrl);
-
-        // Optional: Save if you want (not required)
-        // Storage::put("public/qrcodes/{$guest->id}.svg", $qrImage);
-
-        return redirect()
-            ->back()->with([
-                'status' => 'success',
-                'message' => 'Registered Guest successfully.',
+        if ($exists) {
+            return back()->with([
+                'status' => 'error',
+                'message' => 'Guest already registered for this event.',
             ]);
+        }
+
+        DB::beginTransaction();
+
+        try {
+            // ✅ generate unique short code per event
+            for ($i = 0; $i < 5; $i++) {
+                $shortCode = str_pad(random_int(0, 9999), 4, '0', STR_PAD_LEFT);
+
+                if (!Guest::where('order_id', $eventId)->where('invitation_code', $shortCode)->exists()) {
+                    break;
+                }
+            }
+
+            // ✅ generate guaranteed unique QR code
+            do {
+                $code = 'GUEST-' . strtoupper(Str::random(10));
+            } while (Guest::where('qrcode', $code)->exists());
+
+            $publicUrl = url('/guest/' . $code);
+
+            $guest = Guest::create([
+                'full_name' => $validated['full_name'],
+                'title' => $validated['title'],
+                'email' => $validated['email'],
+                'phone' => $cleanPhone,
+                'address' => $validated['address'],
+                'delivery_method' => $validated['delivery_method'],
+                'order_id' => $validated['event_id'],
+                'counter' => '[0/2]',
+                'invitation_code' => $shortCode,
+                'qrcode' => $code,
+                'more' => $publicUrl,
+            ]);
+
+            DB::commit();
+
+            // ✅ generate QR SVG
+            $qrImage = QrCode::format('svg')
+                ->size(300)
+                ->generate($publicUrl);
+
+            return back()->with([
+                'status' => 'success',
+                'message' => 'Guest registered successfully.',
+            ]);
+
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            throw $e;
+        }
     }
+
 
 
     function normalizePhone(string $input): string
