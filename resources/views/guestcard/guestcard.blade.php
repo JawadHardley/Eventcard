@@ -20,7 +20,7 @@
                     width: 100%;
                     height: auto;
                     position: relative;
-                    aspect-ratio: 16/9; /* Keeps same shape nicely; can adjust */
+                    aspect-ratio: 9/16; /* Keeps same shape nicely; can adjust */
                 }
 
                 .slider-image {
@@ -28,7 +28,7 @@
                 }
             </style>
 
-            <figure class="relative overflow-hidden">
+            <figure class="px-4 pt-4 relative overflow-hidden">
 
                 <div class="slider-container relative rounded-xl border border-blue-700/10">
 
@@ -66,7 +66,7 @@
                     slides[slideIndex].style.opacity = 1;
                 }, 5000);
             </script>
-
+            
             <div class="card-body">
                 <h2 class="card-title text-center mb-5 font-bold text-xl">
                     {{ $event->order_name }}
