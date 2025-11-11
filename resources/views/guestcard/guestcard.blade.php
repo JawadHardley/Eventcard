@@ -28,7 +28,7 @@
                 }
             </style>
 
-            <figure class="px-5 pt-5 relative overflow-hidden">
+            <figure class="relative overflow-hidden">
 
                 <div class="slider-container relative rounded-xl border border-blue-700/10">
 
@@ -66,7 +66,7 @@
                     slides[slideIndex].style.opacity = 1;
                 }, 5000);
             </script>
-            
+
             <div class="card-body">
                 <h2 class="card-title text-center mb-5 font-bold text-xl">
                     {{ $event->order_name }}
