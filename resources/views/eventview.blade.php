@@ -160,7 +160,7 @@
                 <h3>{{ $events->order_name }}</h3>
             </div> --}}
             <div class="p-3 m-3 bg-base-100 border border-stone-900/10 rounded-lg">
-                <div class="mb-3">
+                <div class="mb-5">
                     <input 
                         type="text"
                         id="guestSearch"
@@ -168,7 +168,6 @@
                         class="input input-bordered w-full"
                     />
                 </div>
-                <hr/>
                 <div class="overflow-x-auto">
                     <table class="table">
                         <!-- head -->
