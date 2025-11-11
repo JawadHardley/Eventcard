@@ -258,7 +258,6 @@ class GuestController extends Controller
                 'required',
                 'string',
                 'max:100',
-                'regex:/^[A-Za-z\s\-\'\.]+$/',
             ],
             'title' => ['required', 'string', 'max:900'],
             'event_id' => ['required', 'numeric', 'max:900'],
