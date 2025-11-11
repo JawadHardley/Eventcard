@@ -20,7 +20,7 @@
                     width: 100%;
                     height: auto;
                     position: relative;
-                    aspect-ratio: 9/16; /* Keeps same shape nicely; can adjust */
+                    aspect-ratio: 3/4; /* Keeps same shape nicely; can adjust */
                 }
 
                 .slider-image {
