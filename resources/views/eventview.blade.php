@@ -160,11 +160,19 @@
                 <h3>{{ $events->order_name }}</h3>
             </div> --}}
             <div class="p-3 m-3 bg-base-100 border border-stone-900/10 rounded-lg">
+                <div class="mb-3">
+                    <input 
+                        type="text"
+                        id="guestSearch"
+                        placeholder="Search guest..."
+                        class="input input-bordered w-full"
+                    />
+                </div>
                 <div class="overflow-x-auto">
                     <table class="table">
                         <!-- head -->
                         <thead class="bg-base-100">
-                            <tr>
+                            <tr class="my-4 guest-row">
                                 <th>s/n</th>
                                 <th>Guest name</th>
                                 <th>Contact Validity</th>
@@ -181,7 +189,7 @@
                             @endphp
                             @foreach ($guests as $guest)
                                 <!-- row 1 -->
-                                <tr class="my-4">
+                                <tr class="my-4 guest-row">
                                     <th>{{ $counter }}</th>
                                     {{-- <td>{{ $guest->full_name }}</td> --}}
                                     <td scope="row" class="flex items-center px-6 py-4 whitespace-nowrap">
@@ -396,6 +404,15 @@
                         </tbody>
                     </table>
                 </div>
+                <script>
+                document.getElementById('guestSearch').addEventListener('keyup', function () {
+                    let filter = this.value.toLowerCase();
+                    document.querySelectorAll('.guest-row').forEach(row => {
+                        let text = row.textContent.toLowerCase();
+                        row.style.display = text.includes(filter) ? '' : 'none';
+                    });
+                });
+                </script>
             </div>
         </div>
         <div class="col-span-12 md:col-span-4">
