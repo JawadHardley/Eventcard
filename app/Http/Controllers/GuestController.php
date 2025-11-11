@@ -467,6 +467,13 @@ class GuestController extends Controller
                         ->exists();
                 } while ($exists);
 
+                $existingGuest = Guest::where('order_id', $request->event_id)
+                      ->where('phone', $cleanPhone)
+                      ->first();
+                if ($existingGuest) {
+                    continue; // skip, already exists
+                }
+
                 // Create guest
                 $guest = Guest::create([
                     'full_name' => $fullName,
