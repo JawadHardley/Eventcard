@@ -2,6 +2,12 @@
 @section('content')
     <div class="grid grid-cols-12">
         <div class="col-span-12">
+            
+            <button onclick="captureCard()" 
+                class="fixed btn btn-success bg-indigo-900/20 px-3 py-2 rounded-lg shadow-lg">
+            Capture 💎
+            </button>
+            
             <div class="flex justify-center py-10">
                 <div id="idcard" class="card bg-base-100 w-96 shadow-lg border-2 border-indigo-900/20">
                     <div class="relative">
@@ -135,10 +141,6 @@
 
         </div>
     </div>
-    <button onclick="captureCard()" 
-        class="fixed btn btn-success bg-indigo-900/20 px-3 py-2 rounded-lg shadow-lg">
-    Capture 💎
-    </button>
 
     <script>
         function captureCard() {
