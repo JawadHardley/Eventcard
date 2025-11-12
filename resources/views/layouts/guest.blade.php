@@ -28,7 +28,7 @@
 
 <body class="">
     <div class="grid grid-cols-12">
-        <div class="col-span-12 p-5 flex justify-center">
+        <div class="col-span-12 p-3 flex justify-center">
             <label class="swap border-2 border-blue-800/10 rounded-full p-3">
                 <input type="checkbox" class="sr-only" id="theme-toggle">
                 <i data-lucide="sun" class="swap-on w-6 h-6"></i>
