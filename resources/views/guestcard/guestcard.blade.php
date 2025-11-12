@@ -20,7 +20,7 @@
                     width: 100%;
                     height: auto;
                     position: relative;
-                    aspect-ratio: 2/3; /* Keeps same shape nicely; can adjust */
+                    aspect-ratio: 4/5; /* Keeps same shape nicely; can adjust */
                 }
 
                 .slider-image {
@@ -28,7 +28,7 @@
                 }
             </style>
 
-            <figure class="px-3 pt-3 relative overflow-hidden">
+            <figure class="px-4 pt-4 relative overflow-hidden">
 
                 <div class="slider-container relative rounded-xl border border-blue-700/10">
 
