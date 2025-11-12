@@ -83,7 +83,7 @@
                 </p>
                 <p class="teal">
                     <i class="fa fa-shirt text-xl mr-3 text-[rgb(183,110,121)] dark:text-indigo-900"></i>
-                    {{ $event->dresscode ?? 'Navy Blue' }}
+                    {{ $event->dresscode ?? 'Rosegold' }}
                 </p>
                 <div class="items-center">
                     <div class="divider divider-primary">
