@@ -28,7 +28,7 @@
                 }
             </style>
 
-            <figure class="px-4 pt-4 relative overflow-hidden">
+            <figure class="p-3 relative overflow-hidden">
 
                 <div class="slider-container relative rounded-xl border border-blue-700/10">
 
@@ -68,7 +68,7 @@
             </script>
             
             <div class="card-body">
-                <h2 class="card-title text-center mb-5 font-bold text-xl">
+                <h2 class="card-title text-center mb-4 font-bold text-xl">
                     {{ $event->order_name }}
                 </h2>
                 <p class="teal">
@@ -100,7 +100,7 @@
                     @endphp
                 
                     <div
-                        class="grid text-gray-500 auto-cols-max grid-flow-col gap-5 text-center items-center justify-center">
+                        class="grid text-gray-500 auto-cols-max grid-flow-col gap-4 text-center items-center justify-center">
                         <div class="flex flex-col">
                             <span class="countdown font-mono text-5xl">
                                 <span id="days" style="--value:0;"></span>
