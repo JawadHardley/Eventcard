@@ -1,5 +1,13 @@
 @extends('layouts.guest')
 @section('content')
+
+<!-- this is temporal use statement
+this is temporal use statement
+this is temporal use statement
+this is temporal use statement -->
+
+@if(1 = 2)
+
     <div class="flex justify-center py-2">
 
         <div class="card bg-base-100 w-96 shadow-lg border-2 border-indigo-900/20">
@@ -197,4 +205,68 @@
         s.style.setProperty("--value", seconds);
     }, 1000);
 </script>
+
+@else
+
+    <div class="flex justify-center py-2">
+
+        <div class="card bg-base-100 w-96 shadow-lg border-2 border-indigo-900/20">
+            <!-- <figure class="px-5 pt-5">
+
+                @php
+                    $path = storage_path('app/public/event1x.jpeg'); // full filesystem path
+                    $imageData = base64_encode(file_get_contents($path));
+                    $mime = mime_content_type($path);
+                @endphp
+
+                <img src="data:{{ $mime }};base64,{{ $imageData }}"
+                    alt="Shoes" class="rounded-xl border border-blue-700/10" />
+            </figure> -->
+
+            <style>
+                .slider-container {
+                    width: 100%;
+                    height: auto;
+                    position: relative;
+                    aspect-ratio: 5/6; /* Keeps same shape nicely; can adjust */
+                }
+
+                .slider-image {
+                    transition: opacity 1.3s ease-in-out;
+                }
+            </style>
+
+            <figure class="p-3 relative overflow-hidden">
+
+                <div class="slider-container relative rounded-xl border border-blue-700/10">
+
+                    @php
+                        $images = [
+                            storage_path('app/public/event1x.jpeg'),
+                            storage_path('app/public/event2x.jpeg'),
+                            storage_path('app/public/event3x.jpeg'),
+                        ];
+                    @endphp
+
+                    @foreach ($images as $index => $path)
+                        @php
+                            $imageData = base64_encode(file_get_contents($path));
+                            $mime = mime_content_type($path);
+                        @endphp
+
+                        <img 
+                            src="data:{{ $mime }};base64,{{ $imageData }}"
+                            class="slider-image absolute top-0 left-0 w-full h-full object-cover rounded-xl border border-blue-700/10
+                            @if($index === 0) opacity-100 @else opacity-0 @endif"
+                        />
+                    @endforeach
+
+                </div>
+            </figure>
+        </div>
+
+    </div>
+
+
+@endif
 @endsection
