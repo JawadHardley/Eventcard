@@ -257,6 +257,19 @@ this is temporal use statement -->
 
                 </div>
             </figure>
+            
+            <div class="card-body">
+                <h2 class="card-title text-center mb-4 font-bold text-xl">
+                    Ndugu, Jamaa na Marafiki
+                </h2>
+                <p class="teal">
+                    Familia ya Bw & Bibi <span class="font-bold">Anyosisye Mwandumbya</span> pamoja na kamati ya maandalizi, tunapenda kutoa shukrani zetu za dhati kwa kuwa pamoja na sisi katika kufanikisha sherehe ya binti yetu mpendwa <span class="font-bold">Gladness Mwaipungu</span>. Hakika shughuli ilipendeza kwa sababu ya ushiriki wako.
+                </p>
+                <p class="teal mt-5">
+                    Ahsanteni sana na Mungu awabariki.
+                </p>
+            </div>
+
         </div>
 
     </div>
@@ -271,19 +284,6 @@ this is temporal use statement -->
             slides[slideIndex].style.opacity = 1;
         }, 3000);
     </script>
-
-    <div class="card-body">
-                <h2 class="card-title text-center mb-4 font-bold text-xl">
-                    Ndugu, Jamaa na Marafiki
-                </h2>
-                <p class="teal">
-                    Familia ya Bw & Bibi <span class="font-bold">Anyosisye Mwandumbya</span> pamoja na kamati ya maandalizi, tunapenda kutoa shukrani zetu za dhati kwa kuwa pamoja na sisi katika kufanikisha sherehe ya binti yetu mpendwa <span class="font-bold">Gladness Mwaipungu</span>. Hakika shughuli ilipendeza kwa sababu ya ushiriki wako.
-                </p>
-                <p class="teal mt-5">
-                    Ahsanteni sana na Mungu awabariki.
-                </p>
-            </div>
-
 
 @endif
 
