@@ -6,7 +6,7 @@ this is temporal use statement
 this is temporal use statement
 this is temporal use statement -->
 
-@if(1 = 2)
+@if(1 == 2)
 
     <div class="flex justify-center py-2">
 
@@ -238,8 +238,7 @@ this is temporal use statement -->
 
             <figure class="p-3 relative overflow-hidden">
 
-                <div class="slider-container relative rounded-xl border border-blue-700/10">
-
+                <div class="slider-container relative rounded-xl border border-blue-700/10"> 
                     @php
                         $images = [
                             storage_path('app/public/event1x.jpeg'),
@@ -269,4 +268,5 @@ this is temporal use statement -->
 
 
 @endif
+
 @endsection
