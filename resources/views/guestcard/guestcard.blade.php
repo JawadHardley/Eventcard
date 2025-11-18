@@ -266,6 +266,17 @@ this is temporal use statement -->
 
     </div>
 
+    <script>
+        let slideIndex = 0;
+        const slides = document.querySelectorAll('.slider-image');
+
+        setInterval(() => {
+            slides[slideIndex].style.opacity = 0;
+            slideIndex = (slideIndex + 1) % slides.length;
+            slides[slideIndex].style.opacity = 1;
+        }, 3000);
+    </script>
+
 
 @endif
 
