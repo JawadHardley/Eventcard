@@ -248,13 +248,8 @@ this is temporal use statement -->
                     @endphp
 
                     @foreach ($images as $index => $path)
-                        @php
-                            $imageData = base64_encode(file_get_contents($path));
-                            $mime = mime_content_type($path);
-                        @endphp
-
                         <img 
-                            src="data:{{ $mime }};base64,{{ $imageData }}"
+                            src="{{$path}}"
                             class="slider-image absolute top-0 left-0 w-full h-full object-cover rounded-xl border border-blue-700/10
                             @if($index === 0) opacity-100 @else opacity-0 @endif"
                         />
