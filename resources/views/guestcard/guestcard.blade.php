@@ -262,12 +262,12 @@ this is temporal use statement -->
                 <h2 class="card-title text-center mb-4 font-bold text-xl dark:text-indigo-900">
                     Ndugu, Jamaa na Marafiki
                 </h2>
-                <p class="teal">
+                <p class="teal text-center">
                     Familia ya Bw & Bibi <span class="font-bold">Anyosisye Mwandumbya</span> pamoja na kamati ya maandalizi, tunapenda kutoa shukrani zetu za dhati kwa kuwa pamoja na sisi katika kufanikisha sherehe ya binti yetu mpendwa 
-                    <div class="font-bold text-center dark:text-indigo-900 my-4">Gladness Mwaipungu</div>. 
+                    <div class="font-bold text-center dark:text-indigo-900 my-2 text-lg">Gladness Mwaipungu</div>
                     Hakika shughuli ilipendeza kwa sababu ya ushiriki wako.
                 </p>
-                <p class="teal mt-5">
+                <p class="teal mt-2">
                     Ahsanteni sana na Mungu awabariki.
                 </p>
             </div>
