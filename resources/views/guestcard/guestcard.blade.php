@@ -241,9 +241,9 @@ this is temporal use statement -->
                 <div class="slider-container relative rounded-xl border border-blue-700/10"> 
                     @php
                         $images = [
-                            storage_path('app/public/event1x.jpeg'),
-                            storage_path('app/public/event2x.jpeg'),
-                            storage_path('app/public/event3x.jpeg'),
+                            asset('storage/event1x.jpeg'),
+                            asset('storage/event2x.jpeg'),
+                            asset('storage/event3x.jpeg'),
                         ];
                     @endphp
 
