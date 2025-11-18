@@ -259,16 +259,19 @@ this is temporal use statement -->
             </figure>
             
             <div class="card-body">
-                <h2 class="card-title text-center mb-4 font-bold text-xl dark:text-indigo-900">
+                <h2 class="card-title mb-4 font-bold text-xl dark:text-indigo-900">
                     Ndugu, Jamaa na Marafiki
                 </h2>
-                <p class="teal text-center">
+                <p class="teal">
                     Familia ya Bw & Bibi <span class="font-bold">Anyosisye Mwandumbya</span> pamoja na kamati ya maandalizi, tunapenda kutoa shukrani zetu za dhati kwa kuwa pamoja na sisi katika kufanikisha sherehe ya binti yetu mpendwa 
-                    <div class="font-bold text-center dark:text-indigo-900 my-2 text-lg">Gladness Mwaipungu</div>
+                    <span class="font-bold dark:text-indigo-900">Gladness Mwaipungu</span>
                     Hakika shughuli ilipendeza kwa sababu ya ushiriki wako.
                 </p>
-                <p class="teal mt-2">
+                <!-- <p class="teal mt-2">
                     Ahsanteni sana na Mungu awabariki.
+                </p> -->
+                <p class="text-2xl text-center mt-20" style="font-family: 'Brittany Signature', cursive;">
+                    Ahsanteni sana <span class="text-indigo-900">na</span> Mungu awabariki.
                 </p>
             </div>
 
