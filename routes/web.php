@@ -5,10 +5,14 @@ use App\Http\Controllers\EventController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\qrverify;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\MasterController;
 use App\Http\Controllers\GuestController;
 use Illuminate\Support\Facades\Route;
+use App\Models\Event;
+use App\Models\Guest;
+use Carbon\Carbon;
 
 
 Route::get('/', [MasterController::class, 'index'])->name('landing');
@@ -27,6 +31,20 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
+
+Route::get('/about', function () {
+    return view('about');
+});
+
+
+Route::get('/contact', function () {
+    return view('contact');
+});
+
+Route::get('/pricing', function () {
+    return view('pricing');
+});
+
 require __DIR__ . '/auth.php';
 
 // Admin routes
@@ -40,6 +58,7 @@ Route::prefix('admin')
         Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
             ->name('logout');
     });
+
 
 // User routes
 Route::prefix('user')
@@ -64,4 +83,15 @@ Route::prefix('user')
         Route::post('/eventadd', [EventController::class, 'eventadd'])->name('eventadd');
         Route::post('/event/{id}/update', [EventController::class, 'eventupdate'])->name('eventupdate');
         Route::post('/guests/import', [GuestController::class, 'importGuests'])->name('importGuests');
+        // QR code JSON endpoint
+        Route::get('/guest-qr/{guest}', function ($id) {
+            $guest = App\Models\Guest::findOrFail($id);
+            return response()->json([
+                'qr_svg' => QrCode::size(150)->generate($guest->more ?? url('/guest/' . $guest->qrcode)),
+                'link'   => $guest->more ?? url('/guest/' . $guest->qrcode)
+            ]);
+        })->name('guest.qr');
+
+        // Delete guest
+        Route::delete('/guest/{guest}', [App\Http\Controllers\GuestController::class, 'destroy'])->name('guest.destroy');
     });

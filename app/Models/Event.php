@@ -13,4 +13,9 @@ class Event extends Model
     // protected $table = 'guests';
 
     protected $guarded = [];
+
+    public function guests()
+    {
+        return $this->hasMany(Guest::class, 'order_id');
+    }
 }

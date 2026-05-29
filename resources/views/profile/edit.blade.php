@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.admin')
 @section('content')
     <form id="send-verification" method="post" action="{{ route('verification.send') }}">
         @csrf

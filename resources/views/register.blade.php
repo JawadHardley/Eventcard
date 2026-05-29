@@ -1,47 +1,68 @@
-@extends('layouts.guest')
+<x-guest-layout>
 
-@section('content')
-    <div class="flex items-center justify-center min-h-screen bg-base-100">
-        <!-- Session Status -->
-        <x-auth-session-status class="mb-4" :status="session('status')" />
+    @section('title', 'Create Account')
 
-        <form method="POST" action="{{ route('register') }}">
-            @csrf
-            <fieldset class="fieldset rounded-box w-96 p-6 border-2 shadow-lg border-stone-950/10">
-                <h2 class="text-2xl font-bold mb-5 text-center">
-                    <i class="fa fa-object-ungroup text-primary mr-3"></i> Sign Up
-                </h2>
+    <div class="auth-page tap-hero">
+        <div class="auth-card fade-up">
+            <div class="text-center mb-8">
+                <div class="w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-4">
+                    <div
+                        class="w-10 h-10 rounded-xl flex items-center justify-center shadow-sm bg-gray-900 dark:bg-red-900/30">
+                        <img src="{{ asset('storage/logos/logo1.png') }}" alt="Tapeventcard Logo">
+                    </div>
+                </div>
+                <h1 class="dark-txt font-display text-2xl font-bold">Create an account</h1>
+                <p class="dark-sub text-sm mt-1">Start building unforgettable invitations</p>
+            </div>
 
-                <label class="label">Name</label>
-                <input type="text" name="name" class="input input-bordered w-full" placeholder="username"
-                    value="{{ old('name') }}" required autofocus autocomplete="name" />
-                <x-input-error :messages="$errors->get('name')" class="mt-2" />
+            <form method="POST" action="{{ route('register') }}">
+                @csrf
+                <div class="space-y-4">
+                    <div>
+                        <label class="form-label">Full Name</label>
+                        <input type="text" name="name" class="form-input @error('name') border-red-500 @enderror"
+                            value="{{ old('name') }}" required autofocus placeholder="Jawad Mwinyi">
+                        @error('name')
+                            <p class="text-xs text-red-500 mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    <div>
+                        <label class="form-label">Email</label>
+                        <input type="email" name="email" class="form-input @error('email') border-red-500 @enderror"
+                            value="{{ old('email') }}" required placeholder="you@example.com">
+                        @error('email')
+                            <p class="text-xs text-red-500 mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    <div>
+                        <label class="form-label">Password</label>
+                        <input type="password" name="password"
+                            class="form-input @error('password') border-red-500 @enderror" required
+                            placeholder="Min. 8 characters">
+                        @error('password')
+                            <p class="text-xs text-red-500 mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    <div>
+                        <label class="form-label">Confirm Password</label>
+                        <input type="password" name="password_confirmation" class="form-input" required
+                            placeholder="Same as above">
+                    </div>
+                    <div class="flex items-center gap-2 text-sm dark-sub mb-2">
+                        <input type="checkbox" id="terms" class="accent-[#e8120a] w-4 h-4 rounded-md" required>
+                        <label for="terms">I agree to the
+                            <a href="#" class="text-[#e8120a] font-medium hover:underline">Terms</a> and
+                            <a href="#" class="text-[#e8120a] font-medium hover:underline">Privacy Policy</a>
+                        </label>
+                    </div>
+                    <button type="submit" class="btn btn-red btn-lg w-full">Create Account</button>
+                </div>
+            </form>
 
-                <label class="label">Email</label>
-                <input type="email" name="email" class="input input-bordered w-full" placeholder="Email"
-                    value="{{ old('email') }}" required autofocus autocomplete="username" />
-                <x-input-error :messages="$errors->get('email')" class="mt-2" />
-
-                <label class="label mt-3">Password</label>
-                <input type="password" name="password" class="input input-bordered w-full" placeholder="Password" required
-                    autocomplete="current-password" />
-                <x-input-error :messages="$errors->get('password')" class="mt-2" />
-
-                <label class="label mt-3">Confirm Password</label>
-                <input type="password" name="password_confirmation" class="input input-bordered w-full"
-                    placeholder="password_confirmation" required autocomplete="current-password" />
-                <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
-
-                {{-- <label class="label mt-3">
-                    <input type="checkbox" name="remember" class="checkbox" />
-                    Remember me
-                </label> --}}
-
-                <button class="btn btn-primary w-full mt-4">Register</button>
-                <a href="{{ route('login') }}" class="text-decoration-none text-blue-700">
-                    <label class="label text-blue-700 mt-3">Already have account ? login</label>
-                </a>
-            </fieldset>
-        </form>
+            <div class="text-center mt-6 text-sm dark-sub">
+                Already have an account?
+                <a href="{{ route('login') }}" class="text-[#e8120a] font-semibold hover:underline">Sign in</a>
+            </div>
+        </div>
     </div>
-@endsection
+</x-guest-layout>

@@ -19,4 +19,8 @@ class Guest extends Model
     // {
     //     return $this->belongsTo(Order::class);
     // }
+    public function event()
+    {
+        return $this->belongsTo(Event::class, 'order_id');
+    }
 }

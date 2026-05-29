@@ -1,18 +1,15 @@
-<!DOCTYPE html>
-<html lang="en">
+<x-guest-layout>
 
-<head>
-    <meta charset="UTF-8">
-    <title>Invalid QR</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-</head>
+    @section('title', 'Invitation Not Found')
 
-<body class="bg-gray-100 text-center py-10">
-    <div class="bg-white p-8 max-w-md mx-auto rounded-2xl shadow-lg">
-        <h1 class="text-2xl font-bold text-red-600 mb-4">❌ Invalid or Unknown QR Code</h1>
-        <p class="text-gray-600 mb-2">This QR code doesn’t belong to any event in our system.</p>
-        <p class="text-gray-500 text-sm mt-4">Verified by EventCard</p>
+    <div class="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 px-4">
+        <div class="text-center max-w-md">
+            <div class="text-8xl mb-4">🎫</div>
+            <h1 class="text-3xl font-bold text-gray-800 dark:text-white mb-2">Invalid Invitation</h1>
+            <p class="text-gray-600 dark:text-gray-400 mb-6">The link you used is not valid or has expired. Please check
+                your
+                invitation or contact the event host.</p>
+            <a href="/" class="btn btn-primary">Go Home</a>
+        </div>
     </div>
-</body>
-
-</html>
+</x-guest-layout>

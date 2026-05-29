@@ -1,43 +1,65 @@
-@extends('layouts.guest')
+<x-guest-layout>
 
-@section('content')
-    <div class="flex items-center justify-center min-h-screen">
-        <!-- Session Status -->
-        <x-auth-session-status class="mb-4" :status="session('status')" />
+    @section('title', 'Sign In')
 
-        <form method="POST" action="{{ route('login') }}">
-            @csrf
-            <fieldset class="fieldset rounded-box w-96 p-6 border-2 shadow-lg border-stone-950/10">
-                {{-- <legend class="fieldset-legend text-lg font-semibold mb-2">Login</legend> --}}
-                <h2 class="text-2xl font-bold mb-5 text-center">
-                    <i class="fa fa-object-ungroup text-primary mr-3"></i> Sign In
-                </h2>
+    <div class="auth-page tap-hero">
+        <div class="auth-card fade-up">
+            <div class="text-center mb-8">
+                <div class="w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-4">
+                    <div
+                        class="w-10 h-10 rounded-xl flex items-center justify-center shadow-sm bg-gray-900 dark:bg-red-900/30">
+                        <img src="{{ asset('storage/logos/logo1.png') }}" alt="Tapeventcard Logo">
+                    </div>
+                </div>
+                <h1 class="dark-txt font-display text-2xl font-bold">Welcome back</h1>
+                <p class="dark-sub text-sm mt-1">Sign in to your TapEventCard account</p>
+            </div>
 
-                <label class="label">Email</label>
-                <input type="email" name="email" class="input input-bordered w-full" placeholder="Email"
-                    value="{{ old('email') }}" required autofocus autocomplete="username" />
-                <x-input-error :messages="$errors->get('email')" class="mt-2" />
+            <form method="POST" action="{{ route('login') }}">
+                @csrf
+                <div class="space-y-4">
 
-                <label class="label mt-3">Password</label>
-                <input type="password" name="password" class="input input-bordered w-full" placeholder="Password" required
-                    autocomplete="current-password" />
-                <x-input-error :messages="$errors->get('password')" class="mt-2" />
+                    <!-- Session Status -->
+                    <x-auth-session-status class="mb-4" :status="session('status')" />
+                    <div>
+                        <label class="form-label">Email</label>
+                        <input type="email" name="email" class="form-input @error('email') border-red-500 @enderror"
+                            value="{{ old('email') }}" required autofocus placeholder="you@example.com">
+                        @error('email')
+                            <p class="text-xs text-red-500 mt-1">{{ $message }}</p>
+                        @enderror
 
-                <label class="label mt-3">
-                    <input type="checkbox" name="remember" class="checkbox" />
-                    Remember me
-                </label>
+                    </div>
+                    <div>
+                        <label class="form-label">Password</label>
+                        <input type="password" name="password"
+                            class="form-input @error('password') border-red-500 @enderror" required
+                            placeholder="········">
+                        @error('password')
+                            <p class="text-xs text-red-500 mt-1">{{ $message }}</p>
+                        @enderror
 
-                <button class="btn btn-primary w-full mt-4">Login</button>
-                <a href="{{ route('register') }}" class="text-decoration-none text-blue-700">
-                    <label class="label text-blue-700 mt-3">Dont't have account ? register</label>
-                </a>
-                <a href="{{ route('landing') }}" class="text-decoration-none text-blue-700">
-                    <label class="label text-blue-700 mt-3">
-                        <i class="fa fa-house"></i> Back home
-                    </label>
-                </a>
-            </fieldset>
-        </form>
+                    </div>
+                    <div class="flex items-center justify-between text-sm mb-2">
+                        <label class="flex items-center gap-2 cursor-pointer dark-sub">
+                            <input type="checkbox" name="remember" class="accent-[#e8120a] w-4 h-4 rounded-md">
+                            <span>Remember me</span>
+                        </label>
+                        @if (Route::has('password.request'))
+                            <a href="{{ route('password.request') }}"
+                                class="text-[#e8120a] font-medium hover:underline">
+                                Forgot password?
+                            </a>
+                        @endif
+                    </div>
+                    <button type="submit" class="btn btn-red btn-lg w-full">Sign In</button>
+                </div>
+            </form>
+
+            <div class="text-center mt-6 text-sm dark-sub">
+                Don’t have an account?
+                <a href="{{ route('register') }}" class="text-[#e8120a] font-semibold hover:underline">Create one</a>
+            </div>
+        </div>
     </div>
-@endsection
+</x-guest-layout>

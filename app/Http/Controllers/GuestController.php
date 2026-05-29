@@ -54,6 +54,20 @@ class GuestController extends Controller
         ]);
     }
 
+    public function guestQr($id)
+    {
+        $guest = Guest::findOrFail($id);
+
+        $link = url("/guest/" . $guest->code);
+
+        $qr_svg = QrCode::size(200)->generate($link);
+
+        return response()->json([
+            'qr_svg' => $qr_svg,
+            'link' => $link
+        ]);
+    }
+
     // public function guestadd(Request $request)
     // {
     //     $validated = $request->validate([
@@ -207,7 +221,6 @@ class GuestController extends Controller
                 'status' => 'success',
                 'message' => 'Guest registered successfully.',
             ]);
-
         } catch (\Throwable $e) {
             DB::rollBack();
             throw $e;
@@ -368,7 +381,7 @@ class GuestController extends Controller
             ->select('#idcard')
             ->timeout(60)
             ->setDelay(300)
-            ->noSandbox() 
+            ->noSandbox()
             ->save($path);
 
         return response()->download($path, $fileName);
@@ -468,8 +481,8 @@ class GuestController extends Controller
                 } while ($exists);
 
                 $existingGuest = Guest::where('order_id', $request->event_id)
-                      ->where('phone', $cleanPhone)
-                      ->first();
+                    ->where('phone', $cleanPhone)
+                    ->first();
                 if ($existingGuest) {
                     continue; // skip, already exists
                 }
@@ -505,5 +518,12 @@ class GuestController extends Controller
         } catch (\Exception $e) {
             return back()->with('status', 'invalid')->with('message', $e->getMessage());
         }
+    }
+
+    public function destroy($id)
+    {
+        $guest = Guest::findOrFail($id);
+        $guest->delete();
+        return response()->json(['success' => true]);
     }
 }
