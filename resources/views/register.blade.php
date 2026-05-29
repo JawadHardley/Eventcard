@@ -15,8 +15,9 @@
                 <p class="dark-sub text-sm mt-1">Start building unforgettable invitations</p>
             </div>
 
-            <form method="POST" action="{{ route('register') }}">
-                @csrf
+            {{-- <form method="POST" action="{{ route('register') }}"> --}}
+            {{-- @csrf --}}
+            <form method="#" action="#">
                 <div class="space-y-4">
                     <div>
                         <label class="form-label">Full Name</label>
