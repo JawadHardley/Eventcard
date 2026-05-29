@@ -10,7 +10,7 @@
                 <div class="flex items-center gap-2.5 font-display text-lg font-bold text-gray-900 dark:text-white mb-4">
                     <div
                         class="w-10 h-10 rounded-xl flex items-center justify-center shadow-sm bg-gray-900 dark:bg-red-900/30">
-                        <img src="{{ asset('logos/logo1.png') }}" alt="Tapeventcard Logo">
+                        <img src="{{ Storage::url('logos/logo1.png') }}" alt="Tapeventcard Logo">
                     </div>
                     Tapeventcard
                 </div>
