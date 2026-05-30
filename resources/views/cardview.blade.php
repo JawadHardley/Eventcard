@@ -188,20 +188,20 @@
         }
 
         /* .card-shimmer-bar {
-                                    height: 2px;
-                                    background: linear-gradient(90deg,
-                                            transparent 0%,
-                                            rgba(255, 255, 255, .0) 20%,
-                                            rgba(200, 160, 255, .9) 35%,
-                                            rgba(130, 210, 255, .9) 50%,
-                                            rgba(255, 180, 100, .9) 65%,
-                                            rgba(255, 255, 255, .0) 80%,
-                                            transparent 100%);
-                                    background-size: 800px 100%;
-                                    animation: shimmer-move 3.5s linear infinite;
-                                    margin: 0 -1.4rem;
-                                    margin-bottom: 1.25rem;
-                                } */
+                                                                                                                                                            height: 2px;
+                                                                                                                                                            background: linear-gradient(90deg,
+                                                                                                                                                                    transparent 0%,
+                                                                                                                                                                    rgba(255, 255, 255, .0) 20%,
+                                                                                                                                                                    rgba(200, 160, 255, .9) 35%,
+                                                                                                                                                                    rgba(130, 210, 255, .9) 50%,
+                                                                                                                                                                    rgba(255, 180, 100, .9) 65%,
+                                                                                                                                                                    rgba(255, 255, 255, .0) 80%,
+                                                                                                                                                                    transparent 100%);
+                                                                                                                                                            background-size: 800px 100%;
+                                                                                                                                                            animation: shimmer-move 3.5s linear infinite;
+                                                                                                                                                            margin: 0 -1.4rem;
+                                                                                                                                                            margin-bottom: 1.25rem;
+                                                                                                                                                        } */
 
         /* ── Guest Name Section ── */
         .guest-salutation {
@@ -291,7 +291,7 @@
             display: flex;
             flex-direction: column;
             gap: .6rem;
-            margin-bottom: 1.25rem;
+            /* margin-bottom: 1.25rem; */
         }
 
         .detail-row {
@@ -791,7 +791,7 @@
                     </div>
 
                     <!-- Detail rows -->
-                    <div class="card-details">
+                    <div class="card-details pb-3">
                         <div class="detail-row">
                             <div class="detail-icon-wrap">
                                 <svg fill="none" viewBox="0 0 24 24">
@@ -862,7 +862,7 @@
                         </div>
                     </div>
 
-                    <div class="qr-separator"></div>
+                    {{-- <div class="qr-separator"></div> --}}
 
                     <div class="qr-meta">
                         <div>
@@ -870,10 +870,10 @@
                             <div class="qr-meta-code">{{ $guest->invitation_code }}</div>
                         </div>
                         <div>
-                            <div class="qr-meta-label">Admission</div>
+                            {{-- <div class="qr-meta-label">Admission</div>
                             <div style="font-size:.72rem;font-weight:600;color:#1d1d1f;" class="dark:text-white">
                                 {{ $guest->counter ?? '1 Person' }}
-                            </div>
+                            </div> --}}
                         </div>
                         <div class="qr-meta-hint">Scan QR or present<br>code at the entrance</div>
                     </div>
@@ -882,9 +882,10 @@
                 <!-- Card footer -->
                 <div class="card-footer-strip">
                     <span class="card-brand">TapEvent Card</span>
-                    <span class="card-counter">
-                        <span class="counter-dot"></span>
-                        Valid Invitation
+                    <span class="#">
+                        <div class="w-10 h-10 rounded-xl flex items-center justify-center">
+                            <img src="{{ Storage::url('logos/logo1.png') }}" alt="Tapeventcard Logo">
+                        </div>
                     </span>
                 </div>
 
