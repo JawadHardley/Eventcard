@@ -151,15 +151,28 @@ class GuestController extends Controller
             ],
             'title' => ['required', 'string', 'max:900'],
             'event_id' => ['required', 'numeric', 'max:900'],
-            'address' => ['required', 'string', 'max:900'],
+            'address' => ['nullable', 'string', 'max:900'],
             'delivery_method' => ['required', 'in:sms,email,whatsapp'],
-            'email' => ['required', 'email'],
+            'email' => ['nullable', 'email'],
             'phone' => [
                 'required',
                 'string',
                 'regex:/^(\+?255|0)[0-9]{9}$/',
             ],
         ]);
+
+        // dd($validated);
+
+        // $validated = $request->validate([
+        //     'full_name' => 'required|string|max:100',
+        //     'event_id' => 'required|integer|exists:events,id',
+        //     'delivery_method' => 'required|in:sms,email,whatsapp',
+        //     'phone' => 'required|regex:/^(\+?255|0)[0-9]{9}$/',
+
+        //     'title' => 'nullable|string|max:900',
+        //     'address' => 'nullable|string|max:900',
+        //     'email' => 'nullable|email',
+        // ]);
 
         $cleanPhone = $this->normalizePhone($validated['phone']);
         $validated['full_name'] = Str::title(strtolower($validated['full_name']));

@@ -271,8 +271,8 @@
                             <option value="double">Double</option>
                         </select>
                     </div>
-                    <div><label class="form-label">Email</label><input type="email" name="email" class="form-input"
-                            required></div>
+                    <div><label class="form-label">Email</label><input type="email" name="email" class="form-input">
+                    </div>
                     <div><label class="form-label">Phone</label><input type="text" name="phone" class="form-input"
                             placeholder="+255XXXXXXXXX" required></div>
                     <div><label class="form-label">Delivery Method</label>
