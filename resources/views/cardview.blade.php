@@ -188,20 +188,20 @@
         }
 
         /* .card-shimmer-bar {
-                                height: 2px;
-                                background: linear-gradient(90deg,
-                                        transparent 0%,
-                                        rgba(255, 255, 255, .0) 20%,
-                                        rgba(200, 160, 255, .9) 35%,
-                                        rgba(130, 210, 255, .9) 50%,
-                                        rgba(255, 180, 100, .9) 65%,
-                                        rgba(255, 255, 255, .0) 80%,
-                                        transparent 100%);
-                                background-size: 800px 100%;
-                                animation: shimmer-move 3.5s linear infinite;
-                                margin: 0 -1.4rem;
-                                margin-bottom: 1.25rem;
-                            } */
+                                    height: 2px;
+                                    background: linear-gradient(90deg,
+                                            transparent 0%,
+                                            rgba(255, 255, 255, .0) 20%,
+                                            rgba(200, 160, 255, .9) 35%,
+                                            rgba(130, 210, 255, .9) 50%,
+                                            rgba(255, 180, 100, .9) 65%,
+                                            rgba(255, 255, 255, .0) 80%,
+                                            transparent 100%);
+                                    background-size: 800px 100%;
+                                    animation: shimmer-move 3.5s linear infinite;
+                                    margin: 0 -1.4rem;
+                                    margin-bottom: 1.25rem;
+                                } */
 
         /* ── Guest Name Section ── */
         .guest-salutation {
@@ -732,7 +732,7 @@
                 $publicUrl = $guest->more ?? url('/guest/' . $guest->qrcode);
                 $bgImage = $event->event_image
                     ? asset('storage/' . $event->event_image)
-                    : asset('storage/images/background.png');
+                    : asset('storage/images/tweety.png');
             @endphp
 
             <div id="idcard" data-event-type="{{ $eventType }}">
