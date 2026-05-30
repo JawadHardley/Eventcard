@@ -235,8 +235,6 @@
                         asset('storage/images/img1.png'),
                         asset('storage/images/img2.png'),
                         asset('storage/images/img3.png'),
-                        asset('storage/images/img4.png'),
-                        asset('storage/images/img5.png'),
                     ];
                 @endphp
                 @foreach ($images as $i => $img)
