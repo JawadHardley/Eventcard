@@ -188,20 +188,20 @@
         }
 
         /* .card-shimmer-bar {
-                                height: 2px;
-                                background: linear-gradient(90deg,
-                                        transparent 0%,
-                                        rgba(255, 255, 255, .0) 20%,
-                                        rgba(200, 160, 255, .9) 35%,
-                                        rgba(130, 210, 255, .9) 50%,
-                                        rgba(255, 180, 100, .9) 65%,
-                                        rgba(255, 255, 255, .0) 80%,
-                                        transparent 100%);
-                                background-size: 800px 100%;
-                                animation: shimmer-move 3.5s linear infinite;
-                                margin: 0 -1.4rem;
-                                margin-bottom: 1.25rem;
-                            } */
+                                                        height: 2px;
+                                                        background: linear-gradient(90deg,
+                                                                transparent 0%,
+                                                                rgba(255, 255, 255, .0) 20%,
+                                                                rgba(200, 160, 255, .9) 35%,
+                                                                rgba(130, 210, 255, .9) 50%,
+                                                                rgba(255, 180, 100, .9) 65%,
+                                                                rgba(255, 255, 255, .0) 80%,
+                                                                transparent 100%);
+                                                        background-size: 800px 100%;
+                                                        animation: shimmer-move 3.5s linear infinite;
+                                                        margin: 0 -1.4rem;
+                                                        margin-bottom: 1.25rem;
+                                                    } */
 
         /* ── Guest Name Section ── */
         .guest-salutation {
@@ -939,50 +939,39 @@
             const sub = document.getElementById('dl-sub');
 
             overlay.classList.add('show');
-            title.textContent = 'Preparing your card…';
-            sub.textContent = 'High quality export in progress';
-            spinner.classList.remove('done');
+            title.textContent = 'Generating high‑quality image…';
+            sub.textContent = 'Please wait, this may take a few seconds';
 
-            const card = document.getElementById('idcard');
+            fetch('{{ route('user.generateCardImage', ['eventId' => $event->id, 'guestId' => $guest->id]) }}', {
+                    method: 'GET',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        spinner.classList.add('done');
+                        title.textContent = '✓ Ready!';
+                        sub.textContent = 'Your download will start automatically';
 
-            // Temporarily reset tilt for clean export
-            const savedTransform = card.style.transform;
-            card.style.transform = 'none';
-            card.style.transition = 'none';
+                        // Create a hidden link and trigger download
+                        const link = document.createElement('a');
+                        link.href = data.url;
+                        link.download = 'invitation-card.png';
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
 
-            setTimeout(() => {
-                html2canvas(card, {
-                    scale: 3,
-                    useCORS: true,
-                    allowTaint: true,
-                    backgroundColor: null,
-                    logging: false,
-                    imageTimeout: 5000,
-                }).then(canvas => {
-                    card.style.transform = savedTransform;
-                    card.style.transition = '';
-
-                    spinner.classList.add('done');
-                    title.textContent = '✓ Card ready!';
-                    sub.textContent = 'Your download is starting…';
-
-                    const link = document.createElement('a');
-                    link.download =
-                        `invite-{{ Str::slug($guest->full_name) }}-{{ $event->id }}.png`;
-                    link.href = canvas.toDataURL('image/png', 1.0);
-                    link.click();
-
-                    setTimeout(() => {
-                        overlay.classList.remove('show');
-                    }, 1400);
-
-                }).catch(() => {
-                    card.style.transform = savedTransform;
-                    card.style.transition = '';
+                        setTimeout(() => overlay.classList.remove('show'), 1500);
+                    } else {
+                        throw new Error('Server error');
+                    }
+                })
+                .catch(error => {
                     overlay.classList.remove('show');
-                    if (window.showToast) showToast('Export failed — please try again', 'error');
+                    if (window.showToast) showToast('Failed to generate image', 'error');
                 });
-            }, 100);
         };
 
         /* ── Copy link ── */

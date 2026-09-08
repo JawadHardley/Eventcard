@@ -1,5 +1,8 @@
 <?php
 
+use App\Models\User;
+use Illuminate\Support\Facades\Notification;
+
 test('registration screen can be rendered', function () {
     $response = $this->get('/register');
 
@@ -7,6 +10,8 @@ test('registration screen can be rendered', function () {
 });
 
 test('new users can register', function () {
+    Notification::fake();
+
     $response = $this->post('/register', [
         'name' => 'Test User',
         'email' => 'test@example.com',
@@ -14,6 +19,8 @@ test('new users can register', function () {
         'password_confirmation' => 'password',
     ]);
 
-    $this->assertAuthenticated();
-    $response->assertRedirect(route('dashboard', absolute: false));
+    $this->assertGuest();
+    $response->assertRedirect(route('login', absolute: false));
+    $response->assertSessionHas('registered');
+    Notification::assertSentTo(User::where('email', 'test@example.com')->first(), \App\Notifications\VerifyEmailNotification::class);
 });

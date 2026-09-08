@@ -19,6 +19,20 @@
                 @csrf
                 <div class="space-y-4">
 
+                    @if (session('registered'))
+                        <div
+                            class="rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800 dark:border-green-900/50 dark:bg-green-900/20 dark:text-green-300">
+                            {{ session('registered') }}
+                        </div>
+                    @endif
+
+                    @if (session('status'))
+                        <div
+                            class="rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800 dark:border-green-900/50 dark:bg-green-900/20 dark:text-green-300">
+                            {{ session('status') }}
+                        </div>
+                    @endif
+
                     <!-- Session Status -->
                     <x-auth-session-status class="mb-4" :status="session('status')" />
                     <div>

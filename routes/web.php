@@ -70,7 +70,10 @@ Route::prefix('user')
         Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
             ->name('logout');
         Route::get('/{event}/cameralog', [UserController::class, 'cameralog'])->name('cameralog');
-        Route::get('/card/export-image/{code}/{guest}', [GuestController::class, 'generateCardImage'])->name('generateCardImage');
+        Route::get('/card/export-image/{eventId}/{guestId}', [GuestController::class, 'generateCardImage'])->name('generateCardImage');
+        Route::post('/guest/send/{guest}', [GuestController::class, 'sendInvitation'])->name('guest.send');
+        // Route::get('/card/export-image/{event}/{guest}', [GuestController::class, 'generateCardImage'])
+        //     ->name('card.image');
         Route::get('/{event}/{guest}/card', [UserController::class, 'cardview'])->name('cardview');
         Route::get('/guestlist', [GuestController::class, 'guestlist'])->name('guestlist');
         Route::get('/verify-qr', [qrverify::class, 'verify'])->name('verify');

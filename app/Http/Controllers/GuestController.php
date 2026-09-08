@@ -15,6 +15,8 @@ use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
+use App\Mail\InvitationMail;
+use Illuminate\Support\Facades\Mail;
 
 class GuestController extends Controller
 {
@@ -45,8 +47,9 @@ class GuestController extends Controller
 
     public function guestlist(Request $request)
     {
-        // Fetch all guests, optionally filter by logged-in user’s orders
-        $guests = Guest::all();
+        $guests = Guest::whereHas('event', function ($query) use ($request) {
+            $query->where('user_id', $request->user()->id);
+        })->get();
 
         return view('guestlist', [
             'user' => $request->user(),
@@ -143,6 +146,7 @@ class GuestController extends Controller
 
     public function guestadd(Request $request)
     {
+
         $validated = $request->validate([
             'full_name' => [
                 'required',
@@ -151,19 +155,20 @@ class GuestController extends Controller
             ],
             'title' => ['required', 'string', 'max:900'],
             'event_id' => ['required', 'numeric', 'max:900'],
-            'address' => ['required', 'string', 'max:900'],
+            'address' => ['nullable', 'string', 'max:900'],
             'delivery_method' => ['required', 'in:sms,email,whatsapp'],
-            'email' => ['required', 'email'],
+            'email' => ['nullable', 'email'],
             'phone' => [
                 'required',
                 'string',
-                'regex:/^(\+?255|0)[0-9]{9}$/',
             ],
         ]);
 
         $cleanPhone = $this->normalizePhone($validated['phone']);
         $validated['full_name'] = Str::title(strtolower($validated['full_name']));
         $eventId = $validated['event_id'];
+        // dd($cleanPhone);
+
 
         // ✅ Prevent same number registering twice in same event
         $exists = Guest::where('order_id', $eventId)
@@ -262,7 +267,7 @@ class GuestController extends Controller
         return $clean;
     }
 
-    public function guestupdate(Request $request, $id)
+    public function guestupdatexx(Request $request, $id)
     {
         $guest = Guest::findOrFail($id);
 
@@ -302,6 +307,59 @@ class GuestController extends Controller
                 'status' => 'success',
                 'message' => 'Guest updated successfully!',
             ]);
+    }
+
+    public function guestupdate(Request $request, $id)
+    {
+        $guest = Guest::findOrFail($id);
+
+        $validated = $request->validate([
+            'full_name' => [
+                'required',
+                'string',
+                'max:100',
+            ],
+            'title' => ['required', 'string', 'max:900'],
+            'event_id' => ['required', 'numeric', 'max:900'],
+            'address' => ['nullable', 'string', 'max:900'],
+            'delivery_method' => ['required', 'in:sms,email,whatsapp'],
+            'email' => ['nullable', 'email'],
+            'phone' => [
+                'required',
+                'string',
+                // 'regex:/^(\+?255|0)[0-9]{10}$/',
+            ],
+        ]);
+
+        $cleanPhone = $this->normalizePhone($validated['phone']);
+
+        // Prevent duplicate phone for the SAME event, excluding this guest
+        $exists = Guest::where('order_id', $validated['event_id'])
+            ->where('phone', $cleanPhone)
+            ->where('id', '!=', $id)
+            ->exists();
+
+        if ($exists) {
+            return back()->with([
+                'status' => 'error',
+                'message' => 'Another guest already uses this phone number for this event.'
+            ]);
+        }
+
+        // Update the guest
+        $guest->update([
+            'full_name' => Str::title(strtolower($validated['full_name'])),
+            'title' => $validated['title'],
+            'email' => $validated['email'],
+            'phone' => $cleanPhone,
+            'address' => $validated['address'] ?? null,
+            'delivery_method' => $validated['delivery_method'],
+        ]);
+
+        return back()->with([
+            'status' => 'success',
+            'message' => 'Guest updated successfully!',
+        ]);
     }
 
     public function testSms()
@@ -354,11 +412,43 @@ class GuestController extends Controller
     //     }
     // }
 
-    public function generateCardImage($events, $guests, Request $request)
+    // public function generateCardImage($events, $guests, Request $request)
+    // {
+    //     // find event by id 
+    //     $event = Event::find($events);
+    //     $guest = Guest::where('id', $guests)->first();
+
+    //     $html = view('cardview', compact('event', 'guest'))->render();
+
+    //     $fileName = 'event-card-' . time() . '.png';
+    //     $path = storage_path('app/public/cards/' . $fileName);
+
+    //     $dir = storage_path('app/public/cards');
+
+    //     if (!file_exists($dir)) {
+    //         mkdir($dir, 0755, true);
+    //     }
+
+    //     $remote = env('BROWSERLESS_URL');
+
+    //     Browsershot::html($html)
+    //         ->setRemoteInstance($remote) // 👈 THIS forces cloud chromium
+    //         ->windowSize(650, 1000)
+    //         ->deviceScaleFactor(2)
+    //         ->waitUntilNetworkIdle()
+    //         ->select('#idcard')
+    //         ->timeout(60)
+    //         ->setDelay(300)
+    //         ->noSandbox()
+    //         ->save($path);
+
+    //     return response()->download($path, $fileName);
+    // }
+
+    public function generateCardImage($eventId, $guestId, Request $request)
     {
-        // find event by id 
-        $event = Event::find($events);
-        $guest = Guest::where('id', $guests)->first();
+        $event = Event::findOrFail($eventId);
+        $guest = Guest::findOrFail($guestId);
 
         $html = view('cardview', compact('event', 'guest'))->render();
 
@@ -366,15 +456,12 @@ class GuestController extends Controller
         $path = storage_path('app/public/cards/' . $fileName);
 
         $dir = storage_path('app/public/cards');
+        if (!file_exists($dir)) mkdir($dir, 0755, true);
 
-        if (!file_exists($dir)) {
-            mkdir($dir, 0755, true);
-        }
-
-        $remote = env('BROWSERLESS_URL');
+        $remote = env('BROWSERLESS_URL'); // ensure you set this
 
         Browsershot::html($html)
-            ->setRemoteInstance($remote) // 👈 THIS forces cloud chromium
+            ->setRemoteInstance($remote)
             ->windowSize(650, 1000)
             ->deviceScaleFactor(2)
             ->waitUntilNetworkIdle()
@@ -384,6 +471,15 @@ class GuestController extends Controller
             ->noSandbox()
             ->save($path);
 
+        // If AJAX request, return JSON with download link
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'url' => asset('storage/cards/' . $fileName)
+            ]);
+        }
+
+        // Fallback: direct download
         return response()->download($path, $fileName);
     }
 
@@ -525,5 +621,107 @@ class GuestController extends Controller
         $guest = Guest::findOrFail($id);
         $guest->delete();
         return response()->json(['success' => true]);
+    }
+
+    public function sendInvitation(Request $request, $guestId)
+    {
+        $guest = Guest::findOrFail($guestId);
+        $event = Event::findOrFail($guest->order_id);
+
+        // Build the invitation data
+        $data = [
+            'guest' => $guest,
+            'event' => $event,
+            'qr_url' => $guest->more ?? url('/guest/' . $guest->qrcode),
+            'card_preview_url' => route('user.cardview', ['event' => $event->id, 'guest' => $guest->id])
+        ];
+
+        $method = $guest->delivery_method;
+
+        try {
+            switch ($method) {
+                case 'email':
+                    Mail::to($guest->email)->send(new InvitationMail($data));
+                    break;
+                case 'sms':
+                    $this->sendSmsBeem($guest->phone, $data);
+                    break;
+                case 'whatsapp':
+                    $this->sendWhatsAppBeem($guest->phone, $data);
+                    break;
+                default:
+                    return back()->with('error', 'Unsupported delivery method');
+            }
+            // dd(Mail::to($guest->email)->send(new InvitationMail($data)));
+            return back()->with('success', "Invitation sent via {$method}");
+        } catch (\Exception $e) {
+            // dd($guest->phone);
+            return back()->with('error', "Failed to send: " . $e->getMessage());
+        }
+    }
+
+    private function sendSmsBeem($phone, $data)
+    {
+        // Normalize phone to international format without +
+        $phone = $this->normalizePhone($phone);
+        $phone = ltrim($phone, '0'); // remove leading zero if any
+        if (!str_starts_with($phone, '255')) {
+            $phone = '255' . $phone;
+        }
+
+        $message = "Dear {$data['guest']->full_name}, you are invited to {$data['event']->order_name} on " .
+            \Carbon\Carbon::parse($data['event']->event_date)->format('F j, Y') .
+            " at {$data['event']->event_location}. View your invitation: {$data['qr_url']}";
+
+        // TODO: Integrate Beem SMS API using credentials from .env
+        // Example using Beem (see sms.txt):
+        /*
+    $api_key = env('BEEM_SMS_API_KEY');
+    $secret_key = env('BEEM_SMS_SECRET');
+    $postData = [
+        'source_addr' => env('BEEM_SENDER_ID', 'INFO'),
+        'message' => $message,
+        'recipients' => [['recipient_id' => 1, 'dest_addr' => $phone]]
+    ];
+    $ch = curl_init('https://apisms.beem.africa/v1/send');
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        'Authorization: Basic ' . base64_encode("$api_key:$secret_key"),
+        'Content-Type: application/json'
+    ]);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($postData));
+    $response = curl_exec($ch);
+    if (curl_error($ch)) throw new \Exception(curl_error($ch));
+    */
+
+        // For now, just log
+        \Log::info("SMS would be sent to $phone: $message");
+    }
+
+    private function sendWhatsAppBeem($phone, $data)
+    {
+        $phone = $this->normalizePhone($phone);
+        $phone = ltrim($phone, '0');
+        if (!str_starts_with($phone, '255')) $phone = '255' . $phone;
+
+        // TODO: Integrate Beem WhatsApp API (Moja) using WhatsApp templates
+        // You need a pre-approved template.
+        // Example using Beem Moja (see whatsapp.txt):
+        /*
+    $api_key = env('BEEM_WHATSAPP_API_KEY');
+    $secret_key = env('BEEM_WHATSAPP_SECRET');
+    $from = env('BEEM_WHATSAPP_FROM'); // your WhatsApp business number
+    $template_id = env('BEEM_WHATSAPP_TEMPLATE_ID'); // approved template ID
+    $postData = [
+        'from_addr' => $from,
+        'destination_addr' => [['phoneNumber' => $phone, 'params' => [$data['guest']->full_name, $data['event']->order_name, $data['qr_url']]]],
+        'channel' => 'whatsapp',
+        'messageTemplateData' => ['id' => $template_id]
+    ];
+    // send to https://apibroadcast.beem.africa/v1/broadcast/template/api-send
+    */
+
+        \Log::info("WhatsApp message would be sent to $phone using template");
     }
 }

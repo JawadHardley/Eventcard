@@ -1229,3 +1229,4 @@ html.dark .modal-box {
       to   { opacity:1; transform: translateX(0); }
     }
     .admin-page.active { animation: slideInRight .28s ease; }
+    

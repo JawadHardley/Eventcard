@@ -470,4 +470,6 @@ document.addEventListener('DOMContentLoaded', () => {
     sio.observe(section);
 })();
 
+
+
 /* END TapEventCard enhancement JS */

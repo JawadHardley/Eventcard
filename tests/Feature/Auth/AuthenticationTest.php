@@ -17,7 +17,19 @@ test('users can authenticate using the login screen', function () {
     ]);
 
     $this->assertAuthenticated();
-    $response->assertRedirect(route('dashboard', absolute: false));
+    $response->assertRedirect(route('user.dashboard', absolute: false));
+});
+
+test('unverified users cannot authenticate', function () {
+    $user = User::factory()->unverified()->create();
+
+    $response = $this->post('/login', [
+        'email' => $user->email,
+        'password' => 'password',
+    ]);
+
+    $this->assertGuest();
+    $response->assertSessionHasErrors('email');
 });
 
 test('users can not authenticate with invalid password', function () {
