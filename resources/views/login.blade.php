@@ -8,7 +8,7 @@
                 <div class="w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-4">
                     <div
                         class="w-10 h-10 rounded-xl flex items-center justify-center shadow-sm bg-gray-900 dark:bg-red-900/30">
-                        <img src="{{ asset('storage/logos/logo1.png') }}" alt="Tapeventcard Logo">
+                        <img src="{{ Storage::url('logos/logo1.png') }}" alt="Tapeventcard Logo">
                     </div>
                 </div>
                 <h1 class="dark-txt font-display text-2xl font-bold">Welcome back</h1>
