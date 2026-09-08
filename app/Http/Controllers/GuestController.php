@@ -209,7 +209,7 @@ class GuestController extends Controller
                 'address' => $validated['address'],
                 'delivery_method' => $validated['delivery_method'],
                 'order_id' => $validated['event_id'],
-                'counter' => '[0/2]',
+                'counter' => $validated['title'] === 'single' ? '[0/1]' : '[0/2]',
                 'invitation_code' => $shortCode,
                 'qrcode' => $code,
                 'more' => $publicUrl,
