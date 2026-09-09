@@ -1,11 +1,25 @@
+{{-- ============================================================
+     DROP-IN REPLACEMENT  —  paste this entire file content into
+     resources/views/cardview.blade.php  (replaces the existing file)
+     ============================================================ --}}
+
 @extends('layouts.admin')
 
 @section('title', 'Card Preview — ' . $guest->full_name)
 
 @section('content')
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Cinzel:wght@400;500;600&family=Amiri:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
     <style>
-        /* ── Card Page Wrapper ── */
+        /* ══════════════════════════════════════════════════════════════
+                   PAGE WRAPPER
+                ══════════════════════════════════════════════════════════════ */
         .cardview-page {
             display: flex;
             flex-direction: column;
@@ -23,44 +37,20 @@
             justify-content: center;
         }
 
-        /* ── Card Outer Shell ── */
+        /* ══════════════════════════════════════════════════════════════
+                   CARD SHELL  (perspective + entrance animation)
+                ══════════════════════════════════════════════════════════════ */
         .invitation-shell {
             perspective: 1200px;
             width: 100%;
-            max-width: 420px;
-            cursor: default;
+            max-width: 630px;
+            user-select: none;
         }
 
-        /* ── The Card Itself ── */
-        #idcard {
-            width: 100%;
-            max-width: 420px;
-            border-radius: 28px;
-            overflow: hidden;
-            position: relative;
-            background: #fff;
-            box-shadow:
-                0 2px 0 rgba(255, 255, 255, .12) inset,
-                0 32px 80px rgba(0, 0, 0, .32),
-                0 8px 24px rgba(0, 0, 0, .18);
-            transform-style: preserve-3d;
-            transition: transform .5s cubic-bezier(.23, 1, .32, 1), box-shadow .4s ease;
-            will-change: transform;
-        }
-
-        html.dark #idcard {
-            box-shadow:
-                0 2px 0 rgba(255, 255, 255, .06) inset,
-                0 40px 100px rgba(0, 0, 0, .7),
-                0 8px 24px rgba(0, 0, 0, .5);
-            background: #201e1e6b;
-        }
-
-        /* ── Card entrance animation ── */
         @keyframes cardReveal {
             0% {
                 opacity: 0;
-                transform: translateY(40px) rotateX(8deg) scale(.96);
+                transform: translateY(44px) rotateX(7deg) scale(.96);
             }
 
             100% {
@@ -69,554 +59,537 @@
             }
         }
 
+        /* ══════════════════════════════════════════════════════════════
+                   THE CARD
+                ══════════════════════════════════════════════════════════════ */
         #idcard {
-            animation: cardReveal .75s cubic-bezier(.23, 1, .32, 1) both;
-        }
-
-        /* ── Hero Photo Section ── */
-        .card-hero {
-            position: relative;
             width: 100%;
-            height: 280px;
+            border-radius: 6px;
             overflow: hidden;
+            position: relative;
+            background: #fdf6ee;
+            box-shadow:
+                0 2px 0 rgba(255, 255, 255, .14) inset,
+                0 36px 90px rgba(80, 35, 5, .42),
+                0 8px 28px rgba(0, 0, 0, .22);
+            transform-style: preserve-3d;
+            transition: transform .5s cubic-bezier(.23, 1, .32, 1), box-shadow .4s ease;
+            will-change: transform;
+            animation: cardReveal .8s cubic-bezier(.23, 1, .32, 1) both;
+            font-family: 'Cormorant Garamond', 'DM Sans', serif;
         }
 
-        .card-hero-img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            object-position: center top;
-            display: block;
-            transition: transform 8s ease;
+        /* ── Cream silky background ── */
+        .ic-bg {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            background: linear-gradient(155deg, #fdf8f2 0%, #faeee0 38%, #f7e5cf 68%, #fdf6ee 100%);
         }
 
-        #idcard:hover .card-hero-img {
-            transform: scale(1.04);
-        }
-
-        /* Cinematic gradient overlays */
-        .card-hero::before {
+        .ic-bg::after {
             content: '';
             position: absolute;
             inset: 0;
-            z-index: 1;
-            background: linear-gradient(to bottom,
-                    rgba(0, 0, 0, .08) 0%,
-                    rgba(0, 0, 0, .0) 30%,
-                    rgba(0, 0, 0, .55) 75%,
-                    rgba(0, 0, 0, .82) 100%);
+            background: repeating-linear-gradient(108deg,
+                    transparent 0px,
+                    rgba(255, 255, 255, .16) 1px,
+                    transparent 2px,
+                    transparent 58px);
         }
 
-        /* Ambient color tint — changes per event type */
-        .card-hero::after {
+        /* ── Inner gold border frame ── */
+        .ic-frame {
+            position: absolute;
+            top: 14px;
+            left: 14px;
+            right: 14px;
+            bottom: 14px;
+            z-index: 2;
+            pointer-events: none;
+            border: 1px solid rgba(184, 150, 12, .2);
+            border-radius: 2px;
+        }
+
+        .ic-frame::before,
+        .ic-frame::after {
             content: '';
             position: absolute;
-            inset: 0;
-            z-index: 1;
-            background: var(--theme-tint, rgba(180, 20, 20, .18));
-            mix-blend-mode: multiply;
+            width: 8px;
+            height: 8px;
+            border: 1px solid rgba(184, 150, 12, .45);
+            transform: rotate(45deg);
+            background: #fdf6ee;
+        }
+
+        .ic-frame::before {
+            top: -5px;
+            left: -5px;
+        }
+
+        .ic-frame::after {
+            top: -5px;
+            right: -5px;
+        }
+
+        /* ── All content above bg layers ── */
+        .ic-content {
+            position: relative;
+            z-index: 4;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0 0 1.8rem;
+        }
+
+        /* ══════════════════════════════════════════════════════════════
+                   FLORAL CORNERS  (absolute, pointer-events:none)
+                ══════════════════════════════════════════════════════════════ */
+        .floral-tl,
+        .floral-tr,
+        .floral-br {
+            position: absolute;
+            pointer-events: none;
+            z-index: 3;
+        }
+
+        .floral-tl {
+            top: -6px;
+            left: -6px;
+            width: 210px;
+            height: 250px;
+        }
+
+        .floral-tr {
+            top: -6px;
+            right: -6px;
+            width: 120px;
+            height: 190px;
+        }
+
+        .floral-br {
+            bottom: -6px;
+            right: -6px;
+            width: 230px;
+            height: 270px;
+        }
+
+        /* ── Gold arc (top-right) ── */
+        .ic-arc {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 280px;
+            height: 280px;
+            z-index: 2;
             pointer-events: none;
         }
 
-        /* ── Hero Badge ── */
-        .hero-badge {
-            position: absolute;
-            top: 18px;
-            right: 18px;
-            z-index: 4;
-            background: rgba(0, 0, 0, .55);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, .18);
-            border-radius: 980px;
-            padding: .35rem .85rem;
-            font-size: .68rem;
-            font-weight: 700;
-            letter-spacing: .12em;
-            text-transform: uppercase;
-            color: #fff;
-        }
-
-        /* ── Hero Bottom Info ── */
-        .hero-info {
+        /* ── Mosque silhouette (bottom bg) ── */
+        .ic-mosque {
             position: absolute;
             bottom: 0;
             left: 0;
             right: 0;
-            z-index: 4;
-            padding: 0 1.4rem 1.4rem;
+            z-index: 1;
+            pointer-events: none;
+            opacity: .07;
         }
 
-        .hero-event-name {
-            font-family: 'DM Serif Display', serif;
-            font-size: 1.6rem;
-            font-weight: 400;
-            color: #fff;
-            line-height: 1.15;
-            text-shadow: 0 2px 20px rgba(0, 0, 0, .4);
-            margin-bottom: .2rem;
-        }
-
-        .hero-event-sub {
-            font-size: .72rem;
-            color: rgba(255, 255, 255, .72);
-            font-weight: 500;
-            letter-spacing: .08em;
-            text-transform: uppercase;
-        }
-
-        /* ── Card Body ── */
-        .card-body-inner {
-            background: #fff;
-            padding: 1.4rem 1.4rem 0;
-            position: relative;
-        }
-
-        html.dark .card-body-inner {
-            background: #111113;
-        }
-
-        /* Holographic shimmer bar */
-        @keyframes shimmer-move {
-            0% {
-                background-position: -400px 0;
-            }
-
-            100% {
-                background-position: 400px 0;
-            }
-        }
-
-        /* .card-shimmer-bar {
-                                                        height: 2px;
-                                                        background: linear-gradient(90deg,
-                                                                transparent 0%,
-                                                                rgba(255, 255, 255, .0) 20%,
-                                                                rgba(200, 160, 255, .9) 35%,
-                                                                rgba(130, 210, 255, .9) 50%,
-                                                                rgba(255, 180, 100, .9) 65%,
-                                                                rgba(255, 255, 255, .0) 80%,
-                                                                transparent 100%);
-                                                        background-size: 800px 100%;
-                                                        animation: shimmer-move 3.5s linear infinite;
-                                                        margin: 0 -1.4rem;
-                                                        margin-bottom: 1.25rem;
-                                                    } */
-
-        /* ── Guest Name Section ── */
-        .guest-salutation {
-            font-size: .7rem;
-            color: #aeaeb2;
-            font-weight: 500;
-            letter-spacing: .1em;
-            text-transform: uppercase;
-            margin-bottom: .2rem;
-        }
-
-        html.dark .guest-salutation {
-            color: #636366;
-        }
-
-        .guest-name {
-            font-family: 'DM Serif Display', serif;
-            font-size: 1.5rem;
-            font-weight: 400;
-            color: #1d1d1f;
-            line-height: 1.15;
-            margin-bottom: .25rem;
-        }
-
-        html.dark .guest-name {
-            color: #f5f5f7;
-        }
-
-        .guest-title-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: .35rem;
-            background: rgba(14, 132, 232, .09);
-            color: #0e84e8;
-            border-radius: 980px;
-            padding: .22rem .72rem;
-            font-size: .68rem;
-            font-weight: 700;
-            letter-spacing: .07em;
-            text-transform: uppercase;
-            margin-bottom: 1.1rem;
-        }
-
-        html.dark .guest-title-badge {
-            background: rgba(14, 132, 232, .18);
-            color: #38a3f7;
-        }
-
-        /* ── Divider with ornament ── */
-        .card-ornament-divider {
-            display: flex;
-            align-items: center;
-            gap: .75rem;
-            margin-bottom: 1.1rem;
-        }
-
-        .ornament-line {
-            flex: 1;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, #e8e8ed 60%);
-        }
-
-        .ornament-line.right {
-            background: linear-gradient(90deg, #e8e8ed 40%, transparent);
-        }
-
-        html.dark .ornament-line {
-            background: linear-gradient(90deg, transparent, #2c2c2e 60%);
-        }
-
-        html.dark .ornament-line.right {
-            background: linear-gradient(90deg, #2c2c2e 40%, transparent);
-        }
-
-        .ornament-icon {
-            color: #d1d1d6;
-            font-size: .7rem;
-            flex-shrink: 0;
-        }
-
-        html.dark .ornament-icon {
-            color: #38383a;
-        }
-
-        /* ── Detail rows ── */
-        .card-details {
-            display: flex;
-            flex-direction: column;
-            gap: .6rem;
-            margin-bottom: 1.25rem;
-        }
-
-        .detail-row {
-            display: flex;
-            align-items: center;
-            gap: .75rem;
-        }
-
-        .detail-icon-wrap {
-            width: 30px;
-            height: 30px;
-            border-radius: 9px;
-            background: #f5f5f7;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-            color: #6e6e73;
-        }
-
-        html.dark .detail-icon-wrap {
-            background: #1c1c1e;
-            color: #86868b;
-        }
-
-        .detail-icon-wrap svg {
-            width: 13px;
-            height: 13px;
-        }
-
-        .detail-label {
-            font-size: .65rem;
-            color: #aeaeb2;
-            font-weight: 600;
-            letter-spacing: .07em;
-            text-transform: uppercase;
-            line-height: 1;
-            margin-bottom: .08rem;
-        }
-
-        html.dark .detail-label {
-            color: #48484a;
-        }
-
-        .detail-value {
-            font-size: .8rem;
-            font-weight: 600;
-            color: #1d1d1f;
-            line-height: 1.2;
-        }
-
-        html.dark .detail-value {
-            color: #f5f5f7;
-        }
-
-        /* ── QR + Code Section ── */
-        .card-qr-section {
-            display: flex;
-            gap: 1rem;
-            align-items: stretch;
-            padding: 1rem 1.4rem;
-            background: #f5f5f7;
-            margin: 0 -1.4rem;
-            position: relative;
-            overflow: hidden;
-        }
-
-        html.dark .card-qr-section {
-            background: #0a0a0a;
-        }
-
-        /* Ticket cut notches */
-        .card-qr-section::before,
-        .card-qr-section::after {
-            content: '';
+        /* ── Lanterns (top right, inside arc) ── */
+        .ic-lanterns {
             position: absolute;
-            top: -14px;
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            background: #fff;
-            z-index: 2;
-        }
-
-        html.dark .card-qr-section::before,
-        html.dark .card-qr-section::after {
-            background: #111113;
-        }
-
-        .card-qr-section::before {
-            left: -14px;
-        }
-
-        .card-qr-section::after {
-            right: -14px;
-        }
-
-        /* Dashed separator line inside QR section */
-        .qr-separator {
-            width: 1px;
-            background: repeating-linear-gradient(to bottom,
-                    transparent,
-                    transparent 4px,
-                    #d1d1d6 4px,
-                    #d1d1d6 8px);
-            flex-shrink: 0;
-            align-self: stretch;
-        }
-
-        html.dark .qr-separator {
-            background: repeating-linear-gradient(to bottom,
-                    transparent,
-                    transparent 4px,
-                    #2c2c2e 4px,
-                    #2c2c2e 8px);
-        }
-
-        /* QR code wrap */
-        .qr-wrap {
-            flex-shrink: 0;
-            position: relative;
-        }
-
-        .qr-inner {
-            background: #fff;
-            border-radius: 12px;
-            padding: 8px;
-            display: inline-flex;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 2px 12px rgba(0, 0, 0, .1);
-        }
-
-        /* Animated scan line */
-        @keyframes scan-line {
-            0% {
-                top: 8px;
-                opacity: .9;
-            }
-
-            50% {
-                opacity: .5;
-            }
-
-            100% {
-                top: calc(100% - 12px);
-                opacity: .9;
-            }
-        }
-
-        .qr-scan-line {
-            position: absolute;
-            left: 8px;
-            right: 8px;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, rgba(14, 132, 232, .8), transparent);
-            border-radius: 2px;
-            animation: scan-line 2.5s ease-in-out infinite alternate;
-            z-index: 2;
+            top: 18px;
+            right: 16px;
+            z-index: 5;
             pointer-events: none;
         }
 
-        /* Code meta */
-        .qr-meta {
+        /* ══════════════════════════════════════════════════════════════
+                   TYPOGRAPHY  —  card interior
+                ══════════════════════════════════════════════════════════════ */
+        .ic-bismillah {
+            padding-top: 2.1rem;
+            font-family: 'Amiri', serif;
+            font-size: 1.45rem;
+            color: #8b1a1a;
+            text-align: center;
+            letter-spacing: .04em;
+            line-height: 1.3;
+            margin-bottom: .5rem;
+        }
+
+        .ic-eyebrow {
+            font-family: 'Cinzel', serif;
+            font-size: .58rem;
+            letter-spacing: .22em;
+            color: #7a5a3a;
+            text-align: center;
+            margin-bottom: .2rem;
+        }
+
+        .ic-subline {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: .92rem;
+            font-style: italic;
+            color: #5a3a1a;
+            text-align: center;
+            margin-bottom: .45rem;
+        }
+
+        /* ── Event name (hero title) ── */
+        .ic-event-name {
+            font-family: 'Great Vibes', cursive;
+            font-size: 4.6rem;
+            color: #8b1a1a;
+            line-height: 1;
+            text-align: center;
+            display: block;
+            text-shadow: 0 2px 14px rgba(139, 26, 26, .14);
+            margin-bottom: -.2rem;
+        }
+
+        /* ── Ceremony-style sub label ── */
+        .ic-event-type-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: .85rem;
+        }
+
+        .ic-type-dash {
+            flex: 1;
+            max-width: 55px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #b8960c);
+        }
+
+        .ic-type-dash.r {
+            background: linear-gradient(90deg, #b8960c, transparent);
+        }
+
+        .ic-type-label {
+            font-family: 'Cinzel', serif;
+            font-size: .65rem;
+            letter-spacing: .28em;
+            color: #b8960c;
+        }
+
+        /* ── Ornament row ── */
+        .ic-orn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: .8rem;
+        }
+
+        .ic-orn-line {
+            width: 22px;
+            height: 1px;
+            background: #b8960c;
+            opacity: .5;
+        }
+
+        .ic-orn-diamond {
+            width: 5px;
+            height: 5px;
+            background: #b8960c;
+            transform: rotate(45deg);
+            opacity: .65;
+        }
+
+        /* ── Host line ── */
+        .ic-host {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: .88rem;
+            font-style: italic;
+            color: #7a5030;
+            text-align: center;
+            margin-bottom: .7rem;
+        }
+
+        /* ── Guest salutation ── */
+        .ic-salutation {
+            font-family: 'Cinzel', serif;
+            font-size: .55rem;
+            letter-spacing: .18em;
+            color: #a07850;
+            text-align: center;
+            margin-bottom: .2rem;
+        }
+
+        /* ── Guest name (script) ── */
+        .ic-guest-name {
+            font-family: 'Great Vibes', cursive;
+            font-size: 2.6rem;
+            color: #5a2d00;
+            line-height: 1.1;
+            text-align: center;
+            margin-bottom: .3rem;
+        }
+
+        /* ── Guest title badge ── */
+        .ic-guest-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: .35rem;
+            background: rgba(139, 26, 26, .08);
+            color: #8b1a1a;
+            border-radius: 980px;
+            padding: .22rem .75rem;
+            font-family: 'Cinzel', serif;
+            font-size: .58rem;
+            letter-spacing: .1em;
+            margin-bottom: .9rem;
+        }
+
+        /* ── Blessing paragraph ── */
+        .ic-blessing {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: .98rem;
+            font-weight: 400;
+            color: #4a3020;
+            text-align: center;
+            line-height: 1.65;
+            padding: 0 2.4rem;
+            margin-bottom: 1.1rem;
+            max-width: 340px;
+        }
+
+        /* ── Gold divider rule ── */
+        .ic-rule {
+            width: 58%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #b8960c 30%, #b8960c 70%, transparent);
+            margin-bottom: .9rem;
+            opacity: .55;
+        }
+
+        /* ══════════════════════════════════════════════════════════════
+                   INFO STRIP  (date / time / venue)
+                ══════════════════════════════════════════════════════════════ */
+        .ic-info-strip {
+            display: flex;
+            align-items: stretch;
+            width: calc(100% - 3rem);
+            background: rgba(253, 244, 228, .88);
+            border: 1px solid rgba(184, 150, 12, .22);
+            border-radius: 10px;
+            padding: .8rem 0;
+            margin-bottom: 1.2rem;
+        }
+
+        .ic-info-block {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            gap: .28rem;
+            padding: 0 .7rem;
+            position: relative;
+        }
+
+        .ic-info-block+.ic-info-block::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 10%;
+            height: 80%;
+            width: 1px;
+            background: rgba(184, 150, 12, .28);
+        }
+
+        .ic-info-icon {
+            color: #8b1a1a;
+            font-size: 1.05rem;
+        }
+
+        .ic-info-label {
+            font-family: 'Cinzel', serif;
+            font-size: .52rem;
+            letter-spacing: .1em;
+            color: #6a4a2a;
+            text-align: center;
+            line-height: 1.4;
+        }
+
+        /* ══════════════════════════════════════════════════════════════
+                   QR / TICKET SECTION   (keep existing ticket-stub style)
+                ══════════════════════════════════════════════════════════════ */
+        .ic-ticket {
+            display: flex;
+            gap: 1rem;
+            align-items: stretch;
+            width: calc(100% - 3rem);
+            background: rgba(248, 238, 222, .9);
+            border: 1px solid rgba(184, 150, 12, .2);
+            border-radius: 10px;
+            padding: .95rem 1rem;
+            margin-bottom: 1.2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Ticket punch notches */
+        .ic-ticket::before,
+        .ic-ticket::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: #fdf6ee;
+            z-index: 2;
+        }
+
+        .ic-ticket::before {
+            left: -11px;
+        }
+
+        .ic-ticket::after {
+            right: -11px;
+        }
+
+        .ic-qr-wrap {
+            flex-shrink: 0;
+        }
+
+        .ic-qr-inner {
+            background: #fff;
+            border-radius: 10px;
+            padding: 7px;
+            display: inline-flex;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, .08);
+        }
+
+        .ic-ticket-sep {
+            width: 1px;
+            flex-shrink: 0;
+            align-self: stretch;
+            background: repeating-linear-gradient(to bottom,
+                    transparent, transparent 4px,
+                    rgba(184, 150, 12, .35) 4px, rgba(184, 150, 12, .35) 8px);
+        }
+
+        .ic-ticket-meta {
             flex: 1;
             display: flex;
             flex-direction: column;
             justify-content: center;
             gap: .5rem;
-            padding: .2rem 0;
+            padding: .1rem 0;
         }
 
-        .qr-meta-label {
-            font-size: .6rem;
-            color: #aeaeb2;
+        .ic-ticket-label {
+            font-family: 'Cinzel', serif;
+            font-size: .52rem;
+            letter-spacing: .14em;
+            color: #a07850;
+        }
+
+        .ic-ticket-code {
+            font-family: 'DM Sans', monospace;
+            font-size: 1.25rem;
             font-weight: 700;
-            letter-spacing: .12em;
-            text-transform: uppercase;
-        }
-
-        html.dark .qr-meta-label {
-            color: #48484a;
-        }
-
-        .qr-meta-code {
-            font-family: 'DM Mono', 'Courier New', monospace;
-            font-size: 1.35rem;
-            font-weight: 700;
-            color: #1d1d1f;
-            letter-spacing: .12em;
+            color: #3a200a;
+            letter-spacing: .1em;
             line-height: 1;
         }
 
-        html.dark .qr-meta-code {
-            color: #f5f5f7;
+        .ic-ticket-admission {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: .82rem;
+            font-weight: 600;
+            color: #3a200a;
         }
 
-        .qr-meta-hint {
-            font-size: .65rem;
-            color: #aeaeb2;
+        .ic-ticket-hint {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: .7rem;
+            font-style: italic;
+            color: #a07850;
             line-height: 1.4;
         }
 
-        /* ── Card Footer ── */
-        .card-footer-strip {
-            padding: .9rem 1.4rem;
+        /* ══════════════════════════════════════════════════════════════
+                   CLOSING
+                ══════════════════════════════════════════════════════════════ */
+        .ic-closing {
+            font-family: 'Great Vibes', cursive;
+            font-size: 1.55rem;
+            color: #4a2a00;
+            text-align: center;
+            line-height: 1.45;
+            padding: 0 1.8rem;
+            margin-bottom: 1.1rem;
+        }
+
+        .ic-jazakum {
+            display: inline-flex;
+            align-items: center;
+            gap: .6rem;
+            background: #8b1a1a;
+            color: #fdf6ee;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1rem;
+            font-style: italic;
+            font-weight: 500;
+            letter-spacing: .04em;
+            border-radius: 980px;
+            padding: .52rem 1.8rem;
+        }
+
+        .ic-jazakum-line {
+            display: inline-block;
+            width: 16px;
+            height: 1px;
+            background: rgba(253, 246, 238, .45);
+            vertical-align: middle;
+            flex-shrink: 0;
+        }
+
+        /* ── Card footer strip ── */
+        .ic-footer {
+            padding: .75rem 1.4rem;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            background: #fff;
+            background: rgba(253, 246, 238, .6);
+            border-top: 1px solid rgba(184, 150, 12, .15);
         }
 
-        html.dark .card-footer-strip {
-            background: #111113;
+        .ic-footer-brand {
+            font-family: 'Cinzel', serif;
+            font-size: .55rem;
+            letter-spacing: .16em;
+            color: #c0a060;
         }
 
-        .card-brand {
-            font-size: .62rem;
-            font-weight: 700;
-            letter-spacing: .14em;
-            text-transform: uppercase;
-            color: #d1d1d6;
-        }
-
-        html.dark .card-brand {
-            color: #2c2c2e;
-        }
-
-        .card-counter {
+        .ic-footer-valid {
             display: inline-flex;
             align-items: center;
             gap: .3rem;
-            font-size: .68rem;
-            font-weight: 600;
-            color: #aeaeb2;
-            background: #f5f5f7;
-            border-radius: 980px;
-            padding: .2rem .65rem;
+            font-family: 'Cinzel', serif;
+            font-size: .55rem;
+            letter-spacing: .1em;
+            color: #a07850;
         }
 
-        html.dark .card-counter {
-            background: #1c1c1e;
-            color: #636366;
-        }
-
-        .counter-dot {
+        .ic-valid-dot {
             width: 6px;
             height: 6px;
             border-radius: 50%;
             background: #34c759;
+            flex-shrink: 0;
         }
 
-        /* ── Download Button Premium ── */
-        .download-btn-wrap {
-            position: relative;
-            display: inline-flex;
-        }
-
-        .download-progress-ring {
-            position: absolute;
-            inset: 0;
-            pointer-events: none;
-            opacity: 0;
-            transition: opacity .2s;
-        }
-
-        .download-btn-wrap.loading .download-progress-ring {
-            opacity: 1;
-        }
-
-        .download-btn-wrap.loading .btn-primary {
-            opacity: .7;
-            pointer-events: none;
-        }
-
-        .download-btn-wrap.done .btn-primary {
-            background: #34c759 !important;
-        }
-
-        /* ── Theme variants per event type ── */
-        [data-event-type="birthday"] {
-            --theme-tint: rgba(255, 100, 0, .15);
-        }
-
-        [data-event-type="wedding"] {
-            --theme-tint: rgba(220, 180, 80, .18);
-        }
-
-        [data-event-type="vip"] {
-            --theme-tint: rgba(100, 60, 200, .22);
-        }
-
-        [data-event-type="gala"] {
-            --theme-tint: rgba(30, 30, 30, .25);
-        }
-
-        [data-event-type="club"] {
-            --theme-tint: rgba(0, 120, 255, .2);
-        }
-
-        [data-event-type="party"] {
-            --theme-tint: rgba(220, 0, 100, .15);
-        }
-
-        /* ── Tilt cursor ── */
-        .invitation-shell {
-            user-select: none;
-        }
-
-        /* ── Responsive ── */
-        @media (max-width: 480px) {
-            .card-hero {
-                height: 240px;
-            }
-
-            .hero-event-name {
-                font-size: 1.35rem;
-            }
-
-            .guest-name {
-                font-size: 1.3rem;
-            }
-        }
-
-        /* ── Download overlay ── */
+        /* ══════════════════════════════════════════════════════════════
+                   DOWNLOAD OVERLAY
+                ══════════════════════════════════════════════════════════════ */
         .download-overlay {
             position: fixed;
             inset: 0;
@@ -639,7 +612,7 @@
         }
 
         .download-overlay-card {
-            background: #fff;
+            background: #fdf6ee;
             border-radius: 24px;
             padding: 2rem 2.5rem;
             text-align: center;
@@ -660,8 +633,8 @@
         .dl-spinner {
             width: 48px;
             height: 48px;
-            border: 3px solid #e5e5ea;
-            border-top-color: #0e84e8;
+            border: 3px solid rgba(184, 150, 12, .2);
+            border-top-color: #8b1a1a;
             border-radius: 50%;
             margin: 0 auto 1rem;
             animation: spin360 .8s linear infinite;
@@ -674,9 +647,10 @@
         }
 
         .dl-title {
-            font-weight: 700;
-            font-size: 1rem;
-            color: #1d1d1f;
+            font-family: 'Cinzel', serif;
+            font-size: .9rem;
+            font-weight: 600;
+            color: #3a200a;
             margin-bottom: .35rem;
         }
 
@@ -685,47 +659,61 @@
         }
 
         .dl-sub {
-            font-size: .8rem;
-            color: #aeaeb2;
+            font-size: .78rem;
+            color: #a07850;
+            font-family: 'Cormorant Garamond', serif;
+            font-style: italic;
+        }
+
+        /* ── Download btn wrap ── */
+        .download-btn-wrap {
+            position: relative;
+            display: inline-flex;
+        }
+
+        /* ── Fade-up animation hook (matches existing admin layout) ── */
+        @media (max-width: 480px) {
+            .ic-event-name {
+                font-size: 2rem;
+            }
+
+            .ic-guest-name {
+                font-size: 2rem;
+            }
+
+            .ic-info-label {
+                font-size: .48rem;
+            }
         }
     </style>
 
     <div class="cardview-page">
 
-        <!-- Action bar -->
+        {{-- ── Action Bar ── --}}
         <div class="card-actions fade-up">
             <div class="download-btn-wrap" id="download-btn-wrap">
                 <button class="btn btn-primary btn-lg" onclick="triggerDownload()" id="download-btn">
-                    <svg width="16" height="16" fill="none" viewBox="0 0 24 24">
-                        <path d="M12 3v13m-5-5 5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-                        <path d="M4 20h16" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-                    </svg>
+                    <i class="fa-solid fa-download" style="margin-right:.4rem;"></i>
                     Save as Image
                 </button>
             </div>
 
             <a href="{{ route('showpublic', $guest->qrcode) }}" target="_blank" class="btn btn-ghost btn-lg">
-                <svg width="16" height="16" fill="none" viewBox="0 0 24 24">
-                    <path d="M15 3h6m0 0v6m0-6L10 14M9 5H5a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2v-4"
-                        stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-                </svg>
+                <i class="fa-solid fa-arrow-up-right-from-square" style="margin-right:.4rem;"></i>
                 Public View
             </a>
 
             <button class="btn btn-ghost btn-lg" onclick="copyLink()">
-                <svg width="16" height="16" fill="none" viewBox="0 0 24 24">
-                    <rect x="9" y="9" width="13" height="13" rx="2" stroke="currentColor" stroke-width="2" />
-                    <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke="currentColor" stroke-width="2" />
-                </svg>
+                <i class="fa-regular fa-copy" style="margin-right:.4rem;"></i>
                 Copy Link
             </button>
         </div>
 
-        <!-- Card shell with tilt -->
+        {{-- ── Card Shell ── --}}
         <div class="invitation-shell fade-up delay-1" id="card-shell">
 
             @php
-                $eventType = strtolower($event->event_type ?? 'party');
+                $eventType = strtolower($event->event_type ?? 'event');
                 $guestTitle = strtolower($guest->title ?? 'guest');
                 $eventDate = \Carbon\Carbon::parse($event->event_date);
                 $arrivalTime = \Carbon\Carbon::parse($event->arrival_time);
@@ -733,167 +721,413 @@
                 $bgImage = $event->event_image
                     ? asset('storage/' . $event->event_image)
                     : asset('storage/images/background.png');
+
+                /* ── Detect Islamic events for Bismillah display ── */
+                $islamicTypes = [
+                    'nikah',
+                    'wedding',
+                    'walima',
+                    'aqiqah',
+                    'khitan',
+                    'circumcision',
+                    'islamic',
+                    'muslim',
+                    'eid',
+                ];
+                $isIslamic = false;
+                foreach ($islamicTypes as $kw) {
+                    if (str_contains($eventType, $kw)) {
+                        $isIslamic = true;
+                        break;
+                    }
+                }
             @endphp
 
-            <div id="idcard" data-event-type="{{ $eventType }}">
+            <div id="idcard">
 
-                <!-- Hero image section -->
-                <div class="card-hero">
-                    <img src="{{ $bgImage }}" alt="{{ $event->order_name }}" class="card-hero-img" id="hero-img">
+                {{-- Cream background layer --}}
+                <div class="ic-bg"></div>
 
-                    <!-- Event type badge -->
-                    <div class="hero-badge">
-                        @if (str_contains($eventType, 'birthday'))
-                            🎂 Birthday
-                        @elseif(str_contains($eventType, 'wedding'))
-                            💍 Wedding
-                        @elseif(str_contains($eventType, 'vip'))
-                            ★ VIP
-                        @elseif(str_contains($eventType, 'gala'))
-                            ✦ Gala
-                        @else
-                            {{ ucfirst($eventType) }}
-                        @endif
+                {{-- Inner gold border frame --}}
+                <div class="ic-frame"></div>
+
+                {{-- Gold arc top-right --}}
+                <svg class="ic-arc" viewBox="0 0 280 280" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M280 0 Q120 0 95 165" fill="none" stroke="#b8960c" stroke-width="1.4" opacity=".55" />
+                    <path d="M280 0 Q135 0 110 170" fill="none" stroke="#b8960c" stroke-width=".5" opacity=".35" />
+                    <rect x="271" y="-3" width="6" height="6" transform="rotate(45 274 3)" fill="#b8960c"
+                        opacity=".55" />
+                    <circle cx="100" cy="165" r="2.5" fill="#b8960c" opacity=".45" />
+                </svg>
+
+                {{-- Mosque silhouette bg --}}
+                <svg class="ic-mosque" viewBox="0 0 430 180" xmlns="http://www.w3.org/2000/svg"
+                    preserveAspectRatio="xMidYMax meet">
+                    <ellipse cx="215" cy="115" rx="68" ry="55" fill="#7a4010" />
+                    <rect x="147" y="115" width="136" height="65" fill="#7a4010" />
+                    <rect x="211" y="52" width="8" height="38" fill="#7a4010" />
+                    <polygon points="215,40 207,58 223,58" fill="#7a4010" />
+                    <path d="M215 37 C209 31 209 23 215 21 C207 23 207 33 215 37Z" fill="#7a4010" />
+                    <rect x="102" y="105" width="13" height="75" fill="#7a4010" />
+                    <ellipse cx="108" cy="103" rx="8" ry="12" fill="#7a4010" />
+                    <rect x="105" y="85" width="6" height="12" fill="#7a4010" />
+                    <polygon points="108,76 104,88 112,88" fill="#7a4010" />
+                    <rect x="315" y="105" width="13" height="75" fill="#7a4010" />
+                    <ellipse cx="321" cy="103" rx="8" ry="12" fill="#7a4010" />
+                    <rect x="318" y="85" width="6" height="12" fill="#7a4010" />
+                    <polygon points="321,76 317,88 325,88" fill="#7a4010" />
+                    <rect x="56" y="128" width="9" height="52" fill="#7a4010" />
+                    <ellipse cx="60" cy="126" rx="6" ry="9" fill="#7a4010" />
+                    <rect x="360" y="128" width="9" height="52" fill="#7a4010" />
+                    <ellipse cx="364" cy="126" rx="6" ry="9" fill="#7a4010" />
+                    <path d="M186 115 Q186 101 200 101 Q214 101 214 115Z" fill="#fdf6ee" opacity=".45" />
+                    <path d="M216 115 Q216 101 230 101 Q244 101 244 115Z" fill="#fdf6ee" opacity=".45" />
+                </svg>
+
+                {{-- Floral top-left --}}
+                <svg class="floral-tl" viewBox="0 0 210 250" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M8 220 Q55 155 85 95 Q115 45 145 8" fill="none" stroke="#7a8a5a" stroke-width="1.8" />
+                    <path d="M28 232 Q66 178 95 138" fill="none" stroke="#6a7a4a" stroke-width="1.4" />
+                    <ellipse cx="77" cy="108" rx="20" ry="8" fill="#6a7a4a"
+                        transform="rotate(-40 77 108)" opacity=".85" />
+                    <ellipse cx="107" cy="62" rx="17" ry="7" fill="#8a9a5a"
+                        transform="rotate(-60 107 62)" opacity=".8" />
+                    <ellipse cx="57" cy="152" rx="15" ry="6" fill="#5a6a3a"
+                        transform="rotate(-20 57 152)" opacity=".75" />
+                    <ellipse cx="138" cy="28" rx="13" ry="5" fill="#7a8a5a"
+                        transform="rotate(-70 138 28)" opacity=".7" />
+                    <circle cx="92" cy="76" r="3.5" fill="#8b1a1a" opacity=".8" />
+                    <circle cx="100" cy="70" r="2.8" fill="#8b1a1a" opacity=".7" />
+                    <circle cx="97" cy="81" r="2.5" fill="#a02020" opacity=".6" />
+                    <circle cx="150" cy="12" r="2.5" fill="#8b1a1a" opacity=".7" />
+                    {{-- Large dark-red rose --}}
+                    <g transform="translate(12,152) rotate(-10)">
+                        <circle cx="36" cy="36" r="32" fill="#6b1010" opacity=".8" />
+                        <circle cx="36" cy="36" r="24" fill="#8b1a1a" />
+                        <ellipse cx="36" cy="21" rx="15" ry="17" fill="#a02020" />
+                        <ellipse cx="21" cy="43" rx="15" ry="13" fill="#9a1818" />
+                        <ellipse cx="50" cy="40" rx="14" ry="13" fill="#9a1818" />
+                        <ellipse cx="36" cy="52" rx="13" ry="9" fill="#8b1a1a" />
+                        <ellipse cx="36" cy="27" rx="7" ry="11" fill="#c03030" />
+                        <ellipse cx="29" cy="36" rx="6" ry="9" fill="#b02020" />
+                        <ellipse cx="43" cy="36" rx="6" ry="9" fill="#b02020" />
+                    </g>
+                    {{-- Cream rose --}}
+                    <g transform="translate(78,28) rotate(15)">
+                        <circle cx="26" cy="26" r="22" fill="#e8ddd0" opacity=".9" />
+                        <circle cx="26" cy="26" r="15" fill="#f0e6d8" />
+                        <ellipse cx="26" cy="15" rx="10" ry="12" fill="#f5ede0" />
+                        <ellipse cx="16" cy="31" rx="10" ry="9" fill="#ede3d5" />
+                        <ellipse cx="36" cy="29" rx="9" ry="9" fill="#ede3d5" />
+                        <ellipse cx="26" cy="26" rx="5" ry="7" fill="#fff5ea" />
+                    </g>
+                    {{-- Small bud --}}
+                    <g transform="translate(140,-2) rotate(20)">
+                        <ellipse cx="16" cy="22" rx="9" ry="13" fill="#8b1a1a"
+                            opacity=".72" />
+                        <ellipse cx="16" cy="16" rx="6" ry="9" fill="#a02020"
+                            opacity=".78" />
+                        <path d="M12 27 Q16 33 20 27" fill="#6a7a4a" />
+                    </g>
+                </svg>
+
+                {{-- Floral top-right (small spray) --}}
+                <svg class="floral-tr" viewBox="0 0 120 190" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M100 8 Q70 60 60 110 Q52 150 55 185" fill="none" stroke="#7a8a5a" stroke-width="1.4" />
+                    <ellipse cx="75" cy="55" rx="14" ry="6" fill="#6a7a4a"
+                        transform="rotate(50 75 55)" opacity=".8" />
+                    <ellipse cx="65" cy="100" rx="12" ry="5" fill="#8a9a5a"
+                        transform="rotate(30 65 100)" opacity=".75" />
+                    <circle cx="82" cy="40" r="3" fill="#8b1a1a" opacity=".75" />
+                    <circle cx="90" cy="35" r="2.5" fill="#8b1a1a" opacity=".65" />
+                    {{-- Small red bud --}}
+                    <g transform="translate(88,5) rotate(-15)">
+                        <ellipse cx="12" cy="18" rx="8" ry="12" fill="#8b1a1a"
+                            opacity=".7" />
+                        <ellipse cx="12" cy="13" rx="5" ry="8" fill="#a02020"
+                            opacity=".75" />
+                    </g>
+                </svg>
+
+                {{-- Floral bottom-right --}}
+                <svg class="floral-br" viewBox="0 0 230 270" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M230 270 Q172 215 135 155 Q106 106 87 48" fill="none" stroke="#7a8a5a"
+                        stroke-width="1.8" />
+                    <path d="M230 255 Q185 205 155 162" fill="none" stroke="#6a7a4a" stroke-width="1.4" />
+                    <ellipse cx="153" cy="168" rx="21" ry="8" fill="#6a7a4a"
+                        transform="rotate(40 153 168)" opacity=".85" />
+                    <ellipse cx="124" cy="126" rx="18" ry="7" fill="#8a9a5a"
+                        transform="rotate(60 124 126)" opacity=".8" />
+                    <ellipse cx="182" cy="210" rx="16" ry="6" fill="#5a6a3a"
+                        transform="rotate(25 182 210)" opacity=".75" />
+                    <circle cx="140" cy="142" r="3.5" fill="#8b1a1a" opacity=".8" />
+                    <circle cx="148" cy="137" r="2.8" fill="#8b1a1a" opacity=".7" />
+                    <circle cx="144" cy="148" r="2.5" fill="#a02020" opacity=".6" />
+                    {{-- Large dark-red rose --}}
+                    <g transform="translate(122,170) rotate(10)">
+                        <circle cx="38" cy="38" r="34" fill="#6b1010" opacity=".8" />
+                        <circle cx="38" cy="38" r="26" fill="#8b1a1a" />
+                        <ellipse cx="38" cy="22" rx="16" ry="18" fill="#a02020" />
+                        <ellipse cx="22" cy="45" rx="16" ry="14" fill="#9a1818" />
+                        <ellipse cx="52" cy="43" rx="15" ry="14" fill="#9a1818" />
+                        <ellipse cx="38" cy="54" rx="14" ry="10" fill="#8b1a1a" />
+                        <ellipse cx="38" cy="28" rx="8" ry="12" fill="#c03030" />
+                        <ellipse cx="30" cy="38" rx="7" ry="10" fill="#b02020" />
+                        <ellipse cx="46" cy="38" rx="7" ry="10" fill="#b02020" />
+                    </g>
+                    {{-- Cream rose --}}
+                    <g transform="translate(176,210) rotate(-15)">
+                        <circle cx="26" cy="26" r="22" fill="#e8ddd0" opacity=".9" />
+                        <circle cx="26" cy="26" r="15" fill="#f0e6d8" />
+                        <ellipse cx="26" cy="15" rx="10" ry="12" fill="#f5ede0" />
+                        <ellipse cx="16" cy="31" rx="10" ry="9" fill="#ede3d5" />
+                        <ellipse cx="36" cy="29" rx="9" ry="9" fill="#ede3d5" />
+                        <ellipse cx="26" cy="26" rx="5" ry="7" fill="#fff5ea" />
+                    </g>
+                    {{-- Bud top --}}
+                    <g transform="translate(82,42) rotate(-25)">
+                        <ellipse cx="16" cy="22" rx="9" ry="13" fill="#8b1a1a"
+                            opacity=".72" />
+                        <ellipse cx="16" cy="16" rx="6" ry="9" fill="#a02020"
+                            opacity=".78" />
+                        <path d="M12 27 Q16 33 20 27" fill="#6a7a4a" />
+                    </g>
+                    {{-- Mini bud mid --}}
+                    <g transform="translate(168,155) rotate(28)">
+                        <circle cx="12" cy="12" r="10" fill="#8b1a1a" opacity=".78" />
+                        <circle cx="12" cy="12" r="7" fill="#a02020" />
+                        <ellipse cx="12" cy="7" rx="5" ry="7" fill="#c03030"
+                            opacity=".75" />
+                    </g>
+                </svg>
+
+                {{-- Lanterns --}}
+                <svg class="ic-lanterns" width="68" height="135" viewBox="0 0 68 135"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <line x1="28" y1="0" x2="28" y2="17" stroke="#b8960c"
+                        stroke-width="1.4" />
+                    <line x1="50" y1="0" x2="50" y2="28" stroke="#b8960c"
+                        stroke-width="1.4" />
+                    {{-- Lantern 1 --}}
+                    <g transform="translate(28,17)">
+                        <polygon points="0,-4 13,0 13,38 0,42 -13,38 -13,0" fill="#c9920c" />
+                        <rect x="-9" y="0" width="18" height="38" rx="2" fill="none" stroke="#d4a017"
+                            stroke-width=".5" />
+                        <line x1="-13" y1="10" x2="13" y2="10" stroke="#d4a017"
+                            stroke-width=".5" opacity=".55" />
+                        <line x1="-13" y1="20" x2="13" y2="20" stroke="#d4a017"
+                            stroke-width=".5" opacity=".55" />
+                        <line x1="-13" y1="30" x2="13" y2="30" stroke="#d4a017"
+                            stroke-width=".5" opacity=".55" />
+                        <ellipse cx="0" cy="19" rx="7" ry="11"
+                            fill="rgba(255,220,80,.3)" />
+                        <rect x="-5" y="-7" width="10" height="6" rx="1" fill="#b8960c" />
+                        <line x1="-7" y1="42" x2="-7" y2="50" stroke="#b8960c"
+                            stroke-width="1.1" />
+                        <line x1="-2" y1="42" x2="-2" y2="52" stroke="#b8960c"
+                            stroke-width="1.1" />
+                        <line x1="3" y1="42" x2="3" y2="50" stroke="#b8960c"
+                            stroke-width="1.1" />
+                        <line x1="8" y1="42" x2="8" y2="49" stroke="#b8960c"
+                            stroke-width="1.1" />
+                    </g>
+                    {{-- Lantern 2 (smaller) --}}
+                    <g transform="translate(50,28)">
+                        <polygon points="0,-3 9,0 9,28 0,31 -9,28 -9,0" fill="#c9920c" />
+                        <rect x="-6" y="0" width="12" height="28" rx="2" fill="none" stroke="#d4a017"
+                            stroke-width=".5" />
+                        <line x1="-9" y1="8" x2="9" y2="8" stroke="#d4a017"
+                            stroke-width=".5" opacity=".55" />
+                        <line x1="-9" y1="16" x2="9" y2="16" stroke="#d4a017"
+                            stroke-width=".5" opacity=".55" />
+                        <line x1="-9" y1="24" x2="9" y2="24" stroke="#d4a017"
+                            stroke-width=".5" opacity=".55" />
+                        <ellipse cx="0" cy="14" rx="4.5" ry="7"
+                            fill="rgba(255,220,80,.28)" />
+                        <rect x="-3.5" y="-5" width="7" height="4" rx="1" fill="#b8960c" />
+                        <line x1="-5" y1="31" x2="-5" y2="37" stroke="#b8960c"
+                            stroke-width="1.1" />
+                        <line x1="0" y1="31" x2="0" y2="39" stroke="#b8960c"
+                            stroke-width="1.1" />
+                        <line x1="5" y1="31" x2="5" y2="37" stroke="#b8960c"
+                            stroke-width="1.1" />
+                    </g>
+                </svg>
+
+                {{-- ══════ MAIN CARD CONTENT ══════ --}}
+                <div class="ic-content">
+
+                    {{-- Bismillah — shown for Islamic event types --}}
+                    @if ($isIslamic)
+                        <div class="ic-bismillah">بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيم</div>
+                    @endif
+
+                    {{-- "Together with our families" --}}
+                    <div class="ic-eyebrow" style="margin-top:{{ $isIslamic ? '0' : '2.2rem' }}">
+                        Together With Our Families
+                    </div>
+                    <div class="ic-subline">We cordially invite you to the</div>
+
+                    {{-- Event name in Great Vibes script --}}
+                    <span class="ic-event-name">{{ $event->order_name }}</span>
+
+                    {{-- Event type label with gold dashes --}}
+                    <div class="ic-event-type-row">
+                        <div class="ic-type-dash"></div>
+                        <span class="ic-type-label">{{ ucfirst($eventType) }}</span>
+                        <div class="ic-type-dash r"></div>
                     </div>
 
-                    <!-- Event name at bottom of hero -->
-                    <div class="hero-info">
-                        <div class="hero-event-name">{{ $event->order_name }}</div>
-                        @if ($event->event_host)
-                            <div class="hero-event-sub">Hosted by {{ $event->event_host }}</div>
-                        @endif
+                    {{-- Ornament --}}
+                    <div class="ic-orn">
+                        <div class="ic-orn-line"></div>
+                        <div class="ic-orn-diamond"></div>
+                        <svg width="12" height="8" viewBox="0 0 12 8" style="opacity:.55">
+                            <path d="M6 1 C4 2.5 1 3.5 1 5.5 C1 7 3.5 7.5 6 7.5 C8.5 7.5 11 7 11 5.5 C11 3.5 8 2.5 6 1Z"
+                                fill="none" stroke="#b8960c" stroke-width=".8" />
+                        </svg>
+                        <div class="ic-orn-diamond"></div>
+                        <div class="ic-orn-line"></div>
                     </div>
-                </div>
 
-                <!-- Card body -->
-                <div class="card-body-inner">
-                    <div class="card-shimmer-bar"></div>
+                    {{-- Host line --}}
+                    @if ($event->event_host)
+                        <div class="ic-host">Hosted by {{ $event->event_host }}</div>
+                    @endif
 
-                    <!-- Guest identity -->
-                    <div class="guest-salutation">You are cordially invited,</div>
-                    <div class="guest-name">{{ $guest->full_name }}</div>
+                    {{-- Guest salutation + name --}}
+                    <div class="ic-salutation">You are cordially invited,</div>
+                    <div class="ic-guest-name">{{ $guest->full_name }}</div>
+
                     @if ($guestTitle && $guestTitle !== 'guest')
-                        <div class="guest-title-badge">
-                            <svg width="9" height="9" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M12 2l3 6 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1z" />
-                            </svg>
-                            {{ ucfirst($guestTitle) }}
+                        <div style="text-align:center; margin-bottom:.9rem;">
+                            <span class="ic-guest-badge">
+                                <i class="fa-solid fa-star" style="font-size:.5rem;"></i>
+                                {{ ucfirst($guestTitle) }}
+                            </span>
                         </div>
                     @endif
 
-                    <!-- Ornament divider -->
-                    <div class="card-ornament-divider">
-                        <div class="ornament-line"></div>
-                        <svg class="ornament-icon" width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z" />
-                        </svg>
-                        <div class="ornament-line right"></div>
+                    {{-- Ornament divider --}}
+                    <div class="ic-orn" style="margin-bottom:.85rem;">
+                        <div class="ic-orn-line"></div>
+                        <div class="ic-orn-diamond"></div>
+                        <div class="ic-orn-diamond"></div>
+                        <div class="ic-orn-line"></div>
                     </div>
 
-                    <!-- Detail rows -->
-                    <div class="card-details">
-                        <div class="detail-row">
-                            <div class="detail-icon-wrap">
-                                <svg fill="none" viewBox="0 0 24 24">
-                                    <rect x="3" y="4" width="18" height="18" rx="3" stroke="currentColor"
-                                        stroke-width="2" />
-                                    <path d="M3 9h18M8 2v4m8-4v4" stroke="currentColor" stroke-width="2"
-                                        stroke-linecap="round" />
-                                </svg>
-                            </div>
-                            <div>
-                                <div class="detail-label">Date</div>
-                                <div class="detail-value">{{ $eventDate->format('l, j F Y') }}</div>
-                            </div>
-                        </div>
-
-                        <div class="detail-row">
-                            <div class="detail-icon-wrap">
-                                <svg fill="none" viewBox="0 0 24 24">
-                                    <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2" />
-                                    <path d="M12 7v5l3 3" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-                                </svg>
-                            </div>
-                            <div>
-                                <div class="detail-label">Time</div>
-                                <div class="detail-value">{{ $arrivalTime->format('g:i A') }}</div>
-                            </div>
-                        </div>
-
-                        <div class="detail-row">
-                            <div class="detail-icon-wrap">
-                                <svg fill="none" viewBox="0 0 24 24">
-                                    <path d="M12 21s-7-6.5-7-11a7 7 0 0114 0c0 4.5-7 11-7 11z" stroke="currentColor"
-                                        stroke-width="2" />
-                                    <circle cx="12" cy="10" r="2.5" stroke="currentColor"
-                                        stroke-width="2" />
-                                </svg>
-                            </div>
-                            <div>
-                                <div class="detail-label">Venue</div>
-                                <div class="detail-value">{{ $event->event_location }}</div>
-                            </div>
-                        </div>
-
+                    {{-- Blessing / description --}}
+                    <p class="ic-blessing">
                         @if ($event->event_desc)
-                            <div class="detail-row" style="align-items:flex-start;">
-                                <div class="detail-icon-wrap" style="margin-top:2px;">
-                                    <svg fill="none" viewBox="0 0 24 24">
-                                        <path d="M8 12h8M8 8h5M5 3h14a2 2 0 012 2v16l-4-2-4 2-4-2-4 2V5a2 2 0 012-2z"
-                                            stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-                                    </svg>
-                                </div>
-                                <div>
-                                    <div class="detail-label">Note</div>
-                                    <div class="detail-value" style="font-weight:400;font-size:.76rem;color:#6e6e73;">
-                                        {{ $event->event_desc }}</div>
-                                </div>
-                            </div>
+                            {{ $event->event_desc }}
+                        @else
+                            With the blessings of Allah, we request the honor
+                            of your presence at the celebration of our dear ones.
                         @endif
-                    </div>
-                </div>
+                    </p>
 
-                <!-- QR + Code ticket section -->
-                <div class="card-qr-section px-5">
-                    <div class="qr-wrap ps-2">
-                        <div class="qr-inner">
-                            {{-- <div class="qr-scan-line"></div> --}}
-                            {!! QrCode::size(100)->generate($publicUrl) !!}
-                        </div>
-                    </div>
+                    {{-- Gold rule --}}
+                    <div class="ic-rule"></div>
 
-                    <div class="qr-separator"></div>
-
-                    <div class="qr-meta">
-                        <div>
-                            <div class="qr-meta-label">Invitation Code</div>
-                            <div class="qr-meta-code">{{ $guest->invitation_code }}</div>
-                        </div>
-                        <div>
-                            <div class="qr-meta-label">Admission</div>
-                            <div style="font-size:.72rem;font-weight:600;color:#1d1d1f;" class="dark:text-white">
-                                {{ $guest->counter ?? '1 Person' }}
+                    {{-- Date / Time / Venue info strip --}}
+                    <div class="ic-info-strip">
+                        <div class="ic-info-block">
+                            <i class="fa-regular fa-calendar-days ic-info-icon"></i>
+                            <div class="ic-info-label">
+                                {{ $eventDate->format('l') }}<br>
+                                {{ $eventDate->format('M j, Y') }}
                             </div>
                         </div>
-                        <div class="qr-meta-hint">Scan QR or present<br>code at the entrance</div>
+                        <div class="ic-info-block">
+                            <i class="fa-regular fa-clock ic-info-icon"></i>
+                            <div class="ic-info-label">
+                                At {{ $arrivalTime->format('g:i A') }}
+                            </div>
+                        </div>
+                        <div class="ic-info-block">
+                            <i class="fa-solid fa-location-dot ic-info-icon"></i>
+                            <div class="ic-info-label">
+                                {{ $event->event_location }}
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Closing italic quote --}}
+                    <div class="ic-closing">
+                        Your presence will<br>make this occasion more special
+                    </div>
+
+                    {{-- Small ornament --}}
+                    <div class="ic-orn" style="margin-bottom:.9rem;">
+                        <div class="ic-orn-line"></div>
+                        <div class="ic-orn-diamond"></div>
+                        <svg width="10" height="10" viewBox="0 0 10 10" style="opacity:.55">
+                            <path d="M5 1 L5 9 M1 5 L9 5" stroke="#b8960c" stroke-width=".8" />
+                            <circle cx="5" cy="5" r="1.5" fill="#b8960c" opacity=".7" />
+                        </svg>
+                        <div class="ic-orn-diamond"></div>
+                        <div class="ic-orn-line"></div>
+                    </div>
+
+                    {{-- Jazakum Allah Khair pill --}}
+                    @if ($isIslamic)
+                        <div class="ic-jazakum">
+                            <span class="ic-jazakum-line"></span>
+                            Jazakum Allah Khair
+                            <span class="ic-jazakum-line"></span>
+                        </div>
+                    @else
+                        <div class="ic-jazakum">
+                            <span class="ic-jazakum-line"></span>
+                            We look forward to seeing you
+                            <span class="ic-jazakum-line"></span>
+                        </div>
+                    @endif
+
+                </div>{{-- /.ic-content --}}
+
+                {{-- ══════ QR / TICKET SECTION ══════ --}}
+                <div style="padding: 0 1.4rem; position:relative; z-index:4; margin-bottom:.2rem;">
+                    <div class="ic-ticket">
+                        <div class="ic-qr-wrap">
+                            <div class="ic-qr-inner">
+                                {!! QrCode::size(100)->generate($publicUrl) !!}
+                            </div>
+                        </div>
+
+                        <div class="ic-ticket-sep"></div>
+
+                        <div class="ic-ticket-meta">
+                            <div>
+                                <div class="ic-ticket-label">Invitation Code</div>
+                                <div class="ic-ticket-code">{{ $guest->invitation_code }}</div>
+                            </div>
+                            <div>
+                                <div class="ic-ticket-label">Admission</div>
+                                <div class="ic-ticket-admission">{{ $guest->counter ?? '1 Person' }}</div>
+                            </div>
+                            <div class="ic-ticket-hint">
+                                Scan QR or present code<br>at the entrance
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Card footer -->
-                <div class="card-footer-strip">
-                    <span class="card-brand">TapEvent Card</span>
-                    <span class="card-counter">
-                        <span class="counter-dot"></span>
+                {{-- ══════ CARD FOOTER ══════ --}}
+                <div class="ic-footer" style="position:relative;z-index:4;">
+                    <span class="ic-footer-brand">TapEvent Card</span>
+                    <span class="ic-footer-valid">
+                        <span class="ic-valid-dot"></span>
                         Valid Invitation
                     </span>
                 </div>
 
-            </div><!-- /#idcard -->
-        </div><!-- /.invitation-shell -->
+            </div>{{-- /#idcard --}}
+        </div>{{-- /.invitation-shell --}}
 
-    </div><!-- /.cardview-page -->
+    </div>{{-- /.cardview-page --}}
 
-    <!-- Download overlay -->
+    {{-- Download overlay --}}
     <div class="download-overlay" id="download-overlay">
         <div class="download-overlay-card">
             <div class="dl-spinner" id="dl-spinner"></div>
@@ -904,27 +1138,19 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script>
-        /* ── Tilt effect ── */
+        /* ── 3-D tilt on hover ── */
         (function() {
             const shell = document.getElementById('card-shell');
             const card = document.getElementById('idcard');
             if (!shell || !card) return;
-
             shell.addEventListener('mousemove', (e) => {
-                const rect = shell.getBoundingClientRect();
-                const x = (e.clientX - rect.left) / rect.width - .5;
-                const y = (e.clientY - rect.top) / rect.height - .5;
-                card.style.transform = `
-            rotateY(${x * 10}deg)
-            rotateX(${-y * 8}deg)
-            scale(1.015)
-        `;
-                card.style.boxShadow = `
-            ${-x * 20}px ${-y * 20}px 60px rgba(0,0,0,.25),
-            0 32px 80px rgba(0,0,0,.3)
-        `;
+                const r = shell.getBoundingClientRect();
+                const x = (e.clientX - r.left) / r.width - .5;
+                const y = (e.clientY - r.top) / r.height - .5;
+                card.style.transform = `rotateY(${x*9}deg) rotateX(${-y*7}deg) scale(1.013)`;
+                card.style.boxShadow =
+                    `${-x*22}px ${-y*18}px 55px rgba(80,30,0,.28), 0 36px 90px rgba(80,35,5,.42)`;
             });
-
             shell.addEventListener('mouseleave', () => {
                 card.style.transform = '';
                 card.style.boxShadow = '';
@@ -937,10 +1163,9 @@
             const spinner = document.getElementById('dl-spinner');
             const title = document.getElementById('dl-title');
             const sub = document.getElementById('dl-sub');
-
             overlay.classList.add('show');
-            title.textContent = 'Generating high‑quality image…';
-            sub.textContent = 'Please wait, this may take a few seconds';
+            title.textContent = 'Generating high-quality image…';
+            sub.textContent = 'Please wait a few seconds';
 
             fetch('{{ route('user.generateCardImage', ['eventId' => $event->id, 'guestId' => $guest->id]) }}', {
                     method: 'GET',
@@ -948,27 +1173,24 @@
                         'X-Requested-With': 'XMLHttpRequest'
                     }
                 })
-                .then(response => response.json())
+                .then(r => r.json())
                 .then(data => {
                     if (data.success) {
                         spinner.classList.add('done');
-                        title.textContent = '✓ Ready!';
+                        title.textContent = 'Ready!';
                         sub.textContent = 'Your download will start automatically';
-
-                        // Create a hidden link and trigger download
-                        const link = document.createElement('a');
-                        link.href = data.url;
-                        link.download = 'invitation-card.png';
-                        document.body.appendChild(link);
-                        link.click();
-                        document.body.removeChild(link);
-
+                        const a = document.createElement('a');
+                        a.href = data.url;
+                        a.download = 'invitation-card.png';
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
                         setTimeout(() => overlay.classList.remove('show'), 1500);
                     } else {
                         throw new Error('Server error');
                     }
                 })
-                .catch(error => {
+                .catch(() => {
                     overlay.classList.remove('show');
                     if (window.showToast) showToast('Failed to generate image', 'error');
                 });
@@ -984,16 +1206,12 @@
             });
         };
 
-        /* ── Close overlay on click ── */
+        /* ── Close overlay on backdrop click or Escape ── */
         document.getElementById('download-overlay').addEventListener('click', function(e) {
             if (e.target === this) this.classList.remove('show');
         });
-
-        /* ── Escape closes overlay ── */
         document.addEventListener('keydown', e => {
-            if (e.key === 'Escape') {
-                document.getElementById('download-overlay').classList.remove('show');
-            }
+            if (e.key === 'Escape') document.getElementById('download-overlay').classList.remove('show');
         });
     </script>
 

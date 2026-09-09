@@ -4,7 +4,7 @@
     "name": "bootstrap"
   },
   "resources/css/admin.css": {
-    "file": "assets/admin-CO6ChH74.css",
+    "file": "assets/admin-D84Yz8Yl.css",
     "src": "resources/css/admin.css",
     "isEntry": true,
     "name": "admin",
@@ -13,7 +13,7 @@
     ]
   },
   "resources/css/app.css": {
-    "file": "assets/app-BCUDMV2p.css",
+    "file": "assets/app-BScy8oWk.css",
     "src": "resources/css/app.css",
     "isEntry": true,
     "name": "app",
@@ -22,7 +22,7 @@
     ]
   },
   "resources/css/user.css": {
-    "file": "assets/user-Nc5M5YKv.css",
+    "file": "assets/user-CGzFPvBZ.css",
     "src": "resources/css/user.css",
     "isEntry": true,
     "name": "user",
