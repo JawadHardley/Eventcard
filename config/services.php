@@ -35,4 +35,8 @@ return [
         ],
     ],
 
+    'browserless' => [
+        'url' => env('BROWSERLESS_URL'),
+    ],
+
 ];

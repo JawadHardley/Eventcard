@@ -458,10 +458,14 @@ class GuestController extends Controller
         $dir = storage_path('app/public/cards');
         if (!file_exists($dir)) mkdir($dir, 0755, true);
 
-        $remote = env('BROWSERLESS_URL'); // ensure you set this
+        $browser = Browsershot::html($html);
+        $remote = config('services.browserless.url');
 
-        Browsershot::html($html)
-            ->setRemoteInstance($remote)
+        if ($remote) {
+            $browser->setRemoteInstance($remote);
+        }
+
+        $browser
             ->windowSize(650, 1000)
             ->deviceScaleFactor(2)
             ->waitUntilNetworkIdle()

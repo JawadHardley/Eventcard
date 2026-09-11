@@ -18,8 +18,8 @@
 
     <style>
         /* ══════════════════════════════════════════════════════════════
-                   PAGE WRAPPER
-                ══════════════════════════════════════════════════════════════ */
+                                                                                                                           PAGE WRAPPER
+                                                                                                                        ══════════════════════════════════════════════════════════════ */
         .cardview-page {
             display: flex;
             flex-direction: column;
@@ -37,9 +37,131 @@
             justify-content: center;
         }
 
+        /* ── Share message panel ── */
+        .share-panel {
+            width: 100%;
+            max-width: 630px;
+            margin-bottom: 2rem;
+            background: rgba(255, 250, 244, .96);
+            border: 1px solid rgba(184, 150, 12, .24);
+            border-radius: 12px;
+            box-shadow: 0 12px 34px rgba(80, 35, 5, .14);
+            overflow: hidden;
+        }
+
+        .share-panel-heading {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            padding: 1rem 1.15rem .8rem;
+            border-bottom: 1px solid rgba(184, 150, 12, .16);
+        }
+
+        .share-panel-title {
+            margin: 0;
+            color: #5a2d00;
+            font-family: 'Cinzel', serif;
+            font-size: .82rem;
+            letter-spacing: .08em;
+        }
+
+        .share-panel-subtitle {
+            margin: .25rem 0 0;
+            color: #8a6a4c;
+            font-family: 'DM Sans', sans-serif;
+            font-size: .72rem;
+        }
+
+        .share-panel-icon {
+            display: grid;
+            width: 34px;
+            height: 34px;
+            flex-shrink: 0;
+            place-items: center;
+            border-radius: 50%;
+            background: rgba(139, 26, 26, .09);
+            color: #8b1a1a;
+        }
+
+        .share-message-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: .85rem;
+            padding: 1rem 1.15rem 1.15rem;
+        }
+
+        .share-message-box {
+            min-width: 0;
+        }
+
+        .share-message-box-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: .5rem;
+            margin-bottom: .45rem;
+        }
+
+        .share-message-label {
+            color: #6a4a2a;
+            font-family: 'Cinzel', serif;
+            font-size: .62rem;
+            letter-spacing: .1em;
+        }
+
+        .share-copy-button {
+            display: inline-flex;
+            align-items: center;
+            gap: .35rem;
+            border: 0;
+            border-radius: 6px;
+            padding: .35rem .55rem;
+            background: #8b1a1a;
+            color: #fffaf4;
+            cursor: pointer;
+            font-family: 'DM Sans', sans-serif;
+            font-size: .66rem;
+            font-weight: 600;
+        }
+
+        .share-copy-button:hover {
+            background: #6f1313;
+        }
+
+        .share-message-text {
+            width: 100%;
+            min-height: 285px;
+            resize: vertical;
+            box-sizing: border-box;
+            border: 1px solid rgba(184, 150, 12, .22);
+            border-radius: 8px;
+            padding: .75rem;
+            background: #fffdf9;
+            color: #3a200a;
+            font-family: 'DM Sans', sans-serif;
+            font-size: .76rem;
+            line-height: 1.55;
+        }
+
+        .share-message-text:focus {
+            outline: 2px solid rgba(139, 26, 26, .18);
+            border-color: #8b1a1a;
+        }
+
+        @media (max-width: 620px) {
+            .share-message-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .share-message-text {
+                min-height: 230px;
+            }
+        }
+
         /* ══════════════════════════════════════════════════════════════
-                   CARD SHELL  (perspective + entrance animation)
-                ══════════════════════════════════════════════════════════════ */
+                                                                                                                           CARD SHELL  (perspective + entrance animation)
+                                                                                                                        ══════════════════════════════════════════════════════════════ */
         .invitation-shell {
             perspective: 1200px;
             width: 100%;
@@ -60,8 +182,8 @@
         }
 
         /* ══════════════════════════════════════════════════════════════
-                   THE CARD
-                ══════════════════════════════════════════════════════════════ */
+                                                                                                                           THE CARD
+                                                                                                                        ══════════════════════════════════════════════════════════════ */
         #idcard {
             width: 100%;
             border-radius: 6px;
@@ -143,8 +265,8 @@
         }
 
         /* ══════════════════════════════════════════════════════════════
-                   FLORAL CORNERS  (absolute, pointer-events:none)
-                ══════════════════════════════════════════════════════════════ */
+                                                                                                                           FLORAL CORNERS  (absolute, pointer-events:none)
+                                                                                                                        ══════════════════════════════════════════════════════════════ */
         .floral-tl,
         .floral-tr,
         .floral-br {
@@ -206,8 +328,8 @@
         }
 
         /* ══════════════════════════════════════════════════════════════
-                   TYPOGRAPHY  —  card interior
-                ══════════════════════════════════════════════════════════════ */
+                                                                                                                           TYPOGRAPHY  —  card interior
+                                                                                                                        ══════════════════════════════════════════════════════════════ */
         .ic-bismillah {
             padding-top: 2.1rem;
             font-family: 'Amiri', serif;
@@ -239,8 +361,8 @@
 
         /* ── Event name (hero title) ── */
         .ic-event-name {
-            font-family: 'Great Vibes', cursive;
-            font-size: 4.6rem;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 4rem;
             color: #8b1a1a;
             line-height: 1;
             text-align: center;
@@ -354,7 +476,7 @@
             line-height: 1.65;
             padding: 0 2.4rem;
             margin-bottom: 1.1rem;
-            max-width: 340px;
+            max-width: 600px;
         }
 
         /* ── Gold divider rule ── */
@@ -367,8 +489,8 @@
         }
 
         /* ══════════════════════════════════════════════════════════════
-                   INFO STRIP  (date / time / venue)
-                ══════════════════════════════════════════════════════════════ */
+                                                                                                                           INFO STRIP  (date / time / venue)
+                                                                                                                        ══════════════════════════════════════════════════════════════ */
         .ic-info-strip {
             display: flex;
             align-items: stretch;
@@ -416,8 +538,8 @@
         }
 
         /* ══════════════════════════════════════════════════════════════
-                   QR / TICKET SECTION   (keep existing ticket-stub style)
-                ══════════════════════════════════════════════════════════════ */
+                                                                                                                           QR / TICKET SECTION   (keep existing ticket-stub style)
+                                                                                                                        ══════════════════════════════════════════════════════════════ */
         .ic-ticket {
             display: flex;
             gap: 1rem;
@@ -516,8 +638,8 @@
         }
 
         /* ══════════════════════════════════════════════════════════════
-                   CLOSING
-                ══════════════════════════════════════════════════════════════ */
+                                                                                                                           CLOSING
+                                                                                                                        ══════════════════════════════════════════════════════════════ */
         .ic-closing {
             font-family: 'Great Vibes', cursive;
             font-size: 1.55rem;
@@ -588,8 +710,8 @@
         }
 
         /* ══════════════════════════════════════════════════════════════
-                   DOWNLOAD OVERLAY
-                ══════════════════════════════════════════════════════════════ */
+                                                                                                                           DOWNLOAD OVERLAY
+                                                                                                                        ══════════════════════════════════════════════════════════════ */
         .download-overlay {
             position: fixed;
             inset: 0;
@@ -708,6 +830,85 @@
                 Copy Link
             </button>
         </div>
+
+        @php
+            $messageDate = $event->event_date
+                ? \Carbon\Carbon::parse($event->event_date)->format('l, d-M-Y')
+                : '[Add event date]';
+            $messageTime = $event->arrival_time
+                ? \Carbon\Carbon::parse($event->arrival_time)->format('g:i A')
+                : '[Add event time]';
+            $messageHost = $event->event_host ?: '[Add family or host name]';
+            $messageVenue = $event->event_location ?: '[Add venue]';
+            $messageVenue2 = 'Sinza Africasana, Dar es Salaam';
+            $messageType = $event->event_type ? ucfirst($event->event_type) : '[Add invitation type]';
+            $messageCode = $guest->invitation_code ?: '[Add invitation code]';
+            $messageMapUrl = $event->card_link ?: 'https://maps.app.goo.gl/JqaKFPZhVwuCUURo6';
+            $messageUrl = $guest->more ?? url('/guest/' . $guest->qrcode);
+
+            $whatsappMessage =
+                "*{$event->order_name}*\n\n" .
+                "Familia ya {$messageHost}, Wanapenda kukualika *{$guest->full_name}* " .
+                "Kwenye harusi ya vijana wao wapendwa *Yasin H. Seif & Upendo S. Juma*\n\n" .
+                "Tarehe: {$messageDate} | {$messageTime}\n" .
+                "Ukumbi: {$messageVenue}\n" .
+                "Mahali: {$messageVenue2}\n" .
+                "Dresscode: Dark Purple\n" .
+                "S/N: {$messageCode}\n\n" .
+                "Location: {$messageMapUrl}\n\n" .
+                "Asante na Karibu Sana\n\n" .
+                "NOTE: *WATOTO TUNAWAPENDA ILA HAWARUHUSIWI*\n\n" .
+                "{$messageUrl}\n" .
+                'Designed by TapEventCard 0778515202';
+
+            $smsMessage =
+                "{$event->order_name}\n\n" .
+                "Familia ya {$messageHost}, Wanapenda kukualika ({$guest->full_name}) " .
+                "kwenye harusi ya vijana wao wapendwa *Yasin H. Seif & Upendo S. Juma*.\n\n" .
+                "Tarehe: {$messageDate} | {$messageTime}\n" .
+                "Ukumbi: {$messageVenue}\n" .
+                "Mahali: {$messageVenue2}\n" .
+                "Dresscode: Dark Purple\n" .
+                "S/N: {$messageCode}\n\n" .
+                "Location: {$messageMapUrl}\n\n" .
+                "Asante na Karibu Sana\n" .
+                "NOTE: WATOTO TUNAWAPENDA ILA HAWARUHUSIWI\n\n" .
+                "{$messageUrl}\n" .
+                'Designed by TapEventCard 0778515202';
+        @endphp
+
+        {{-- ── Copy-ready share messages ── --}}
+        <section class="share-panel fade-up delay-1" aria-labelledby="share-panel-title">
+            <div class="share-panel-heading">
+                <div>
+                    <h2 class="share-panel-title" id="share-panel-title">Copy invitation message</h2>
+                    <p class="share-panel-subtitle">Edit any placeholder, then copy the version you need.</p>
+                </div>
+                <span class="share-panel-icon" aria-hidden="true"><i class="fa-solid fa-paper-plane"></i></span>
+            </div>
+
+            <div class="share-message-grid">
+                <div class="share-message-box">
+                    <div class="share-message-box-header">
+                        <label class="share-message-label" for="whatsapp-message">WhatsApp</label>
+                        <button type="button" class="share-copy-button" onclick="copyMessage('whatsapp-message', this)">
+                            <i class="fa-regular fa-copy"></i> Copy
+                        </button>
+                    </div>
+                    <textarea class="share-message-text" id="whatsapp-message" spellcheck="false">{{ $whatsappMessage }}</textarea>
+                </div>
+
+                <div class="share-message-box">
+                    <div class="share-message-box-header">
+                        <label class="share-message-label" for="sms-message">SMS</label>
+                        <button type="button" class="share-copy-button" onclick="copyMessage('sms-message', this)">
+                            <i class="fa-regular fa-copy"></i> Copy
+                        </button>
+                    </div>
+                    <textarea class="share-message-text" id="sms-message" spellcheck="false">{{ $smsMessage }}</textarea>
+                </div>
+            </div>
+        </section>
 
         {{-- ── Card Shell ── --}}
         <div class="invitation-shell fade-up delay-1" id="card-shell">
@@ -966,7 +1167,7 @@
                     <div class="ic-eyebrow" style="margin-top:{{ $isIslamic ? '0' : '2.2rem' }}">
                         Together With Our Families
                     </div>
-                    <div class="ic-subline">We cordially invite you to the</div>
+                    <div class="ic-subline">We cordially invite you to</div>
 
                     {{-- Event name in Great Vibes script --}}
                     <span class="ic-event-name">{{ $event->order_name }}</span>
@@ -1054,11 +1255,11 @@
 
                     {{-- Closing italic quote --}}
                     <div class="ic-closing">
-                        Your presence will<br>make this occasion more special
+                        Watoto tunawapena ila hawaruhusiwi.
                     </div>
 
                     {{-- Small ornament --}}
-                    <div class="ic-orn" style="margin-bottom:.9rem;">
+                    {{-- <div class="ic-orn" style="margin-bottom:.9rem;">
                         <div class="ic-orn-line"></div>
                         <div class="ic-orn-diamond"></div>
                         <svg width="10" height="10" viewBox="0 0 10 10" style="opacity:.55">
@@ -1067,13 +1268,13 @@
                         </svg>
                         <div class="ic-orn-diamond"></div>
                         <div class="ic-orn-line"></div>
-                    </div>
+                    </div> --}}
 
                     {{-- Jazakum Allah Khair pill --}}
                     @if ($isIslamic)
                         <div class="ic-jazakum">
                             <span class="ic-jazakum-line"></span>
-                            Jazakum Allah Khair
+                            Asante na Karibu Sana
                             <span class="ic-jazakum-line"></span>
                         </div>
                     @else
@@ -1157,6 +1358,32 @@
             });
         })();
 
+        /* ── Copy share message ── */
+        window.copyMessage = function(messageId, button) {
+            const message = document.getElementById(messageId);
+            if (!message) return;
+
+            const copied = () => {
+                const original = button.innerHTML;
+                button.innerHTML = '<i class="fa-solid fa-check"></i> Copied';
+                if (window.showToast) showToast('Message copied!', 'success');
+                setTimeout(() => button.innerHTML = original, 1600);
+            };
+
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(message.value).then(copied).catch(() => fallbackCopy());
+            } else {
+                fallbackCopy();
+            }
+
+            function fallbackCopy() {
+                message.focus();
+                message.select();
+                if (document.execCommand('copy')) copied();
+                message.setSelectionRange(message.value.length, message.value.length);
+            }
+        };
+
         /* ── Download ── */
         window.triggerDownload = function() {
             const overlay = document.getElementById('download-overlay');
@@ -1173,7 +1400,13 @@
                         'X-Requested-With': 'XMLHttpRequest'
                     }
                 })
-                .then(r => r.json())
+                .then(async response => {
+                    const data = await response.json().catch(() => ({}));
+                    if (!response.ok) {
+                        throw new Error(data.message || `Export failed (${response.status})`);
+                    }
+                    return data;
+                })
                 .then(data => {
                     if (data.success) {
                         spinner.classList.add('done');
@@ -1181,7 +1414,8 @@
                         sub.textContent = 'Your download will start automatically';
                         const a = document.createElement('a');
                         a.href = data.url;
-                        a.download = 'invitation-card.png';
+                        randr = Math.floor(Math.random() * 100);
+                        a.download = `invitation-card-${randr}.png`;
                         document.body.appendChild(a);
                         a.click();
                         document.body.removeChild(a);
