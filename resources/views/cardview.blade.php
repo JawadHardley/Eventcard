@@ -18,8 +18,8 @@
 
     <style>
         /* ══════════════════════════════════════════════════════════════
-                                                                                                                                                           PAGE WRAPPER
-                                                                                                                                                        ══════════════════════════════════════════════════════════════ */
+                                                                                                                                                                   PAGE WRAPPER
+                                                                                                                                                                ══════════════════════════════════════════════════════════════ */
         .cardview-page {
             display: flex;
             flex-direction: column;
@@ -160,8 +160,8 @@
         }
 
         /* ══════════════════════════════════════════════════════════════
-                                                                                                                                                           CARD SHELL  (perspective + entrance animation)
-                                                                                                                                                        ══════════════════════════════════════════════════════════════ */
+                                                                                                                                                                   CARD SHELL  (perspective + entrance animation)
+                                                                                                                                                                ══════════════════════════════════════════════════════════════ */
         .invitation-shell {
             perspective: 1200px;
             width: 100%;
@@ -182,8 +182,8 @@
         }
 
         /* ══════════════════════════════════════════════════════════════
-                                                                                                                                                           THE CARD
-                                                                                                                                                        ══════════════════════════════════════════════════════════════ */
+                                                                                                                                                                   THE CARD
+                                                                                                                                                                ══════════════════════════════════════════════════════════════ */
         #idcard {
             width: 100%;
             border-radius: 6px;
@@ -265,8 +265,8 @@
         }
 
         /* ══════════════════════════════════════════════════════════════
-                                                                                                                                                           FLORAL CORNERS  (absolute, pointer-events:none)
-                                                                                                                                                        ══════════════════════════════════════════════════════════════ */
+                                                                                                                                                                   FLORAL CORNERS  (absolute, pointer-events:none)
+                                                                                                                                                                ══════════════════════════════════════════════════════════════ */
         .floral-tl,
         .floral-tr,
         .floral-br {
@@ -328,8 +328,8 @@
         }
 
         /* ══════════════════════════════════════════════════════════════
-                                                                                                                                                           TYPOGRAPHY  —  card interior
-                                                                                                                                                        ══════════════════════════════════════════════════════════════ */
+                                                                                                                                                                   TYPOGRAPHY  —  card interior
+                                                                                                                                                                ══════════════════════════════════════════════════════════════ */
         .ic-bismillah {
             padding-top: 2.1rem;
             font-family: 'Amiri', serif;
@@ -489,8 +489,8 @@
         }
 
         /* ══════════════════════════════════════════════════════════════
-                                                                                                                                                           INFO STRIP  (date / time / venue)
-                                                                                                                                                        ══════════════════════════════════════════════════════════════ */
+                                                                                                                                                                   INFO STRIP  (date / time / venue)
+                                                                                                                                                                ══════════════════════════════════════════════════════════════ */
         .ic-info-strip {
             display: flex;
             align-items: stretch;
@@ -538,8 +538,8 @@
         }
 
         /* ══════════════════════════════════════════════════════════════
-                                                                                                                                                           QR / TICKET SECTION   (keep existing ticket-stub style)
-                                                                                                                                                        ══════════════════════════════════════════════════════════════ */
+                                                                                                                                                                   QR / TICKET SECTION   (keep existing ticket-stub style)
+                                                                                                                                                                ══════════════════════════════════════════════════════════════ */
         .ic-ticket {
             display: flex;
             gap: 1rem;
@@ -638,8 +638,8 @@
         }
 
         /* ══════════════════════════════════════════════════════════════
-                                                                                                                                                           CLOSING
-                                                                                                                                                        ══════════════════════════════════════════════════════════════ */
+                                                                                                                                                                   CLOSING
+                                                                                                                                                                ══════════════════════════════════════════════════════════════ */
         .ic-closing {
             font-family: 'Great Vibes', cursive;
             font-size: 1.55rem;
@@ -710,8 +710,8 @@
         }
 
         /* ══════════════════════════════════════════════════════════════
-                                                                                                                                                           DOWNLOAD OVERLAY
-                                                                                                                                                        ══════════════════════════════════════════════════════════════ */
+                                                                                                                                                                   DOWNLOAD OVERLAY
+                                                                                                                                                                ══════════════════════════════════════════════════════════════ */
         .download-overlay {
             position: fixed;
             inset: 0;
@@ -1403,28 +1403,47 @@
             title.textContent = 'Generating high-quality image…';
             sub.textContent = 'Preparing the card in your browser';
 
-            const originalTransform = card.style.transform;
-            const originalTransition = card.style.transition;
-            const originalAnimation = card.style.animation;
-            const cardWidth = Math.ceil(card.getBoundingClientRect().width);
-            const cardHeight = Math.ceil(card.scrollHeight);
+            const exportWidth = 630;
+            const exportStage = document.createElement('div');
+            const exportCard = card.cloneNode(true);
 
-            card.style.transform = 'none';
-            card.style.transition = 'none';
-            card.style.animation = 'none';
+            exportStage.style.cssText = [
+                'position:fixed',
+                'left:-10000px',
+                'top:0',
+                `width:${exportWidth}px`,
+                'min-width:630px',
+                'visibility:visible',
+                'pointer-events:none',
+                'z-index:-1',
+                'overflow:visible',
+            ].join(';');
+            exportCard.style.cssText += [
+                `width:${exportWidth}px`,
+                'min-width:630px',
+                'max-width:630px',
+                'transform:none',
+                'transition:none',
+                'animation:none',
+                'margin:0',
+            ].join(';');
+            exportStage.appendChild(exportCard);
+            document.body.appendChild(exportStage);
 
             const renderCard = async () => {
                 if (document.fonts && document.fonts.ready) {
                     await document.fonts.ready;
                 }
 
-                return html2canvas(card, {
+                const exportHeight = Math.max(1, Math.ceil(exportCard.getBoundingClientRect().height));
+
+                return html2canvas(exportCard, {
                     backgroundColor: '#fdf6ee',
-                    scale: 3,
-                    width: cardWidth,
-                    height: cardHeight,
-                    windowWidth: cardWidth,
-                    windowHeight: cardHeight,
+                    scale: 2,
+                    width: exportWidth,
+                    height: exportHeight,
+                    windowWidth: exportWidth,
+                    windowHeight: exportHeight,
                     x: 0,
                     y: 0,
                     useCORS: true,
@@ -1499,12 +1518,9 @@
                         captureStyle.textContent = `
                             *, *::before, *::after { box-sizing: border-box !important; }
                             #idcard {
-                                width: ${cardWidth}px !important;
-                                min-width: ${cardWidth}px !important;
-                                max-width: ${cardWidth}px !important;
-                                height: ${cardHeight}px !important;
-                                min-height: ${cardHeight}px !important;
-                                max-height: ${cardHeight}px !important;
+                                width: ${exportWidth}px !important;
+                                min-width: ${exportWidth}px !important;
+                                max-width: ${exportWidth}px !important;
                                 transform: none !important;
                                 animation: none !important;
                             }
@@ -1547,9 +1563,7 @@
                     if (window.showToast) showToast(error.message || 'Failed to generate image', 'error');
                 })
                 .finally(() => {
-                    card.style.transform = originalTransform;
-                    card.style.transition = originalTransition;
-                    card.style.animation = originalAnimation;
+                    exportStage.remove();
                     button.disabled = false;
                 });
         };
