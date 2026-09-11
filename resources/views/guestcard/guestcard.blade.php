@@ -2,19 +2,17 @@
     @section('title', $event->order_name . ' — Your Invitation')
 
     {{-- ═══════════════════════════════════════════════════════════
-     CINEMATIC INTRO OVERLAY  (fades out after ~1.8s)
+    WEDDING REVEAL  (fast, graceful, immediately readable)
 ════════════════════════════════════════════════════════════ --}}
     <div id="gc-intro" aria-hidden="true">
         <div id="gc-intro-logo">
 
-            <div class="w-12 h-12 rounded-xl flex items-center justify-center shadow-sm">
-                <img src="{{ asset('storage/logos/logo1.png') }}" alt="Tapeventcard Logo">
-            </div>
+            <div class="gc-intro-seal" aria-hidden="true">&amp;</div>
             <span>TapEventCard</span>
         </div>
         <div id="gc-intro-title">{{ $event->order_name }}</div>
         <div id="gc-intro-line"></div>
-        <div id="gc-intro-sub">Your personal invitation awaits</div>
+        <div id="gc-intro-sub">A celebration of two hearts</div>
         <div id="gc-intro-sweep"></div>
     </div>
 
@@ -51,10 +49,14 @@
     {{-- ═══════════════════════════════════════════════════════════
      HERO
 ════════════════════════════════════════════════════════════ --}}
-    <section id="gc-hero" class="gc-hero" style="--hero-bg:url('{{ asset('storage/images/event-hero.jpg') }}')">
+    <section id="gc-hero" class="gc-hero">
 
         {{-- layered bg --}}
-        <div class="gc-hero-bg-img"></div>
+        <div class="gc-wedding-orbit gc-wedding-orbit--one"></div>
+        <div class="gc-wedding-orbit gc-wedding-orbit--two"></div>
+        <div class="gc-wedding-petals" aria-hidden="true">
+            <span>✦</span><span>✧</span><span>✦</span><span>·</span><span>✧</span><span>·</span>
+        </div>
         <div class="gc-hero-overlay"></div>
         <div class="gc-hero-noise"></div>
 
@@ -65,17 +67,21 @@
         <div class="gc-hero-content">
             <div class="gc-hero-eyebrow fade-up delay-1">
                 <span class="gc-dot-pulse"></span>
-                You're Invited
+                A wedding invitation
             </div>
 
             <h1 class="gc-hero-title fade-up delay-2">{{ $event->order_name }}</h1>
+
+            <div class="gc-wedding-mark fade-up delay-2" aria-hidden="true">
+                <span></span><b>&amp;</b><span></span>
+            </div>
 
             <p class="gc-hero-host fade-up delay-3">
                 Hosted by <strong>{{ $event->event_host }}</strong>
             </p>
 
             <p class="gc-hero-guest fade-up delay-4">
-                Dear <em>{{ $guest->full_name }}</em>, welcome.
+                Dear <em>{{ $guest->full_name }}</em>, your seat awaits.
             </p>
 
             {{-- Countdown --}}
@@ -220,50 +226,32 @@
     </section>
 
     {{-- ═══════════════════════════════════════════════════════════
-     GALLERY / IMAGE SHOWCASE
+     WEDDING STORY RAIL
 ════════════════════════════════════════════════════════════ --}}
-    <section id="gallery" class="gc-section gc-section--dark">
+    <section id="story" class="gc-section gc-section--dark gc-story-section">
         <div class="gc-container">
-            <div class="gc-eyebrow gc-eyebrow--light sr-up">Gallery</div>
-            <h2 class="gc-section-title gc-section-title--light sr-up">Memories in the Making</h2>
-        </div>
+            <div class="gc-eyebrow gc-eyebrow--light sr-up">The celebration</div>
+            <h2 class="gc-section-title gc-section-title--light sr-up">A beautiful day, held close.</h2>
 
-        <div class="gc-gallery-outer sr-up">
-            <div class="gc-gallery-track" id="gc-gallery-track">
-                @php
-                    $images = [
-                        asset('storage/images/img1.png'),
-                        asset('storage/images/img2.png'),
-                        asset('storage/images/img3.png'),
-                        asset('storage/images/img4.png'),
-                        asset('storage/images/img5.png'),
-                    ];
-                @endphp
-                @foreach ($images as $i => $img)
-                    <div class="gc-gallery-slide {{ $i === 0 ? 'active' : '' }}"
-                        style="--slide-img:url('{{ $img }}')">
-                        <div class="gc-gallery-slide-inner"></div>
-                        <div class="gc-gallery-num">{{ str_pad($i + 1, 2, '0', STR_PAD_LEFT) }}</div>
-                    </div>
-                @endforeach
-            </div>
-
-            <button class="gc-gallery-btn gc-gallery-btn--prev" onclick="gcGalleryPrev()" aria-label="Previous">
-                <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
-                    <path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-                </svg>
-            </button>
-            <button class="gc-gallery-btn gc-gallery-btn--next" onclick="gcGalleryNext()" aria-label="Next">
-                <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
-                    <path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-                </svg>
-            </button>
-
-            <div class="gc-gallery-dots" id="gc-gallery-dots">
-                @foreach ($images as $i => $img)
-                    <button class="gc-gdot {{ $i === 0 ? 'active' : '' }}"
-                        onclick="gcGalleryGo({{ $i }})" aria-label="Slide {{ $i + 1 }}"></button>
-                @endforeach
+            <div class="gc-story-rail">
+                <article class="gc-story-card sr-up">
+                    <span class="gc-story-number">01</span>
+                    <div class="gc-story-glyph">♡</div>
+                    <h3>The gathering</h3>
+                    <p>Come as you are, arrive with joy, and share this beginning with us.</p>
+                </article>
+                <article class="gc-story-card gc-story-card--featured sr-up">
+                    <span class="gc-story-number">02</span>
+                    <div class="gc-story-glyph">◌</div>
+                    <h3>The moment</h3>
+                    <p>Two lives, one promise, and a room full of the people who matter most.</p>
+                </article>
+                <article class="gc-story-card sr-up">
+                    <span class="gc-story-number">03</span>
+                    <div class="gc-story-glyph">✧</div>
+                    <h3>The memory</h3>
+                    <p>Stay for the laughter, the photographs, and every little celebration after.</p>
+                </article>
             </div>
         </div>
     </section>
@@ -444,6 +432,19 @@
             text-transform: uppercase;
             opacity: 0;
             animation: gcFadeUp .5s ease .1s forwards;
+        }
+
+        .gc-intro-seal {
+            display: grid;
+            width: 42px;
+            height: 42px;
+            place-items: center;
+            border: 1px solid rgba(201, 168, 76, .7);
+            border-radius: 50%;
+            color: #e7c878;
+            font-family: var(--gc-font-display);
+            font-size: 1.15rem;
+            box-shadow: 0 0 0 5px rgba(201, 168, 76, .08);
         }
 
         #gc-intro-title {
@@ -1414,6 +1415,318 @@
                 height: 38px;
             }
         }
+
+        /* ─────────── WEDDING STAGE ─────────── */
+        #gc-intro {
+            background: #120d0d;
+            transition-duration: .45s;
+        }
+
+        #gc-intro::before {
+            content: '';
+            position: absolute;
+            width: min(80vw, 540px);
+            aspect-ratio: 1;
+            border: 1px solid rgba(201, 168, 76, .22);
+            border-radius: 50%;
+            box-shadow: 0 0 0 22px rgba(201, 168, 76, .035), 0 0 0 48px rgba(201, 168, 76, .025);
+            animation: gcIntroOrbit 2s ease-out forwards;
+        }
+
+        #gc-intro-logo,
+        #gc-intro-title,
+        #gc-intro-sub,
+        #gc-intro-line {
+            position: relative;
+            z-index: 1;
+        }
+
+        #gc-intro-title {
+            color: #fff4e6;
+        }
+
+        #gc-intro-line {
+            background: #c9a84c;
+        }
+
+        @keyframes gcIntroOrbit {
+            from {
+                transform: scale(.7) rotate(-12deg);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1) rotate(0);
+                opacity: 1;
+            }
+        }
+
+        .gc-hero {
+            min-height: 100svh;
+            background:
+                radial-gradient(circle at 50% 22%, rgba(176, 35, 44, .2), transparent 30%),
+                radial-gradient(circle at 15% 80%, rgba(201, 168, 76, .08), transparent 28%),
+                #120d0d;
+        }
+
+        .gc-hero-bg-img {
+            display: none;
+        }
+
+        .gc-hero-overlay {
+            background:
+                linear-gradient(90deg, rgba(18, 13, 13, .94), transparent 30%, transparent 70%, rgba(18, 13, 13, .94)),
+                linear-gradient(180deg, rgba(18, 13, 13, .15), rgba(18, 13, 13, .9));
+        }
+
+        .gc-hero-noise {
+            opacity: .06;
+            background-image: radial-gradient(rgba(255, 255, 255, .65) .6px, transparent .6px);
+            background-size: 5px 5px;
+        }
+
+        .gc-hero-content {
+            max-width: 920px;
+            padding-top: 5rem;
+        }
+
+        .gc-hero-eyebrow {
+            color: rgba(255, 244, 230, .72);
+            border-color: rgba(201, 168, 76, .3);
+            background: rgba(201, 168, 76, .06);
+        }
+
+        .gc-hero-title {
+            max-width: 900px;
+            color: #fff4e6;
+            text-shadow: 0 8px 50px rgba(0, 0, 0, .5);
+            letter-spacing: -.035em;
+        }
+
+        .gc-wedding-mark {
+            display: flex;
+            align-items: center;
+            gap: .8rem;
+            width: min(220px, 55vw);
+            margin: -.2rem 0 1rem;
+            color: var(--gc-gold);
+            font-family: var(--gc-font-display);
+            font-size: 1.35rem;
+        }
+
+        .gc-wedding-mark span {
+            height: 1px;
+            flex: 1;
+            background: linear-gradient(90deg, transparent, var(--gc-gold));
+        }
+
+        .gc-wedding-mark span:last-child {
+            background: linear-gradient(90deg, var(--gc-gold), transparent);
+        }
+
+        .gc-hero-host,
+        .gc-hero-guest {
+            color: rgba(255, 244, 230, .72);
+        }
+
+        .gc-hero-guest em {
+            color: #e7c878;
+        }
+
+        .gc-wedding-orbit {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            width: min(78vw, 720px);
+            aspect-ratio: 1;
+            border: 1px solid rgba(201, 168, 76, .13);
+            border-radius: 50%;
+            transform: translate(-50%, -50%) rotate(-20deg);
+            pointer-events: none;
+        }
+
+        .gc-wedding-orbit::after {
+            content: '';
+            position: absolute;
+            top: 12%;
+            left: 50%;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #e7c878;
+            box-shadow: 0 0 22px 5px rgba(231, 200, 120, .45);
+        }
+
+        .gc-wedding-orbit--one {
+            animation: gcOrbit 18s linear infinite;
+        }
+
+        .gc-wedding-orbit--two {
+            width: min(62vw, 560px);
+            border-color: rgba(177, 42, 53, .2);
+            transform: translate(-50%, -50%) rotate(42deg) scaleY(.56);
+            animation: gcOrbitReverse 13s linear infinite;
+        }
+
+        @keyframes gcOrbit {
+            to {
+                transform: translate(-50%, -50%) rotate(340deg);
+            }
+        }
+
+        @keyframes gcOrbitReverse {
+            to {
+                transform: translate(-50%, -50%) rotate(-318deg) scaleY(.56);
+            }
+        }
+
+        .gc-wedding-petals {
+            position: absolute;
+            inset: 0;
+            overflow: hidden;
+            pointer-events: none;
+            color: rgba(231, 200, 120, .7);
+        }
+
+        .gc-wedding-petals span {
+            position: absolute;
+            top: -10%;
+            left: calc(var(--petal-x, 50) * 1%);
+            font-size: clamp(.7rem, 1.4vw, 1.15rem);
+            animation: gcPetalFall var(--petal-time, 9s) linear infinite;
+            animation-delay: var(--petal-delay, 0s);
+            opacity: 0;
+        }
+
+        .gc-wedding-petals span:nth-child(1) {
+            --petal-x: 12;
+            --petal-time: 8s;
+            --petal-delay: 0s;
+        }
+
+        .gc-wedding-petals span:nth-child(2) {
+            --petal-x: 28;
+            --petal-time: 11s;
+            --petal-delay: -4s;
+        }
+
+        .gc-wedding-petals span:nth-child(3) {
+            --petal-x: 47;
+            --petal-time: 9s;
+            --petal-delay: -2s;
+        }
+
+        .gc-wedding-petals span:nth-child(4) {
+            --petal-x: 65;
+            --petal-time: 12s;
+            --petal-delay: -6s;
+        }
+
+        .gc-wedding-petals span:nth-child(5) {
+            --petal-x: 81;
+            --petal-time: 10s;
+            --petal-delay: -1s;
+        }
+
+        .gc-wedding-petals span:nth-child(6) {
+            --petal-x: 93;
+            --petal-time: 13s;
+            --petal-delay: -8s;
+        }
+
+        @keyframes gcPetalFall {
+            0% {
+                opacity: 0;
+                transform: translate3d(0, -10vh, 0) rotate(0);
+            }
+
+            12% {
+                opacity: .75;
+            }
+
+            88% {
+                opacity: .3;
+            }
+
+            100% {
+                opacity: 0;
+                transform: translate3d(8vw, 115vh, 0) rotate(260deg);
+            }
+        }
+
+        .gc-story-section {
+            background: #100b0b;
+            border-top: 1px solid rgba(201, 168, 76, .12);
+        }
+
+        .gc-story-rail {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+
+        .gc-story-card {
+            position: relative;
+            min-height: 235px;
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, .1);
+            border-radius: 20px;
+            background: rgba(255, 255, 255, .045);
+            overflow: hidden;
+        }
+
+        .gc-story-card--featured {
+            background: linear-gradient(145deg, rgba(177, 42, 53, .42), rgba(201, 168, 76, .08));
+            border-color: rgba(201, 168, 76, .32);
+            transform: translateY(-18px);
+        }
+
+        .gc-story-number {
+            color: rgba(231, 200, 120, .6);
+            font-size: .7rem;
+            letter-spacing: .16em;
+        }
+
+        .gc-story-glyph {
+            margin: 2rem 0 1.2rem;
+            color: #e7c878;
+            font-family: var(--gc-font-display);
+            font-size: 2.6rem;
+        }
+
+        .gc-story-card h3 {
+            margin-bottom: .45rem;
+            color: #fff4e6;
+            font-family: var(--gc-font-display);
+            font-size: 1.3rem;
+        }
+
+        .gc-story-card p {
+            max-width: 29ch;
+            color: rgba(255, 244, 230, .55);
+            font-size: .85rem;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 720px) {
+            .gc-story-rail {
+                grid-template-columns: 1fr;
+            }
+
+            .gc-story-card--featured {
+                transform: none;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+
+            *,
+            *::before,
+            *::after {
+                animation-duration: .01ms !important;
+                transition-duration: .01ms !important;
+            }
+        }
     </style>
 
     {{-- ═══════════════════════════════════════════════════════════
@@ -1441,7 +1754,7 @@
 
                     // Show float bar after a moment
                     setTimeout(() => floatBar.classList.add('gc-visible'), 1400);
-                }, 2000);
+                }, 650);
             });
 
             /* ── Countdown ── */
@@ -1471,31 +1784,6 @@
             }
             setInterval(gcCountdown, 1000);
             gcCountdown();
-
-            /* ── Gallery ── */
-            let gcSlide = 0;
-            const gcSlides = document.querySelectorAll('.gc-gallery-slide');
-            const gcDots = document.querySelectorAll('.gc-gdot');
-            const gcLen = gcSlides.length;
-            let gcAutoTimer = null;
-
-            function gcGalleryGo(i) {
-                gcSlides[gcSlide].classList.remove('active');
-                gcDots[gcSlide].classList.remove('active');
-                gcSlide = (i + gcLen) % gcLen;
-                gcSlides[gcSlide].classList.add('active');
-                gcDots[gcSlide].classList.add('active');
-                gcResetAuto();
-            }
-            window.gcGalleryNext = () => gcGalleryGo(gcSlide + 1);
-            window.gcGalleryPrev = () => gcGalleryGo(gcSlide - 1);
-            window.gcGalleryGo = gcGalleryGo;
-
-            function gcResetAuto() {
-                clearInterval(gcAutoTimer);
-                gcAutoTimer = setInterval(() => gcGalleryGo(gcSlide + 1), 3000);
-            }
-            gcResetAuto();
 
             /* ── Copy code ── */
             window.gcCopyCode = function() {
