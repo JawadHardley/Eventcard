@@ -462,10 +462,17 @@ class GuestController extends Controller
                 throw new \RuntimeException('The card storage directory could not be created.');
             }
 
-            $browser = Browsershot::html($html);
+            $browser = Browsershot::html($html)
+                ->setContentUrl(rtrim(config('app.url'), '/') . '/card-export-content');
             $browserlessEndpoint = config('services.browserless.ws_endpoint');
 
             if ($browserlessEndpoint) {
+                if (str_starts_with($browserlessEndpoint, 'https://')) {
+                    $browserlessEndpoint = 'wss://' . substr($browserlessEndpoint, 8);
+                } elseif (str_starts_with($browserlessEndpoint, 'http://')) {
+                    $browserlessEndpoint = 'ws://' . substr($browserlessEndpoint, 7);
+                }
+
                 $browser->setWSEndpoint($browserlessEndpoint);
             } else {
                 $nodeBinary = config('services.browserless.node_binary');
