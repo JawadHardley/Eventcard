@@ -18,8 +18,8 @@
 
     <style>
         /* ══════════════════════════════════════════════════════════════
-                                                                                                                               PAGE WRAPPER
-                                                                                                                            ══════════════════════════════════════════════════════════════ */
+                                                                                                                                                           PAGE WRAPPER
+                                                                                                                                                        ══════════════════════════════════════════════════════════════ */
         .cardview-page {
             display: flex;
             flex-direction: column;
@@ -160,8 +160,8 @@
         }
 
         /* ══════════════════════════════════════════════════════════════
-                                                                                                                               CARD SHELL  (perspective + entrance animation)
-                                                                                                                            ══════════════════════════════════════════════════════════════ */
+                                                                                                                                                           CARD SHELL  (perspective + entrance animation)
+                                                                                                                                                        ══════════════════════════════════════════════════════════════ */
         .invitation-shell {
             perspective: 1200px;
             width: 100%;
@@ -182,8 +182,8 @@
         }
 
         /* ══════════════════════════════════════════════════════════════
-                                                                                                                               THE CARD
-                                                                                                                            ══════════════════════════════════════════════════════════════ */
+                                                                                                                                                           THE CARD
+                                                                                                                                                        ══════════════════════════════════════════════════════════════ */
         #idcard {
             width: 100%;
             border-radius: 6px;
@@ -265,8 +265,8 @@
         }
 
         /* ══════════════════════════════════════════════════════════════
-                                                                                                                               FLORAL CORNERS  (absolute, pointer-events:none)
-                                                                                                                            ══════════════════════════════════════════════════════════════ */
+                                                                                                                                                           FLORAL CORNERS  (absolute, pointer-events:none)
+                                                                                                                                                        ══════════════════════════════════════════════════════════════ */
         .floral-tl,
         .floral-tr,
         .floral-br {
@@ -328,8 +328,8 @@
         }
 
         /* ══════════════════════════════════════════════════════════════
-                                                                                                                               TYPOGRAPHY  —  card interior
-                                                                                                                            ══════════════════════════════════════════════════════════════ */
+                                                                                                                                                           TYPOGRAPHY  —  card interior
+                                                                                                                                                        ══════════════════════════════════════════════════════════════ */
         .ic-bismillah {
             padding-top: 2.1rem;
             font-family: 'Amiri', serif;
@@ -489,8 +489,8 @@
         }
 
         /* ══════════════════════════════════════════════════════════════
-                                                                                                                               INFO STRIP  (date / time / venue)
-                                                                                                                            ══════════════════════════════════════════════════════════════ */
+                                                                                                                                                           INFO STRIP  (date / time / venue)
+                                                                                                                                                        ══════════════════════════════════════════════════════════════ */
         .ic-info-strip {
             display: flex;
             align-items: stretch;
@@ -538,8 +538,8 @@
         }
 
         /* ══════════════════════════════════════════════════════════════
-                                                                                                                               QR / TICKET SECTION   (keep existing ticket-stub style)
-                                                                                                                            ══════════════════════════════════════════════════════════════ */
+                                                                                                                                                           QR / TICKET SECTION   (keep existing ticket-stub style)
+                                                                                                                                                        ══════════════════════════════════════════════════════════════ */
         .ic-ticket {
             display: flex;
             gap: 1rem;
@@ -638,8 +638,8 @@
         }
 
         /* ══════════════════════════════════════════════════════════════
-                                                                                                                               CLOSING
-                                                                                                                            ══════════════════════════════════════════════════════════════ */
+                                                                                                                                                           CLOSING
+                                                                                                                                                        ══════════════════════════════════════════════════════════════ */
         .ic-closing {
             font-family: 'Great Vibes', cursive;
             font-size: 1.55rem;
@@ -710,8 +710,8 @@
         }
 
         /* ══════════════════════════════════════════════════════════════
-                                                                                                                               DOWNLOAD OVERLAY
-                                                                                                                            ══════════════════════════════════════════════════════════════ */
+                                                                                                                                                           DOWNLOAD OVERLAY
+                                                                                                                                                        ══════════════════════════════════════════════════════════════ */
         .download-overlay {
             position: fixed;
             inset: 0;
@@ -1390,43 +1390,167 @@
             const spinner = document.getElementById('dl-spinner');
             const title = document.getElementById('dl-title');
             const sub = document.getElementById('dl-sub');
-            overlay.classList.add('show');
-            title.textContent = 'Generating high-quality image…';
-            sub.textContent = 'Please wait a few seconds';
+            const card = document.getElementById('idcard');
+            const button = document.getElementById('download-btn');
 
-            fetch('{{ route('user.generateCardImage', ['eventId' => $event->id, 'guestId' => $guest->id]) }}', {
-                    method: 'GET',
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest'
-                    }
+            if (!card || typeof html2canvas !== 'function') {
+                if (window.showToast) showToast('Image export is unavailable in this browser', 'error');
+                return;
+            }
+
+            overlay.classList.add('show');
+            button.disabled = true;
+            title.textContent = 'Generating high-quality image…';
+            sub.textContent = 'Preparing the card in your browser';
+
+            const originalTransform = card.style.transform;
+            const originalTransition = card.style.transition;
+            const originalAnimation = card.style.animation;
+            const cardWidth = Math.ceil(card.getBoundingClientRect().width);
+            const cardHeight = Math.ceil(card.scrollHeight);
+
+            card.style.transform = 'none';
+            card.style.transition = 'none';
+            card.style.animation = 'none';
+
+            const renderCard = async () => {
+                if (document.fonts && document.fonts.ready) {
+                    await document.fonts.ready;
+                }
+
+                return html2canvas(card, {
+                    backgroundColor: '#fdf6ee',
+                    scale: 3,
+                    width: cardWidth,
+                    height: cardHeight,
+                    windowWidth: cardWidth,
+                    windowHeight: cardHeight,
+                    x: 0,
+                    y: 0,
+                    useCORS: true,
+                    logging: false,
+                    imageTimeout: 15000,
+                    removeContainer: true,
+                    onclone: clonedDocument => {
+                        clonedDocument.querySelectorAll('link[rel="stylesheet"], style').forEach(
+                            stylesheet => {
+                                const href = stylesheet.getAttribute('href') || '';
+                                const cssText = stylesheet.textContent || '';
+                                const isFontStylesheet = href.includes(
+                                        'fonts.googleapis.com') ||
+                                    href.includes('cdnjs.cloudflare.com');
+
+                                if (stylesheet.tagName === 'LINK' && !isFontStylesheet) {
+                                    stylesheet.remove();
+                                } else if (!isFontStylesheet && /oklch\(/i.test(cssText)) {
+                                    stylesheet.remove();
+                                }
+                            });
+
+                        const colorCanvas = clonedDocument.createElement('canvas');
+                        const colorContext = colorCanvas.getContext('2d');
+                        const colorProperties = [
+                            'color',
+                            'backgroundColor',
+                            'borderTopColor',
+                            'borderRightColor',
+                            'borderBottomColor',
+                            'borderLeftColor',
+                            'outlineColor',
+                            'textDecorationColor',
+                            'fill',
+                            'stroke',
+                        ];
+
+                        const normalizeColor = value => {
+                            if (!value || !/oklch\(/i.test(value) || !colorContext)
+                                return value;
+                            colorContext.fillStyle = '#000000';
+                            colorContext.fillStyle = value;
+                            return colorContext.fillStyle;
+                        };
+
+                        clonedDocument.querySelectorAll('*').forEach(element => {
+                            const computedStyle = clonedDocument.defaultView
+                                .getComputedStyle(element);
+
+                            colorProperties.forEach(property => {
+                                const value = normalizeColor(computedStyle[
+                                    property]);
+                                if (value && value !== computedStyle[property]) {
+                                    element.style[property] = value;
+                                }
+                            });
+
+                            if (/oklch\(/i.test(computedStyle.backgroundImage)) {
+                                element.style.backgroundImage = 'none';
+                            }
+
+                            if (/oklch\(/i.test(computedStyle.boxShadow)) {
+                                element.style.boxShadow = 'none';
+                            }
+
+                            if (/oklch\(/i.test(computedStyle.textShadow)) {
+                                element.style.textShadow = 'none';
+                            }
+                        });
+
+                        const captureStyle = clonedDocument.createElement('style');
+                        captureStyle.textContent = `
+                            *, *::before, *::after { box-sizing: border-box !important; }
+                            #idcard {
+                                width: ${cardWidth}px !important;
+                                min-width: ${cardWidth}px !important;
+                                max-width: ${cardWidth}px !important;
+                                height: ${cardHeight}px !important;
+                                min-height: ${cardHeight}px !important;
+                                max-height: ${cardHeight}px !important;
+                                transform: none !important;
+                                animation: none !important;
+                            }
+                            #idcard .ic-qr-inner,
+                            #idcard .ic-qr-inner svg {
+                                width: 100px !important;
+                                height: 100px !important;
+                                min-width: 100px !important;
+                                min-height: 100px !important;
+                                display: block !important;
+                            }
+                        `;
+                        clonedDocument.head.appendChild(captureStyle);
+                    },
+                });
+            };
+
+            renderCard()
+                .then(canvas => new Promise((resolve, reject) => {
+                    canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error(
+                        'The image could not be created')), 'image/png');
+                }))
+                .then(blob => {
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = `invitation-card-{{ $guest->invitation_code ?? 'export' }}.png`;
+                    document.body.appendChild(link);
+                    link.click();
+                    link.remove();
+                    URL.revokeObjectURL(url);
+
+                    spinner.classList.add('done');
+                    title.textContent = 'Ready!';
+                    sub.textContent = 'Your HD card has been downloaded';
+                    setTimeout(() => overlay.classList.remove('show'), 1500);
                 })
-                .then(async response => {
-                    const data = await response.json().catch(() => ({}));
-                    if (!response.ok) {
-                        throw new Error(data.message || `Export failed (${response.status})`);
-                    }
-                    return data;
-                })
-                .then(data => {
-                    if (data.success) {
-                        spinner.classList.add('done');
-                        title.textContent = 'Ready!';
-                        sub.textContent = 'Your download will start automatically';
-                        const a = document.createElement('a');
-                        a.href = data.url;
-                        randr = Math.floor(Math.random() * 100);
-                        a.download = `invitation-card-${randr}.png`;
-                        document.body.appendChild(a);
-                        a.click();
-                        document.body.removeChild(a);
-                        setTimeout(() => overlay.classList.remove('show'), 1500);
-                    } else {
-                        throw new Error('Server error');
-                    }
-                })
-                .catch((error) => {
+                .catch(error => {
                     overlay.classList.remove('show');
                     if (window.showToast) showToast(error.message || 'Failed to generate image', 'error');
+                })
+                .finally(() => {
+                    card.style.transform = originalTransform;
+                    card.style.transition = originalTransition;
+                    card.style.animation = originalAnimation;
+                    button.disabled = false;
                 });
         };
 
