@@ -12,6 +12,7 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use AfricasTalking\SDK\AfricasTalking;
 use Spatie\Browsershot\Browsershot;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Facades\Excel;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
@@ -447,44 +448,80 @@ class GuestController extends Controller
 
     public function generateCardImage($eventId, $guestId, Request $request)
     {
-        $event = Event::findOrFail($eventId);
-        $guest = Guest::findOrFail($guestId);
+        try {
+            $event = Event::findOrFail($eventId);
+            $guest = Guest::findOrFail($guestId);
 
-        $html = view('cardview', compact('event', 'guest'))->render();
+            $html = view('cardview', compact('event', 'guest'))->render();
 
-        $fileName = 'event-card-' . time() . '.png';
-        $path = storage_path('app/public/cards/' . $fileName);
+            $fileName = 'event-card-' . time() . '.png';
+            $path = storage_path('app/public/cards/' . $fileName);
 
-        $dir = storage_path('app/public/cards');
-        if (!file_exists($dir)) mkdir($dir, 0755, true);
+            $dir = storage_path('app/public/cards');
+            if (! is_dir($dir) && ! mkdir($dir, 0755, true) && ! is_dir($dir)) {
+                throw new \RuntimeException('The card storage directory could not be created.');
+            }
 
-        $browser = Browsershot::html($html);
-        $remote = config('services.browserless.url');
+            $browser = Browsershot::html($html);
+            $browserlessEndpoint = config('services.browserless.ws_endpoint');
 
-        if ($remote) {
-            $browser->setRemoteInstance($remote);
-        }
+            if ($browserlessEndpoint) {
+                $browser->setWSEndpoint($browserlessEndpoint);
+            } else {
+                $nodeBinary = config('services.browserless.node_binary');
+                $npmBinary = config('services.browserless.npm_binary');
+                $nodeModulePath = config('services.browserless.node_module_path');
+                $chromePath = config('services.browserless.chrome_path');
 
-        $browser
-            ->windowSize(650, 1000)
-            ->deviceScaleFactor(2)
-            ->waitUntilNetworkIdle()
-            ->select('#idcard')
-            ->timeout(60)
-            ->setDelay(300)
-            ->noSandbox()
-            ->save($path);
+                if ($nodeBinary) {
+                    $browser->setNodeBinary($nodeBinary);
+                }
+                if ($npmBinary) {
+                    $browser->setNpmBinary($npmBinary);
+                }
+                if ($nodeModulePath) {
+                    $browser->setNodeModulePath($nodeModulePath);
+                }
+                if ($chromePath) {
+                    $browser->setChromePath($chromePath);
+                }
+            }
 
-        // If AJAX request, return JSON with download link
-        if ($request->ajax()) {
-            return response()->json([
-                'success' => true,
-                'url' => asset('storage/cards/' . $fileName)
+            $browser
+                ->windowSize(650, 1000)
+                ->deviceScaleFactor(2)
+                ->waitUntilNetworkIdle()
+                ->select('#idcard')
+                ->timeout(60)
+                ->setDelay(300)
+                ->noSandbox()
+                ->save($path);
+
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'url' => asset('storage/cards/' . $fileName),
+                ]);
+            }
+
+            return response()->download($path, $fileName);
+        } catch (\Throwable $exception) {
+            Log::error('Invitation card image generation failed.', [
+                'event_id' => $eventId,
+                'guest_id' => $guestId,
+                'message' => $exception->getMessage(),
+                'exception' => get_class($exception),
             ]);
-        }
 
-        // Fallback: direct download
-        return response()->download($path, $fileName);
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'The invitation image could not be generated. Check the server configuration and logs.',
+                ], 500);
+            }
+
+            throw $exception;
+        }
     }
 
     public function importGuests(Request $request)

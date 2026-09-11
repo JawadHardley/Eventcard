@@ -37,6 +37,11 @@ return [
 
     'browserless' => [
         'url' => env('BROWSERLESS_URL'),
+        'ws_endpoint' => env('BROWSERLESS_WS_ENDPOINT'),
+        'node_binary' => env('BROWSERSHOT_NODE_BINARY'),
+        'npm_binary' => env('BROWSERSHOT_NPM_BINARY'),
+        'node_module_path' => env('BROWSERSHOT_NODE_MODULE_PATH'),
+        'chrome_path' => env('BROWSERSHOT_CHROME_PATH'),
     ],
 
 ];
