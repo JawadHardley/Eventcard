@@ -1,9 +1,9 @@
 {{-- ============================================================
-     DROP-IN REPLACEMENT  —  paste this entire file content into
-     resources/views/cardview.blade.php  (replaces the existing file)
+     TapEvent Card — redesigned cardview (reference layout)
+     resources/views/cardview.blade.php
      ============================================================ --}}
 
-@extends('layouts.admin')
+@extends(isset($export) && $export ? 'layouts.card-export' : 'layouts.admin')
 
 @section('title', 'Card Preview — ' . $guest->full_name)
 
@@ -12,14 +12,13 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Cinzel:wght@400;500;600&family=Amiri:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@400;500;600;700&display=swap"
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500&family=DM+Serif+Display:ital@0;1&display=swap"
         rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
     <style>
-        /* ══════════════════════════════════════════════════════════════
-                                                                                                                                                                   PAGE WRAPPER
-                                                                                                                                                                ══════════════════════════════════════════════════════════════ */
+        /* ══════════════════════════════════════════════════════════
+                               PAGE WRAPPER
+                               ══════════════════════════════════════════════════════════ */
         .cardview-page {
             display: flex;
             flex-direction: column;
@@ -28,7 +27,6 @@
             min-height: calc(100vh - 60px);
         }
 
-        /* ── Action Bar ── */
         .card-actions {
             display: flex;
             gap: .65rem;
@@ -37,16 +35,21 @@
             justify-content: center;
         }
 
-        /* ── Share message panel ── */
+        /* ── Share panel ─────────────────────────────────────────── */
         .share-panel {
             width: 100%;
-            max-width: 630px;
+            max-width: 680px;
             margin-bottom: 2rem;
-            background: rgba(255, 250, 244, .96);
-            border: 1px solid rgba(184, 150, 12, .24);
-            border-radius: 12px;
-            box-shadow: 0 12px 34px rgba(80, 35, 5, .14);
+            background: rgba(255, 252, 248, .96);
+            border: 1px solid rgba(0, 0, 0, .06);
+            border-radius: 16px;
+            box-shadow: 0 12px 34px rgba(0, 0, 0, .06);
             overflow: hidden;
+        }
+
+        html.dark .share-panel {
+            background: rgba(28, 28, 30, .96);
+            border-color: rgba(255, 255, 255, .08);
         }
 
         .share-panel-heading {
@@ -55,21 +58,28 @@
             justify-content: space-between;
             gap: 1rem;
             padding: 1rem 1.15rem .8rem;
-            border-bottom: 1px solid rgba(184, 150, 12, .16);
+            border-bottom: 1px solid rgba(0, 0, 0, .06);
+        }
+
+        html.dark .share-panel-heading {
+            border-bottom-color: rgba(255, 255, 255, .08);
         }
 
         .share-panel-title {
             margin: 0;
-            color: #5a2d00;
-            font-family: 'Cinzel', serif;
+            color: #1a1a1a;
             font-size: .82rem;
-            letter-spacing: .08em;
+            font-weight: 700;
+            letter-spacing: .04em;
+        }
+
+        html.dark .share-panel-title {
+            color: #f5f5f7;
         }
 
         .share-panel-subtitle {
             margin: .25rem 0 0;
-            color: #8a6a4c;
-            font-family: 'DM Sans', sans-serif;
+            color: #8a8a8f;
             font-size: .72rem;
         }
 
@@ -80,8 +90,8 @@
             flex-shrink: 0;
             place-items: center;
             border-radius: 50%;
-            background: rgba(139, 26, 26, .09);
-            color: #8b1a1a;
+            background: rgba(14, 132, 232, .1);
+            color: #0e84e8;
         }
 
         .share-message-grid {
@@ -104,10 +114,15 @@
         }
 
         .share-message-label {
-            color: #6a4a2a;
-            font-family: 'Cinzel', serif;
-            font-size: .62rem;
-            letter-spacing: .1em;
+            color: #4a4a4a;
+            font-size: .65rem;
+            font-weight: 700;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+        }
+
+        html.dark .share-message-label {
+            color: #a1a1a6;
         }
 
         .share-copy-button {
@@ -115,10 +130,10 @@
             align-items: center;
             gap: .35rem;
             border: 0;
-            border-radius: 6px;
-            padding: .35rem .55rem;
-            background: #8b1a1a;
-            color: #fffaf4;
+            border-radius: 8px;
+            padding: .35rem .65rem;
+            background: #1a1a1a;
+            color: #fff;
             cursor: pointer;
             font-family: 'DM Sans', sans-serif;
             font-size: .66rem;
@@ -126,27 +141,42 @@
         }
 
         .share-copy-button:hover {
-            background: #6f1313;
+            background: #333;
+        }
+
+        html.dark .share-copy-button {
+            background: #f5f5f7;
+            color: #1a1a1a;
+        }
+
+        html.dark .share-copy-button:hover {
+            background: #e5e5ea;
         }
 
         .share-message-text {
             width: 100%;
-            min-height: 285px;
+            min-height: 240px;
             resize: vertical;
             box-sizing: border-box;
-            border: 1px solid rgba(184, 150, 12, .22);
-            border-radius: 8px;
+            border: 1px solid rgba(0, 0, 0, .08);
+            border-radius: 10px;
             padding: .75rem;
-            background: #fffdf9;
-            color: #3a200a;
+            background: #fafafa;
+            color: #1a1a1a;
             font-family: 'DM Sans', sans-serif;
             font-size: .76rem;
             line-height: 1.55;
         }
 
+        html.dark .share-message-text {
+            background: #2c2c2e;
+            border-color: rgba(255, 255, 255, .08);
+            color: #f5f5f7;
+        }
+
         .share-message-text:focus {
-            outline: 2px solid rgba(139, 26, 26, .18);
-            border-color: #8b1a1a;
+            outline: 2px solid rgba(14, 132, 232, .2);
+            border-color: #0e84e8;
         }
 
         @media (max-width: 620px) {
@@ -155,24 +185,24 @@
             }
 
             .share-message-text {
-                min-height: 230px;
+                min-height: 200px;
             }
         }
 
-        /* ══════════════════════════════════════════════════════════════
-                                                                                                                                                                   CARD SHELL  (perspective + entrance animation)
-                                                                                                                                                                ══════════════════════════════════════════════════════════════ */
+        /* ══════════════════════════════════════════════════════════
+                               CARD SHELL
+                               ══════════════════════════════════════════════════════════ */
         .invitation-shell {
-            perspective: 1200px;
+            perspective: 1400px;
             width: 100%;
-            max-width: 630px;
+            max-width: 680px;
             user-select: none;
         }
 
         @keyframes cardReveal {
             0% {
                 opacity: 0;
-                transform: translateY(44px) rotateX(7deg) scale(.96);
+                transform: translateY(36px) rotateX(6deg) scale(.97);
             }
 
             100% {
@@ -181,548 +211,535 @@
             }
         }
 
-        /* ══════════════════════════════════════════════════════════════
-                                                                                                                                                                   THE CARD
-                                                                                                                                                                ══════════════════════════════════════════════════════════════ */
+        /* ══════════════════════════════════════════════════════════
+                               THE CARD  —  design tokens
+                               ══════════════════════════════════════════════════════════ */
         #idcard {
+            /* ── Light mode tokens ── */
+            --card-bg: #f5efe6;
+            --card-surface: #ffffff;
+            --card-surface-2: #ede4d3;
+            --card-text: #1a1a1a;
+            --card-text-secondary: #5a5a5f;
+            --card-muted: #8a7f6e;
+            --card-border: rgba(0, 0, 0, .07);
+            --card-border-strong: rgba(0, 0, 0, .14);
+            --card-divider: rgba(0, 0, 0, .08);
+
+            /* ── Accent (overridden by data-event-type) ── */
+            --card-accent: #8b1a1a;
+            --card-accent-soft: rgba(139, 26, 26, .08);
+            --card-accent-ink: #6b1010;
+
+            --card-radius: 22px;
+            --card-radius-lg: 14px;
+            --card-radius-sm: 10px;
+
             width: 100%;
-            border-radius: 6px;
+            max-width: 680px;
+            min-height: 880px;
+            border-radius: var(--card-radius);
             overflow: hidden;
             position: relative;
-            background: #fdf6ee;
+            background: var(--card-bg);
+            color: var(--card-text);
+            font-family: 'DM Sans', system-ui, sans-serif;
+            font-size: 14px;
+            line-height: 1.5;
             box-shadow:
-                0 2px 0 rgba(255, 255, 255, .14) inset,
-                0 36px 90px rgba(80, 35, 5, .42),
-                0 8px 28px rgba(0, 0, 0, .22);
+                0 1px 0 rgba(255, 255, 255, .5) inset,
+                0 24px 60px rgba(80, 40, 10, .14),
+                0 8px 20px rgba(0, 0, 0, .07);
             transform-style: preserve-3d;
             transition: transform .5s cubic-bezier(.23, 1, .32, 1), box-shadow .4s ease;
             will-change: transform;
             animation: cardReveal .8s cubic-bezier(.23, 1, .32, 1) both;
-            font-family: 'Cormorant Garamond', 'DM Sans', serif;
         }
 
-        /* ── Cream silky background ── */
-        .ic-bg {
-            position: absolute;
-            inset: 0;
-            z-index: 0;
-            background: linear-gradient(155deg, #fdf8f2 0%, #faeee0 38%, #f7e5cf 68%, #fdf6ee 100%);
+        html.dark #idcard {
+            --card-bg: #0e0e10;
+            --card-surface: #1a1a1c;
+            --card-surface-2: #232326;
+            --card-text: #f5f5f7;
+            --card-text-secondary: #a1a1a6;
+            --card-muted: #7a7a7f;
+            --card-border: rgba(255, 255, 255, .08);
+            --card-border-strong: rgba(255, 255, 255, .16);
+            --card-divider: rgba(255, 255, 255, .08);
+            box-shadow:
+                0 1px 0 rgba(255, 255, 255, .04) inset,
+                0 24px 60px rgba(0, 0, 0, .6),
+                0 8px 20px rgba(0, 0, 0, .35);
         }
 
-        .ic-bg::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: repeating-linear-gradient(108deg,
-                    transparent 0px,
-                    rgba(255, 255, 255, .16) 1px,
-                    transparent 2px,
-                    transparent 58px);
+        /* ── Event type accent overrides (subtle, single hue) ── */
+        #idcard[data-event-type="birthday"] {
+            --card-accent: #8b1a1a;
+            --card-accent-soft: rgba(139, 26, 26, .08);
+            --card-accent-ink: #6b1010;
         }
 
-        /* ── Inner gold border frame ── */
-        .ic-frame {
-            position: absolute;
-            top: 14px;
-            left: 14px;
-            right: 14px;
-            bottom: 14px;
-            z-index: 2;
-            pointer-events: none;
-            border: 1px solid rgba(184, 150, 12, .2);
-            border-radius: 2px;
+        #idcard[data-event-type="wedding"] {
+            --card-accent: #b8860b;
+            --card-accent-soft: rgba(184, 134, 11, .1);
+            --card-accent-ink: #7a5a08;
         }
 
-        .ic-frame::before,
-        .ic-frame::after {
-            content: '';
-            position: absolute;
-            width: 8px;
-            height: 8px;
-            border: 1px solid rgba(184, 150, 12, .45);
-            transform: rotate(45deg);
-            background: #fdf6ee;
+        #idcard[data-event-type="walima"] {
+            --card-accent: #b8860b;
+            --card-accent-soft: rgba(184, 134, 11, .1);
+            --card-accent-ink: #7a5a08;
         }
 
-        .ic-frame::before {
-            top: -5px;
-            left: -5px;
+        #idcard[data-event-type="nikah"] {
+            --card-accent: #1a8a5a;
+            --card-accent-soft: rgba(26, 138, 90, .1);
+            --card-accent-ink: #0f5c3c;
         }
 
-        .ic-frame::after {
-            top: -5px;
-            right: -5px;
+        #idcard[data-event-type="aqiqah"] {
+            --card-accent: #1a8a5a;
+            --card-accent-soft: rgba(26, 138, 90, .1);
+            --card-accent-ink: #0f5c3c;
         }
 
-        /* ── All content above bg layers ── */
-        .ic-content {
-            position: relative;
-            z-index: 4;
+        #idcard[data-event-type="khitan"] {
+            --card-accent: #1a8a5a;
+            --card-accent-soft: rgba(26, 138, 90, .1);
+            --card-accent-ink: #0f5c3c;
+        }
+
+        #idcard[data-event-type="vip"] {
+            --card-accent: #7c5cff;
+            --card-accent-soft: rgba(124, 92, 255, .1);
+            --card-accent-ink: #4f3aa8;
+        }
+
+        #idcard[data-event-type="gala"] {
+            --card-accent: #c9a227;
+            --card-accent-soft: rgba(201, 162, 39, .12);
+            --card-accent-ink: #856b14;
+        }
+
+        #idcard[data-event-type="club"] {
+            --card-accent: #0e84e8;
+            --card-accent-soft: rgba(14, 132, 232, .1);
+            --card-accent-ink: #0a5aa0;
+        }
+
+        #idcard[data-event-type="party"] {
+            --card-accent: #d946a0;
+            --card-accent-soft: rgba(217, 70, 160, .1);
+            --card-accent-ink: #96286c;
+        }
+
+        /* ── Grid: text left, image right ── */
+        #idcard {
+            display: grid;
+            grid-template-columns: 55fr 45fr;
+            padding: 26px;
+            gap: 0;
+        }
+
+        /* ══════════════════════════════════════════════════════════
+                               LEFT COLUMN
+                               ══════════════════════════════════════════════════════════ */
+        .card-left {
             display: flex;
             flex-direction: column;
-            align-items: center;
-            padding: 0 0 1.8rem;
+            min-width: 0;
+            padding: 14px 26px 12px 12px;
         }
 
-        /* ══════════════════════════════════════════════════════════════
-                                                                                                                                                                   FLORAL CORNERS  (absolute, pointer-events:none)
-                                                                                                                                                                ══════════════════════════════════════════════════════════════ */
-        .floral-tl,
-        .floral-tr,
-        .floral-br {
-            position: absolute;
-            pointer-events: none;
-            z-index: 3;
+        /* ── Eyebrow block ── */
+        .eyebrow-block {
+            margin-bottom: 20px;
         }
 
-        .floral-tl {
-            top: -6px;
-            left: -6px;
-            width: 210px;
-            height: 250px;
-        }
-
-        .floral-tr {
-            top: -6px;
-            right: -6px;
-            width: 120px;
-            height: 190px;
-        }
-
-        .floral-br {
-            bottom: -6px;
-            right: -6px;
-            width: 230px;
-            height: 270px;
-        }
-
-        /* ── Gold arc (top-right) ── */
-        .ic-arc {
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 280px;
-            height: 280px;
-            z-index: 2;
-            pointer-events: none;
-        }
-
-        /* ── Mosque silhouette (bottom bg) ── */
-        .ic-mosque {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            z-index: 1;
-            pointer-events: none;
-            opacity: .07;
-        }
-
-        /* ── Lanterns (top right, inside arc) ── */
-        .ic-lanterns {
-            position: absolute;
-            top: 18px;
-            right: 16px;
-            z-index: 5;
-            pointer-events: none;
-        }
-
-        /* ══════════════════════════════════════════════════════════════
-                                                                                                                                                                   TYPOGRAPHY  —  card interior
-                                                                                                                                                                ══════════════════════════════════════════════════════════════ */
-        .ic-bismillah {
-            padding-top: 2.1rem;
-            font-family: 'Amiri', serif;
-            font-size: 1.45rem;
-            color: #8b1a1a;
-            text-align: center;
-            letter-spacing: .04em;
-            line-height: 1.3;
-            margin-bottom: .5rem;
-        }
-
-        .ic-eyebrow {
-            font-family: 'Cinzel', serif;
-            font-size: .58rem;
+        .eyebrow {
+            font-family: 'DM Sans', sans-serif;
+            font-size: .62rem;
+            font-weight: 700;
             letter-spacing: .22em;
-            color: #7a5a3a;
-            text-align: center;
-            margin-bottom: .2rem;
+            text-transform: uppercase;
+            color: var(--card-muted);
+            line-height: 1.5;
         }
 
-        .ic-subline {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: .92rem;
-            font-style: italic;
-            color: #5a3a1a;
-            text-align: center;
-            margin-bottom: .45rem;
-        }
-
-        /* ── Event name (hero title) ── */
-        .ic-event-name {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 4rem;
-            color: #8b1a1a;
-            line-height: 1;
-            text-align: center;
-            display: block;
-            text-shadow: 0 2px 14px rgba(139, 26, 26, .14);
-            margin-bottom: -.2rem;
-        }
-
-        /* ── Ceremony-style sub label ── */
-        .ic-event-type-row {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            margin-bottom: .85rem;
-        }
-
-        .ic-type-dash {
-            flex: 1;
-            max-width: 55px;
+        .eyebrow-rule {
+            width: 42px;
             height: 1px;
-            background: linear-gradient(90deg, transparent, #b8960c);
+            background: var(--card-border-strong);
+            margin: 10px 0;
         }
 
-        .ic-type-dash.r {
-            background: linear-gradient(90deg, #b8960c, transparent);
-        }
-
-        .ic-type-label {
-            font-family: 'Cinzel', serif;
-            font-size: .65rem;
-            letter-spacing: .28em;
-            color: #b8960c;
-        }
-
-        /* ── Ornament row ── */
-        .ic-orn {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            margin-bottom: .8rem;
-        }
-
-        .ic-orn-line {
-            width: 22px;
-            height: 1px;
-            background: #b8960c;
-            opacity: .5;
-        }
-
-        .ic-orn-diamond {
-            width: 5px;
-            height: 5px;
-            background: #b8960c;
-            transform: rotate(45deg);
-            opacity: .65;
-        }
-
-        /* ── Host line ── */
-        .ic-host {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: .88rem;
-            font-style: italic;
-            color: #7a5030;
-            text-align: center;
-            margin-bottom: .7rem;
-        }
-
-        /* ── Guest salutation ── */
-        .ic-salutation {
-            font-family: 'Cinzel', serif;
-            font-size: .55rem;
-            letter-spacing: .18em;
-            color: #a07850;
-            text-align: center;
-            margin-bottom: .2rem;
-        }
-
-        /* ── Guest name (script) ── */
-        .ic-guest-name {
-            font-family: 'Great Vibes', cursive;
-            font-size: 2.6rem;
-            color: #5a2d00;
+        /* ── Guest name ── */
+        .guest-name {
+            font-family: 'DM Serif Display', Georgia, serif;
+            font-size: clamp(1.5rem, 3.6vw, 1.9rem);
             line-height: 1.1;
-            text-align: center;
-            margin-bottom: .3rem;
+            letter-spacing: -.01em;
+            color: var(--card-text);
+            margin: 0 0 6px;
+            font-weight: 400;
+            overflow-wrap: anywhere;
+            word-break: break-word;
         }
 
-        /* ── Guest title badge ── */
-        .ic-guest-badge {
+        .guest-title-pill {
             display: inline-flex;
             align-items: center;
             gap: .35rem;
-            background: rgba(139, 26, 26, .08);
-            color: #8b1a1a;
-            border-radius: 980px;
-            padding: .22rem .75rem;
-            font-family: 'Cinzel', serif;
-            font-size: .58rem;
-            letter-spacing: .1em;
-            margin-bottom: .9rem;
-        }
-
-        /* ── Blessing paragraph ── */
-        .ic-blessing {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: .98rem;
-            font-weight: 400;
-            color: #4a3020;
-            text-align: center;
-            line-height: 1.65;
-            padding: 0 2.4rem;
-            margin-bottom: 1.1rem;
-            max-width: 600px;
-        }
-
-        /* ── Gold divider rule ── */
-        .ic-rule {
-            width: 58%;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, #b8960c 30%, #b8960c 70%, transparent);
-            margin-bottom: .9rem;
-            opacity: .55;
-        }
-
-        /* ══════════════════════════════════════════════════════════════
-                                                                                                                                                                   INFO STRIP  (date / time / venue)
-                                                                                                                                                                ══════════════════════════════════════════════════════════════ */
-        .ic-info-strip {
-            display: flex;
-            align-items: stretch;
-            width: calc(100% - 3rem);
-            background: rgba(253, 244, 228, .88);
-            border: 1px solid rgba(184, 150, 12, .22);
-            border-radius: 10px;
-            padding: .8rem 0;
-            margin-bottom: 1.2rem;
-        }
-
-        .ic-info-block {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-start;
-            gap: .28rem;
-            padding: 0 .7rem;
-            position: relative;
-        }
-
-        .ic-info-block+.ic-info-block::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 10%;
-            height: 80%;
-            width: 1px;
-            background: rgba(184, 150, 12, .28);
-        }
-
-        .ic-info-icon {
-            color: #8b1a1a;
-            font-size: 1.05rem;
-        }
-
-        .ic-info-label {
-            font-family: 'Cinzel', serif;
-            font-size: .52rem;
-            letter-spacing: .1em;
-            color: #6a4a2a;
-            text-align: center;
-            line-height: 1.4;
-        }
-
-        /* ══════════════════════════════════════════════════════════════
-                                                                                                                                                                   QR / TICKET SECTION   (keep existing ticket-stub style)
-                                                                                                                                                                ══════════════════════════════════════════════════════════════ */
-        .ic-ticket {
-            display: flex;
-            gap: 1rem;
-            align-items: stretch;
-            width: calc(100% - 3rem);
-            background: rgba(248, 238, 222, .9);
-            border: 1px solid rgba(184, 150, 12, .2);
-            border-radius: 10px;
-            padding: .95rem 1rem;
-            margin-bottom: 1.2rem;
-            position: relative;
-            overflow: hidden;
-        }
-
-        /* Ticket punch notches */
-        .ic-ticket::before,
-        .ic-ticket::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 22px;
-            height: 22px;
-            border-radius: 50%;
-            background: #fdf6ee;
-            z-index: 2;
-        }
-
-        .ic-ticket::before {
-            left: -11px;
-        }
-
-        .ic-ticket::after {
-            right: -11px;
-        }
-
-        .ic-qr-wrap {
-            flex-shrink: 0;
-        }
-
-        .ic-qr-inner {
-            background: #fff;
-            border-radius: 10px;
-            padding: 7px;
-            display: inline-flex;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, .08);
-        }
-
-        .ic-ticket-sep {
-            width: 1px;
-            flex-shrink: 0;
-            align-self: stretch;
-            background: repeating-linear-gradient(to bottom,
-                    transparent, transparent 4px,
-                    rgba(184, 150, 12, .35) 4px, rgba(184, 150, 12, .35) 8px);
-        }
-
-        .ic-ticket-meta {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            gap: .5rem;
-            padding: .1rem 0;
-        }
-
-        .ic-ticket-label {
-            font-family: 'Cinzel', serif;
-            font-size: .52rem;
-            letter-spacing: .14em;
-            color: #a07850;
-        }
-
-        .ic-ticket-code {
-            font-family: 'DM Sans', monospace;
-            font-size: 1.25rem;
+            padding: .28rem .7rem;
+            border-radius: 999px;
+            background: var(--card-accent-soft);
+            color: var(--card-accent-ink);
+            font-family: 'DM Sans', sans-serif;
+            font-size: .64rem;
             font-weight: 700;
-            color: #3a200a;
             letter-spacing: .1em;
-            line-height: 1;
+            text-transform: uppercase;
+            align-self: flex-start;
+            margin: 2px 0 4px;
+            max-width: 100%;
         }
 
-        .ic-ticket-admission {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: .82rem;
-            font-weight: 600;
-            color: #3a200a;
+        html.dark .guest-title-pill {
+            color: var(--card-accent);
         }
 
-        .ic-ticket-hint {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: .7rem;
-            font-style: italic;
-            color: #a07850;
-            line-height: 1.4;
+        /* ── Event name (hero) ── */
+        .event-name {
+            font-family: 'DM Serif Display', Georgia, serif;
+            font-size: clamp(2.2rem, 6.4vw, 3.05rem);
+            line-height: 1.02;
+            letter-spacing: -.015em;
+            color: var(--card-accent);
+            margin: 4px 0 14px;
+            font-weight: 400;
+            overflow-wrap: anywhere;
+            word-break: break-word;
         }
 
-        /* ══════════════════════════════════════════════════════════════
-                                                                                                                                                                   CLOSING
-                                                                                                                                                                ══════════════════════════════════════════════════════════════ */
-        .ic-closing {
-            font-family: 'Great Vibes', cursive;
-            font-size: 1.55rem;
-            color: #4a2a00;
-            text-align: center;
-            line-height: 1.45;
-            padding: 0 1.8rem;
-            margin-bottom: 1.1rem;
+        html.dark .event-name {
+            color: var(--card-accent);
         }
 
-        .ic-jazakum {
-            display: inline-flex;
-            align-items: center;
-            gap: .6rem;
-            background: #8b1a1a;
-            color: #fdf6ee;
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 1rem;
-            font-style: italic;
-            font-weight: 500;
-            letter-spacing: .04em;
-            border-radius: 980px;
-            padding: .52rem 1.8rem;
-        }
-
-        .ic-jazakum-line {
-            display: inline-block;
-            width: 16px;
-            height: 1px;
-            background: rgba(253, 246, 238, .45);
-            vertical-align: middle;
-            flex-shrink: 0;
-        }
-
-        /* ── Card footer strip ── */
-        .ic-footer {
-            padding: .75rem 1.4rem;
+        /* ── Host row ── */
+        .event-host-row {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            background: rgba(253, 246, 238, .6);
-            border-top: 1px solid rgba(184, 150, 12, .15);
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 18px;
         }
 
-        .ic-footer-brand {
-            font-family: 'Cinzel', serif;
-            font-size: .55rem;
-            letter-spacing: .16em;
-            color: #c0a060;
+        .event-host {
+            font-family: 'DM Sans', sans-serif;
+            font-size: .66rem;
+            font-weight: 700;
+            letter-spacing: .18em;
+            text-transform: uppercase;
+            color: var(--card-text-secondary);
+            line-height: 1.5;
+            overflow-wrap: anywhere;
+            min-width: 0;
+            flex: 1 1 auto;
         }
 
-        .ic-footer-valid {
+        .event-type-chip {
             display: inline-flex;
             align-items: center;
-            gap: .3rem;
-            font-family: 'Cinzel', serif;
-            font-size: .55rem;
-            letter-spacing: .1em;
-            color: #a07850;
+            gap: .35rem;
+            padding: .25rem .6rem;
+            border-radius: 999px;
+            background: var(--card-accent-soft);
+            color: var(--card-accent-ink);
+            font-family: 'DM Sans', sans-serif;
+            font-size: .58rem;
+            font-weight: 700;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+            flex-shrink: 0;
+            white-space: nowrap;
         }
 
-        .ic-valid-dot {
+        html.dark .event-type-chip {
+            color: var(--card-accent);
+        }
+
+        /* ── Ornament divider ── */
+        .ornament {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 4px 0 16px;
+        }
+
+        .ornament-line {
+            flex: 1;
+            height: 1px;
+            background: var(--card-border-strong);
+            opacity: .7;
+        }
+
+        .ornament-diamond {
             width: 6px;
             height: 6px;
-            border-radius: 50%;
-            background: #34c759;
+            background: var(--card-accent);
+            transform: rotate(45deg);
+            flex-shrink: 0;
+            opacity: .75;
+        }
+
+        /* ── Description ── */
+        .event-desc {
+            font-family: 'DM Serif Display', Georgia, serif;
+            font-style: italic;
+            font-size: .96rem;
+            line-height: 1.5;
+            color: var(--card-text-secondary);
+            margin: 0 0 22px;
+            overflow-wrap: anywhere;
+        }
+
+        /* ══════════════════════════════════════════════════════════
+                               INFO ROWS  (icon │ text)
+                               ══════════════════════════════════════════════════════════ */
+        .info-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            margin-bottom: 20px;
+        }
+
+        .info-row {
+            display: grid;
+            grid-template-columns: 26px 1px 1fr;
+            gap: 14px;
+            align-items: center;
+            padding: 12px 0;
+        }
+
+        .info-icon {
+            color: var(--card-text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
             flex-shrink: 0;
         }
 
-        /* ══════════════════════════════════════════════════════════════
-                                                                                                                                                                   DOWNLOAD OVERLAY
-                                                                                                                                                                ══════════════════════════════════════════════════════════════ */
+        .info-icon svg {
+            width: 20px;
+            height: 20px;
+            stroke-width: 1.4;
+        }
+
+        .info-bar {
+            width: 1px;
+            height: 34px;
+            background: var(--card-border-strong);
+            opacity: .85;
+        }
+
+        .info-content {
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .info-label {
+            font-family: 'DM Sans', sans-serif;
+            font-size: .64rem;
+            font-weight: 600;
+            letter-spacing: .18em;
+            text-transform: uppercase;
+            color: var(--card-muted);
+            line-height: 1.3;
+        }
+
+        .info-value {
+            font-family: 'DM Sans', sans-serif;
+            font-size: .82rem;
+            font-weight: 600;
+            letter-spacing: .14em;
+            text-transform: uppercase;
+            color: var(--card-text);
+            line-height: 1.4;
+            overflow-wrap: anywhere;
+            word-break: break-word;
+        }
+
+        /* ══════════════════════════════════════════════════════════
+                               TICKET / QR
+                               ══════════════════════════════════════════════════════════ */
+        .ticket {
+            margin-top: 4px;
+            padding: 16px 16px 14px;
+            border-radius: var(--card-radius-lg);
+            background: var(--card-surface-2);
+            border: 1px solid var(--card-border);
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .ticket-qr {
+            flex-shrink: 0;
+        }
+
+        .ticket-qr-inner {
+            background: #ffffff;
+            border-radius: 10px;
+            padding: 8px;
+            box-sizing: border-box;
+            width: 100px;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, .08);
+        }
+
+        .ticket-qr-inner svg {
+            display: block !important;
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        .ticket-info {
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .ticket-field {
+            min-width: 0;
+        }
+
+        .ticket-label {
+            font-family: 'DM Sans', sans-serif;
+            font-size: .58rem;
+            font-weight: 700;
+            letter-spacing: .16em;
+            text-transform: uppercase;
+            color: var(--card-muted);
+            margin-bottom: 2px;
+            line-height: 1.3;
+        }
+
+        .ticket-value {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--card-text);
+            line-height: 1.15;
+            letter-spacing: .04em;
+            overflow-wrap: anywhere;
+            word-break: break-word;
+        }
+
+        .ticket-hint {
+            font-family: 'DM Serif Display', Georgia, serif;
+            font-style: italic;
+            font-size: .72rem;
+            line-height: 1.4;
+            color: var(--card-muted);
+            margin-top: 2px;
+            overflow-wrap: anywhere;
+        }
+
+        /* ══════════════════════════════════════════════════════════
+                               CLOSING + FOOTER
+                               ══════════════════════════════════════════════════════════ */
+        .closing {
+            font-family: 'DM Serif Display', Georgia, serif;
+            font-style: italic;
+            font-size: 1.05rem;
+            line-height: 1.35;
+            color: var(--card-text);
+            margin: auto 0 16px;
+            padding-top: 22px;
+            overflow-wrap: anywhere;
+        }
+
+        .card-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding-top: 14px;
+            border-top: 1px solid var(--card-border);
+        }
+
+        .footer-brand {
+            font-family: 'DM Sans', sans-serif;
+            font-size: .6rem;
+            font-weight: 700;
+            letter-spacing: .2em;
+            text-transform: uppercase;
+            color: var(--card-muted);
+        }
+
+        .footer-valid {
+            display: inline-flex;
+            align-items: center;
+            gap: .4rem;
+            font-family: 'DM Sans', sans-serif;
+            font-size: .6rem;
+            font-weight: 700;
+            letter-spacing: .16em;
+            text-transform: uppercase;
+            color: var(--card-text-secondary);
+        }
+
+        .footer-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #d42828;
+            flex-shrink: 0;
+        }
+
+        /* ══════════════════════════════════════════════════════════
+                               RIGHT COLUMN  (image)
+                               ══════════════════════════════════════════════════════════ */
+        .card-right {
+            position: relative;
+            border-radius: var(--card-radius-lg);
+            overflow: hidden;
+            background: var(--card-surface-2);
+            min-height: 100%;
+        }
+
+        .card-image {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center top;
+            display: block;
+        }
+
+        /* ══════════════════════════════════════════════════════════
+                               DOWNLOAD OVERLAY
+                               ══════════════════════════════════════════════════════════ */
         .download-overlay {
             position: fixed;
             inset: 0;
             z-index: 9999;
             background: rgba(0, 0, 0, .72);
             backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 1.5rem;
             opacity: 0;
             pointer-events: none;
             transition: opacity .3s ease;
@@ -734,8 +751,8 @@
         }
 
         .download-overlay-card {
-            background: #fdf6ee;
-            border-radius: 24px;
+            background: #fff;
+            border-radius: 20px;
             padding: 2rem 2.5rem;
             text-align: center;
             box-shadow: 0 32px 80px rgba(0, 0, 0, .35);
@@ -744,6 +761,7 @@
 
         html.dark .download-overlay-card {
             background: #1c1c1e;
+            color: #fff;
         }
 
         @keyframes spin360 {
@@ -755,8 +773,8 @@
         .dl-spinner {
             width: 48px;
             height: 48px;
-            border: 3px solid rgba(184, 150, 12, .2);
-            border-top-color: #8b1a1a;
+            border: 3px solid rgba(14, 132, 232, .18);
+            border-top-color: #0e84e8;
             border-radius: 50%;
             margin: 0 auto 1rem;
             animation: spin360 .8s linear infinite;
@@ -769,10 +787,9 @@
         }
 
         .dl-title {
-            font-family: 'Cinzel', serif;
             font-size: .9rem;
             font-weight: 600;
-            color: #3a200a;
+            color: #1a1a1a;
             margin-bottom: .35rem;
         }
 
@@ -782,29 +799,56 @@
 
         .dl-sub {
             font-size: .78rem;
-            color: #a07850;
-            font-family: 'Cormorant Garamond', serif;
-            font-style: italic;
+            color: #8a8a8f;
         }
 
-        /* ── Download btn wrap ── */
-        .download-btn-wrap {
-            position: relative;
-            display: inline-flex;
+        /* ══════════════════════════════════════════════════════════
+                               RESPONSIVE  —  shrink the card gracefully on small screens
+                               ══════════════════════════════════════════════════════════ */
+        @media (max-width: 720px) {
+            #idcard {
+                grid-template-columns: 1fr;
+                padding: 20px;
+                min-height: unset;
+            }
+
+            .card-left {
+                padding: 8px 4px 8px 4px;
+            }
+
+            .card-right {
+                min-height: 340px;
+                aspect-ratio: 4 / 3;
+                order: -1;
+                margin-bottom: 18px;
+            }
+
+            .event-name {
+                font-size: clamp(1.9rem, 8vw, 2.4rem);
+            }
+
+            .guest-name {
+                font-size: clamp(1.3rem, 5.5vw, 1.6rem);
+            }
         }
 
-        /* ── Fade-up animation hook (matches existing admin layout) ── */
-        @media (max-width: 480px) {
-            .ic-event-name {
-                font-size: 2rem;
+        @media (max-width: 400px) {
+            .ticket {
+                padding: 14px;
+                gap: 12px;
             }
 
-            .ic-guest-name {
-                font-size: 2rem;
+            .ticket-qr-inner {
+                width: 88px;
+                height: 88px;
             }
 
-            .ic-info-label {
-                font-size: .48rem;
+            .ticket-value {
+                font-size: 1rem;
+            }
+
+            .info-row {
+                gap: 10px;
             }
         }
     </style>
@@ -816,9 +860,15 @@
             <div class="download-btn-wrap" id="download-btn-wrap">
                 <button class="btn btn-primary btn-lg" onclick="triggerDownload()" id="download-btn">
                     <i class="fa-solid fa-download" style="margin-right:.4rem;"></i>
-                    Save as Image
+                    Download Image
                 </button>
             </div>
+
+            <a href="{{ route('user.generateCardPdf', ['eventId' => $event->id, 'guestId' => $guest->id]) }}"
+                class="btn btn-ghost btn-lg">
+                <i class="fa-solid fa-file-pdf" style="margin-right:.4rem;"></i>
+                Download PDF
+            </a>
 
             <a href="{{ route('showpublic', $guest->qrcode) }}" target="_blank" class="btn btn-ghost btn-lg">
                 <i class="fa-solid fa-arrow-up-right-from-square" style="margin-right:.4rem;"></i>
@@ -841,7 +891,6 @@
             $messageHost = $event->event_host ?: '[Add family or host name]';
             $messageVenue = $event->event_location ?: '[Add venue]';
             $messageVenue2 = 'Sinza Africasana, Dar es Salaam';
-            $messageType = $event->event_type ? ucfirst($event->event_type) : '[Add invitation type]';
             $messageCode = $guest->invitation_code ?: '[Add invitation code]';
             $messageMapUrl = $event->card_link ?: 'https://maps.app.goo.gl/JqaKFPZhVwuCUURo6';
             $messageUrl = $guest->more ?? url('/guest/' . $guest->qrcode);
@@ -884,7 +933,9 @@
                     <h2 class="share-panel-title" id="share-panel-title">Copy invitation message</h2>
                     <p class="share-panel-subtitle">Edit any placeholder, then copy the version you need.</p>
                 </div>
-                <span class="share-panel-icon" aria-hidden="true"><i class="fa-solid fa-paper-plane"></i></span>
+                <span class="share-panel-icon" aria-hidden="true">
+                    <i class="fa-solid fa-paper-plane" style="font-size:.8rem;"></i>
+                </span>
             </div>
 
             <div class="share-message-grid">
@@ -910,20 +961,21 @@
             </div>
         </section>
 
-        {{-- ── Card Shell ── --}}
+        {{-- ══════════════════════════════════════════════════════
+         CARD
+         ══════════════════════════════════════════════════════ --}}
         <div class="invitation-shell fade-up delay-1" id="card-shell">
 
             @php
-                $eventType = strtolower($event->event_type ?? 'event');
+                $eventType = strtolower($event->event_type ?? 'party');
                 $guestTitle = strtolower($guest->title ?? 'guest');
                 $eventDate = \Carbon\Carbon::parse($event->event_date);
                 $arrivalTime = \Carbon\Carbon::parse($event->arrival_time);
                 $publicUrl = $guest->more ?? url('/guest/' . $guest->qrcode);
                 $bgImage = $event->event_image
                     ? asset('storage/' . $event->event_image)
-                    : asset('storage/images/background.png');
+                    : asset('storage/images/willsave.png');
 
-                /* ── Detect Islamic events for Bismillah display ── */
                 $islamicTypes = [
                     'nikah',
                     'wedding',
@@ -944,383 +996,145 @@
                 }
             @endphp
 
-            <div id="idcard">
+            <div id="idcard" data-event-type="{{ $eventType }}">
 
-                {{-- Cream background layer --}}
-                <div class="ic-bg"></div>
+                {{-- ══ LEFT: TEXT COLUMN ══ --}}
+                <div class="card-left">
 
-                {{-- Inner gold border frame --}}
-                <div class="ic-frame"></div>
-
-                {{-- Gold arc top-right --}}
-                <svg class="ic-arc" viewBox="0 0 280 280" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M280 0 Q120 0 95 165" fill="none" stroke="#b8960c" stroke-width="1.4" opacity=".55" />
-                    <path d="M280 0 Q135 0 110 170" fill="none" stroke="#b8960c" stroke-width=".5" opacity=".35" />
-                    <rect x="271" y="-3" width="6" height="6" transform="rotate(45 274 3)" fill="#b8960c"
-                        opacity=".55" />
-                    <circle cx="100" cy="165" r="2.5" fill="#b8960c" opacity=".45" />
-                </svg>
-
-                {{-- Mosque silhouette bg --}}
-                <svg class="ic-mosque" viewBox="0 0 430 180" xmlns="http://www.w3.org/2000/svg"
-                    preserveAspectRatio="xMidYMax meet">
-                    <ellipse cx="215" cy="115" rx="68" ry="55" fill="#7a4010" />
-                    <rect x="147" y="115" width="136" height="65" fill="#7a4010" />
-                    <rect x="211" y="52" width="8" height="38" fill="#7a4010" />
-                    <polygon points="215,40 207,58 223,58" fill="#7a4010" />
-                    <path d="M215 37 C209 31 209 23 215 21 C207 23 207 33 215 37Z" fill="#7a4010" />
-                    <rect x="102" y="105" width="13" height="75" fill="#7a4010" />
-                    <ellipse cx="108" cy="103" rx="8" ry="12" fill="#7a4010" />
-                    <rect x="105" y="85" width="6" height="12" fill="#7a4010" />
-                    <polygon points="108,76 104,88 112,88" fill="#7a4010" />
-                    <rect x="315" y="105" width="13" height="75" fill="#7a4010" />
-                    <ellipse cx="321" cy="103" rx="8" ry="12" fill="#7a4010" />
-                    <rect x="318" y="85" width="6" height="12" fill="#7a4010" />
-                    <polygon points="321,76 317,88 325,88" fill="#7a4010" />
-                    <rect x="56" y="128" width="9" height="52" fill="#7a4010" />
-                    <ellipse cx="60" cy="126" rx="6" ry="9" fill="#7a4010" />
-                    <rect x="360" y="128" width="9" height="52" fill="#7a4010" />
-                    <ellipse cx="364" cy="126" rx="6" ry="9" fill="#7a4010" />
-                    <path d="M186 115 Q186 101 200 101 Q214 101 214 115Z" fill="#fdf6ee" opacity=".45" />
-                    <path d="M216 115 Q216 101 230 101 Q244 101 244 115Z" fill="#fdf6ee" opacity=".45" />
-                </svg>
-
-                {{-- Floral top-left --}}
-                <svg class="floral-tl" viewBox="0 0 210 250" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M8 220 Q55 155 85 95 Q115 45 145 8" fill="none" stroke="#7a8a5a" stroke-width="1.8" />
-                    <path d="M28 232 Q66 178 95 138" fill="none" stroke="#6a7a4a" stroke-width="1.4" />
-                    <ellipse cx="77" cy="108" rx="20" ry="8" fill="#6a7a4a"
-                        transform="rotate(-40 77 108)" opacity=".85" />
-                    <ellipse cx="107" cy="62" rx="17" ry="7" fill="#8a9a5a"
-                        transform="rotate(-60 107 62)" opacity=".8" />
-                    <ellipse cx="57" cy="152" rx="15" ry="6" fill="#5a6a3a"
-                        transform="rotate(-20 57 152)" opacity=".75" />
-                    <ellipse cx="138" cy="28" rx="13" ry="5" fill="#7a8a5a"
-                        transform="rotate(-70 138 28)" opacity=".7" />
-                    <circle cx="92" cy="76" r="3.5" fill="#8b1a1a" opacity=".8" />
-                    <circle cx="100" cy="70" r="2.8" fill="#8b1a1a" opacity=".7" />
-                    <circle cx="97" cy="81" r="2.5" fill="#a02020" opacity=".6" />
-                    <circle cx="150" cy="12" r="2.5" fill="#8b1a1a" opacity=".7" />
-                    {{-- Large dark-red rose --}}
-                    <g transform="translate(12,152) rotate(-10)">
-                        <circle cx="36" cy="36" r="32" fill="#6b1010" opacity=".8" />
-                        <circle cx="36" cy="36" r="24" fill="#8b1a1a" />
-                        <ellipse cx="36" cy="21" rx="15" ry="17" fill="#a02020" />
-                        <ellipse cx="21" cy="43" rx="15" ry="13" fill="#9a1818" />
-                        <ellipse cx="50" cy="40" rx="14" ry="13" fill="#9a1818" />
-                        <ellipse cx="36" cy="52" rx="13" ry="9" fill="#8b1a1a" />
-                        <ellipse cx="36" cy="27" rx="7" ry="11" fill="#c03030" />
-                        <ellipse cx="29" cy="36" rx="6" ry="9" fill="#b02020" />
-                        <ellipse cx="43" cy="36" rx="6" ry="9" fill="#b02020" />
-                    </g>
-                    {{-- Cream rose --}}
-                    <g transform="translate(78,28) rotate(15)">
-                        <circle cx="26" cy="26" r="22" fill="#e8ddd0" opacity=".9" />
-                        <circle cx="26" cy="26" r="15" fill="#f0e6d8" />
-                        <ellipse cx="26" cy="15" rx="10" ry="12" fill="#f5ede0" />
-                        <ellipse cx="16" cy="31" rx="10" ry="9" fill="#ede3d5" />
-                        <ellipse cx="36" cy="29" rx="9" ry="9" fill="#ede3d5" />
-                        <ellipse cx="26" cy="26" rx="5" ry="7" fill="#fff5ea" />
-                    </g>
-                    {{-- Small bud --}}
-                    <g transform="translate(140,-2) rotate(20)">
-                        <ellipse cx="16" cy="22" rx="9" ry="13" fill="#8b1a1a"
-                            opacity=".72" />
-                        <ellipse cx="16" cy="16" rx="6" ry="9" fill="#a02020"
-                            opacity=".78" />
-                        <path d="M12 27 Q16 33 20 27" fill="#6a7a4a" />
-                    </g>
-                </svg>
-
-                {{-- Floral top-right (small spray) --}}
-                <svg class="floral-tr" viewBox="0 0 120 190" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M100 8 Q70 60 60 110 Q52 150 55 185" fill="none" stroke="#7a8a5a" stroke-width="1.4" />
-                    <ellipse cx="75" cy="55" rx="14" ry="6" fill="#6a7a4a"
-                        transform="rotate(50 75 55)" opacity=".8" />
-                    <ellipse cx="65" cy="100" rx="12" ry="5" fill="#8a9a5a"
-                        transform="rotate(30 65 100)" opacity=".75" />
-                    <circle cx="82" cy="40" r="3" fill="#8b1a1a" opacity=".75" />
-                    <circle cx="90" cy="35" r="2.5" fill="#8b1a1a" opacity=".65" />
-                    {{-- Small red bud --}}
-                    <g transform="translate(88,5) rotate(-15)">
-                        <ellipse cx="12" cy="18" rx="8" ry="12" fill="#8b1a1a"
-                            opacity=".7" />
-                        <ellipse cx="12" cy="13" rx="5" ry="8" fill="#a02020"
-                            opacity=".75" />
-                    </g>
-                </svg>
-
-                {{-- Floral bottom-right --}}
-                <svg class="floral-br" viewBox="0 0 230 270" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M230 270 Q172 215 135 155 Q106 106 87 48" fill="none" stroke="#7a8a5a"
-                        stroke-width="1.8" />
-                    <path d="M230 255 Q185 205 155 162" fill="none" stroke="#6a7a4a" stroke-width="1.4" />
-                    <ellipse cx="153" cy="168" rx="21" ry="8" fill="#6a7a4a"
-                        transform="rotate(40 153 168)" opacity=".85" />
-                    <ellipse cx="124" cy="126" rx="18" ry="7" fill="#8a9a5a"
-                        transform="rotate(60 124 126)" opacity=".8" />
-                    <ellipse cx="182" cy="210" rx="16" ry="6" fill="#5a6a3a"
-                        transform="rotate(25 182 210)" opacity=".75" />
-                    <circle cx="140" cy="142" r="3.5" fill="#8b1a1a" opacity=".8" />
-                    <circle cx="148" cy="137" r="2.8" fill="#8b1a1a" opacity=".7" />
-                    <circle cx="144" cy="148" r="2.5" fill="#a02020" opacity=".6" />
-                    {{-- Large dark-red rose --}}
-                    <g transform="translate(122,170) rotate(10)">
-                        <circle cx="38" cy="38" r="34" fill="#6b1010" opacity=".8" />
-                        <circle cx="38" cy="38" r="26" fill="#8b1a1a" />
-                        <ellipse cx="38" cy="22" rx="16" ry="18" fill="#a02020" />
-                        <ellipse cx="22" cy="45" rx="16" ry="14" fill="#9a1818" />
-                        <ellipse cx="52" cy="43" rx="15" ry="14" fill="#9a1818" />
-                        <ellipse cx="38" cy="54" rx="14" ry="10" fill="#8b1a1a" />
-                        <ellipse cx="38" cy="28" rx="8" ry="12" fill="#c03030" />
-                        <ellipse cx="30" cy="38" rx="7" ry="10" fill="#b02020" />
-                        <ellipse cx="46" cy="38" rx="7" ry="10" fill="#b02020" />
-                    </g>
-                    {{-- Cream rose --}}
-                    <g transform="translate(176,210) rotate(-15)">
-                        <circle cx="26" cy="26" r="22" fill="#e8ddd0" opacity=".9" />
-                        <circle cx="26" cy="26" r="15" fill="#f0e6d8" />
-                        <ellipse cx="26" cy="15" rx="10" ry="12" fill="#f5ede0" />
-                        <ellipse cx="16" cy="31" rx="10" ry="9" fill="#ede3d5" />
-                        <ellipse cx="36" cy="29" rx="9" ry="9" fill="#ede3d5" />
-                        <ellipse cx="26" cy="26" rx="5" ry="7" fill="#fff5ea" />
-                    </g>
-                    {{-- Bud top --}}
-                    <g transform="translate(82,42) rotate(-25)">
-                        <ellipse cx="16" cy="22" rx="9" ry="13" fill="#8b1a1a"
-                            opacity=".72" />
-                        <ellipse cx="16" cy="16" rx="6" ry="9" fill="#a02020"
-                            opacity=".78" />
-                        <path d="M12 27 Q16 33 20 27" fill="#6a7a4a" />
-                    </g>
-                    {{-- Mini bud mid --}}
-                    <g transform="translate(168,155) rotate(28)">
-                        <circle cx="12" cy="12" r="10" fill="#8b1a1a" opacity=".78" />
-                        <circle cx="12" cy="12" r="7" fill="#a02020" />
-                        <ellipse cx="12" cy="7" rx="5" ry="7" fill="#c03030"
-                            opacity=".75" />
-                    </g>
-                </svg>
-
-                {{-- Lanterns --}}
-                <svg class="ic-lanterns" width="68" height="135" viewBox="0 0 68 135"
-                    xmlns="http://www.w3.org/2000/svg">
-                    <line x1="28" y1="0" x2="28" y2="17" stroke="#b8960c"
-                        stroke-width="1.4" />
-                    <line x1="50" y1="0" x2="50" y2="28" stroke="#b8960c"
-                        stroke-width="1.4" />
-                    {{-- Lantern 1 --}}
-                    <g transform="translate(28,17)">
-                        <polygon points="0,-4 13,0 13,38 0,42 -13,38 -13,0" fill="#c9920c" />
-                        <rect x="-9" y="0" width="18" height="38" rx="2" fill="none" stroke="#d4a017"
-                            stroke-width=".5" />
-                        <line x1="-13" y1="10" x2="13" y2="10" stroke="#d4a017"
-                            stroke-width=".5" opacity=".55" />
-                        <line x1="-13" y1="20" x2="13" y2="20" stroke="#d4a017"
-                            stroke-width=".5" opacity=".55" />
-                        <line x1="-13" y1="30" x2="13" y2="30" stroke="#d4a017"
-                            stroke-width=".5" opacity=".55" />
-                        <ellipse cx="0" cy="19" rx="7" ry="11"
-                            fill="rgba(255,220,80,.3)" />
-                        <rect x="-5" y="-7" width="10" height="6" rx="1" fill="#b8960c" />
-                        <line x1="-7" y1="42" x2="-7" y2="50" stroke="#b8960c"
-                            stroke-width="1.1" />
-                        <line x1="-2" y1="42" x2="-2" y2="52" stroke="#b8960c"
-                            stroke-width="1.1" />
-                        <line x1="3" y1="42" x2="3" y2="50" stroke="#b8960c"
-                            stroke-width="1.1" />
-                        <line x1="8" y1="42" x2="8" y2="49" stroke="#b8960c"
-                            stroke-width="1.1" />
-                    </g>
-                    {{-- Lantern 2 (smaller) --}}
-                    <g transform="translate(50,28)">
-                        <polygon points="0,-3 9,0 9,28 0,31 -9,28 -9,0" fill="#c9920c" />
-                        <rect x="-6" y="0" width="12" height="28" rx="2" fill="none" stroke="#d4a017"
-                            stroke-width=".5" />
-                        <line x1="-9" y1="8" x2="9" y2="8" stroke="#d4a017"
-                            stroke-width=".5" opacity=".55" />
-                        <line x1="-9" y1="16" x2="9" y2="16" stroke="#d4a017"
-                            stroke-width=".5" opacity=".55" />
-                        <line x1="-9" y1="24" x2="9" y2="24" stroke="#d4a017"
-                            stroke-width=".5" opacity=".55" />
-                        <ellipse cx="0" cy="14" rx="4.5" ry="7"
-                            fill="rgba(255,220,80,.28)" />
-                        <rect x="-3.5" y="-5" width="7" height="4" rx="1" fill="#b8960c" />
-                        <line x1="-5" y1="31" x2="-5" y2="37" stroke="#b8960c"
-                            stroke-width="1.1" />
-                        <line x1="0" y1="31" x2="0" y2="39" stroke="#b8960c"
-                            stroke-width="1.1" />
-                        <line x1="5" y1="31" x2="5" y2="37" stroke="#b8960c"
-                            stroke-width="1.1" />
-                    </g>
-                </svg>
-
-                {{-- ══════ MAIN CARD CONTENT ══════ --}}
-                <div class="ic-content">
-
-                    {{-- Bismillah — shown for Islamic event types --}}
-                    @if ($isIslamic)
-                        <div class="ic-bismillah">بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيم</div>
-                    @endif
-
-                    {{-- "Together with our families" --}}
-                    <div class="ic-eyebrow" style="margin-top:{{ $isIslamic ? '0' : '2.2rem' }}">
-                        Together With Our Families
-                    </div>
-                    <div class="ic-subline">We cordially invite you to</div>
-
-                    {{-- Event name in Great Vibes script --}}
-                    <span class="ic-event-name">{{ $event->order_name }}</span>
-
-                    {{-- Event type label with gold dashes --}}
-                    <div class="ic-event-type-row">
-                        <div class="ic-type-dash"></div>
-                        <span class="ic-type-label">{{ ucfirst($eventType) }}</span>
-                        <div class="ic-type-dash r"></div>
+                    {{-- Eyebrows --}}
+                    <div class="eyebrow-block">
+                        <div class="eyebrow">Together With Our Families</div>
+                        <div class="eyebrow-rule"></div>
+                        <div class="eyebrow">We Cordially Invite You To</div>
                     </div>
 
-                    {{-- Ornament --}}
-                    <div class="ic-orn">
-                        <div class="ic-orn-line"></div>
-                        <div class="ic-orn-diamond"></div>
-                        <svg width="12" height="8" viewBox="0 0 12 8" style="opacity:.55">
-                            <path d="M6 1 C4 2.5 1 3.5 1 5.5 C1 7 3.5 7.5 6 7.5 C8.5 7.5 11 7 11 5.5 C11 3.5 8 2.5 6 1Z"
-                                fill="none" stroke="#b8960c" stroke-width=".8" />
-                        </svg>
-                        <div class="ic-orn-diamond"></div>
-                        <div class="ic-orn-line"></div>
-                    </div>
-
-                    {{-- Host line --}}
-                    @if ($event->event_host)
-                        <div class="ic-host">Hosted by {{ $event->event_host }}</div>
-                    @endif
-
-                    {{-- Guest salutation + name --}}
-                    <div class="ic-salutation">You are cordially invited,</div>
-                    <div class="ic-guest-name">{{ $guest->full_name }}</div>
+                    {{-- Guest name --}}
+                    <h1 class="guest-name">{{ $guest->full_name }}</h1>
 
                     @if ($guestTitle && $guestTitle !== 'guest')
-                        <div style="text-align:center; margin-bottom:.9rem;">
-                            <span class="ic-guest-badge">
-                                <i class="fa-solid fa-star" style="font-size:.5rem;"></i>
-                                {{ ucfirst($guestTitle) }}
-                            </span>
-                        </div>
+                        <span class="guest-title-pill">
+                            <svg width="9" height="9" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                                <path
+                                    d="M12 2l2.39 7.36H22l-6.18 4.49 2.36 7.27L12 16.63 5.82 21.12l2.36-7.27L2 9.36h7.61L12 2z" />
+                            </svg>
+                            {{ ucfirst($guestTitle) }}
+                        </span>
                     @endif
+
+                    {{-- Event name (hero) --}}
+                    <h2 class="event-name">{{ $event->order_name }}</h2>
+
+                    {{-- Host + event type chip --}}
+                    <div class="event-host-row">
+                        @if ($event->event_host)
+                            <div class="event-host">Hosted by {{ $event->event_host }}</div>
+                        @else
+                            <div class="event-host">&nbsp;</div>
+                        @endif
+                        <span class="event-type-chip">{{ ucfirst($eventType) }}</span>
+                    </div>
 
                     {{-- Ornament divider --}}
-                    <div class="ic-orn" style="margin-bottom:.85rem;">
-                        <div class="ic-orn-line"></div>
-                        <div class="ic-orn-diamond"></div>
-                        <div class="ic-orn-diamond"></div>
-                        <div class="ic-orn-line"></div>
+                    <div class="ornament">
+                        <span class="ornament-line"></span>
+                        <span class="ornament-diamond"></span>
+                        <span class="ornament-line"></span>
                     </div>
 
-                    {{-- Blessing / description --}}
-                    <p class="ic-blessing">
-                        @if ($event->event_desc)
-                            {{ $event->event_desc }}
-                        @else
-                            With the blessings of Allah, we request the honor
-                            of your presence at the celebration of our dear ones.
-                        @endif
-                    </p>
-
-                    {{-- Gold rule --}}
-                    <div class="ic-rule"></div>
-
-                    {{-- Date / Time / Venue info strip --}}
-                    <div class="ic-info-strip">
-                        <div class="ic-info-block">
-                            <i class="fa-regular fa-calendar-days ic-info-icon"></i>
-                            <div class="ic-info-label">
-                                {{ $eventDate->format('l') }}<br>
-                                {{ $eventDate->format('M j, Y') }}
-                            </div>
-                        </div>
-                        <div class="ic-info-block">
-                            <i class="fa-regular fa-clock ic-info-icon"></i>
-                            <div class="ic-info-label">
-                                At {{ $arrivalTime->format('g:i A') }}
-                            </div>
-                        </div>
-                        <div class="ic-info-block">
-                            <i class="fa-solid fa-location-dot ic-info-icon"></i>
-                            <div class="ic-info-label">
-                                {{ $event->event_location }}
-                            </div>
-                        </div>
-                    </div>
-
-                    {{-- Closing italic quote --}}
-                    <div class="ic-closing">
-                        Watoto tunawapena ila hawaruhusiwi.
-                    </div>
-
-                    {{-- Small ornament --}}
-                    {{-- <div class="ic-orn" style="margin-bottom:.9rem;">
-                        <div class="ic-orn-line"></div>
-                        <div class="ic-orn-diamond"></div>
-                        <svg width="10" height="10" viewBox="0 0 10 10" style="opacity:.55">
-                            <path d="M5 1 L5 9 M1 5 L9 5" stroke="#b8960c" stroke-width=".8" />
-                            <circle cx="5" cy="5" r="1.5" fill="#b8960c" opacity=".7" />
-                        </svg>
-                        <div class="ic-orn-diamond"></div>
-                        <div class="ic-orn-line"></div>
-                    </div> --}}
-
-                    {{-- Jazakum Allah Khair pill --}}
-                    @if ($isIslamic)
-                        <div class="ic-jazakum">
-                            <span class="ic-jazakum-line"></span>
-                            Asante na Karibu Sana
-                            <span class="ic-jazakum-line"></span>
-                        </div>
-                    @else
-                        <div class="ic-jazakum">
-                            <span class="ic-jazakum-line"></span>
-                            We look forward to seeing you
-                            <span class="ic-jazakum-line"></span>
-                        </div>
+                    {{-- Description (optional) --}}
+                    @if ($event->event_desc)
+                        <p class="event-desc">{{ $event->event_desc }}</p>
                     @endif
 
-                </div>{{-- /.ic-content --}}
+                    {{-- Info rows --}}
+                    <div class="info-list">
+                        <div class="info-row">
+                            <div class="info-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
+                                    stroke-linejoin="round" aria-hidden="true">
+                                    <rect x="3" y="4.5" width="18" height="16" rx="2" />
+                                    <line x1="16" y1="2.5" x2="16" y2="6.5" />
+                                    <line x1="8" y1="2.5" x2="8" y2="6.5" />
+                                    <line x1="3" y1="10" x2="21" y2="10" />
+                                </svg>
+                            </div>
+                            <div class="info-bar"></div>
+                            <div class="info-content">
+                                <div class="info-label">{{ $eventDate->format('l') }}</div>
+                                <div class="info-value">{{ $eventDate->format('F j, Y') }}</div>
+                            </div>
+                        </div>
 
-                {{-- ══════ QR / TICKET SECTION ══════ --}}
-                <div style="padding: 0 1.4rem; position:relative; z-index:4; margin-bottom:.2rem;">
-                    <div class="ic-ticket">
-                        <div class="ic-qr-wrap">
-                            <div class="ic-qr-inner">
+                        <div class="info-row">
+                            <div class="info-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
+                                    stroke-linejoin="round" aria-hidden="true">
+                                    <circle cx="12" cy="12" r="9.5" />
+                                    <polyline points="12 6.5 12 12 15.5 14" />
+                                </svg>
+                            </div>
+                            <div class="info-bar"></div>
+                            <div class="info-content">
+                                <div class="info-label">Time</div>
+                                <div class="info-value">At {{ $arrivalTime->format('g:i A') }}</div>
+                            </div>
+                        </div>
+
+                        <div class="info-row">
+                            <div class="info-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"
+                                    stroke-linejoin="round" aria-hidden="true">
+                                    <path d="M20.5 10c0 6.5-8.5 12-8.5 12s-8.5-5.5-8.5-12a8.5 8.5 0 1 1 17 0z" />
+                                    <circle cx="12" cy="10" r="2.8" />
+                                </svg>
+                            </div>
+                            <div class="info-bar"></div>
+                            <div class="info-content">
+                                <div class="info-label">Venue</div>
+                                <div class="info-value">{{ $event->event_location }}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Ticket / QR --}}
+                    <div class="ticket">
+                        <div class="ticket-qr">
+                            <div class="ticket-qr-inner">
                                 {!! QrCode::size(100)->generate($publicUrl) !!}
                             </div>
                         </div>
-
-                        <div class="ic-ticket-sep"></div>
-
-                        <div class="ic-ticket-meta">
-                            <div>
-                                <div class="ic-ticket-label">Invitation Code</div>
-                                <div class="ic-ticket-code">{{ $guest->invitation_code }}</div>
+                        <div class="ticket-info">
+                            <div class="ticket-field">
+                                <div class="ticket-label">Invitation Code</div>
+                                <div class="ticket-value">{{ $guest->invitation_code }}</div>
                             </div>
-                            <div>
-                                <div class="ic-ticket-label">Admission</div>
-                                <div class="ic-ticket-admission">{{ $guest->counter ?? '1 Person' }}</div>
+                            <div class="ticket-field">
+                                <div class="ticket-label">Admission</div>
+                                <div class="ticket-value">{{ $guest->counter ?? '1 Person' }}</div>
                             </div>
-                            <div class="ic-ticket-hint">
-                                Scan QR or present code<br>at the entrance
-                            </div>
+                            <div class="ticket-hint">Scan QR or present code at the entrance</div>
                         </div>
                     </div>
-                </div>
 
-                {{-- ══════ CARD FOOTER ══════ --}}
-                <div class="ic-footer" style="position:relative;z-index:4;">
-                    <span class="ic-footer-brand">TapEvent Card</span>
-                    <span class="ic-footer-valid">
-                        <span class="ic-valid-dot"></span>
-                        Valid Invitation
-                    </span>
+                    {{-- Closing --}}
+                    <div class="closing">
+                        {{ $isIslamic ? 'Asante na Karibu Sana.' : 'We look forward to seeing you.' }}
+                    </div>
+
+                    {{-- Footer --}}
+                    <div class="card-footer">
+                        <span class="footer-brand">TapEvent Card</span>
+                        <span class="footer-valid">
+                            <span class="footer-dot"></span>
+                            Valid Invitation
+                        </span>
+                    </div>
+
+                </div>{{-- /.card-left --}}
+
+                {{-- ══ RIGHT: IMAGE COLUMN ══ --}}
+                <div class="card-right">
+                    <img src="{{ $bgImage }}" alt="{{ $event->order_name }}" class="card-image">
                 </div>
 
             </div>{{-- /#idcard --}}
@@ -1337,20 +1151,20 @@
         </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script>
-        /* ── 3-D tilt on hover ── */
+        /* ── 3-D tilt on hover (desktop only) ── */
         (function() {
             const shell = document.getElementById('card-shell');
             const card = document.getElementById('idcard');
             if (!shell || !card) return;
             shell.addEventListener('mousemove', (e) => {
+                if (window.innerWidth < 720) return;
                 const r = shell.getBoundingClientRect();
                 const x = (e.clientX - r.left) / r.width - .5;
                 const y = (e.clientY - r.top) / r.height - .5;
-                card.style.transform = `rotateY(${x*9}deg) rotateX(${-y*7}deg) scale(1.013)`;
+                card.style.transform = `rotateY(${x*5}deg) rotateX(${-y*4}deg) scale(1.008)`;
                 card.style.boxShadow =
-                    `${-x*22}px ${-y*18}px 55px rgba(80,30,0,.28), 0 36px 90px rgba(80,35,5,.42)`;
+                    `${-x*16}px ${-y*12}px 44px rgba(0,0,0,.16), 0 24px 60px rgba(0,0,0,.14)`;
             });
             shell.addEventListener('mouseleave', () => {
                 card.style.transform = '';
@@ -1371,7 +1185,7 @@
             };
 
             if (navigator.clipboard && window.isSecureContext) {
-                navigator.clipboard.writeText(message.value).then(copied).catch(() => fallbackCopy());
+                navigator.clipboard.writeText(message.value).then(copied).catch(fallbackCopy);
             } else {
                 fallbackCopy();
             }
@@ -1390,182 +1204,19 @@
             const spinner = document.getElementById('dl-spinner');
             const title = document.getElementById('dl-title');
             const sub = document.getElementById('dl-sub');
-            const card = document.getElementById('idcard');
             const button = document.getElementById('download-btn');
-
-            if (!card || typeof html2canvas !== 'function') {
-                if (window.showToast) showToast('Image export is unavailable in this browser', 'error');
-                return;
-            }
 
             overlay.classList.add('show');
             button.disabled = true;
             title.textContent = 'Generating high-quality image…';
-            sub.textContent = 'Preparing the card in your browser';
-
-            const exportWidth = 630;
-            const exportStage = document.createElement('div');
-            const exportCard = card.cloneNode(true);
-
-            exportStage.style.cssText = [
-                'position:fixed',
-                'left:-10000px',
-                'top:0',
-                `width:${exportWidth}px`,
-                'min-width:630px',
-                'visibility:visible',
-                'pointer-events:none',
-                'z-index:-1',
-                'overflow:visible',
-            ].join(';');
-            exportCard.style.cssText += [
-                `width:${exportWidth}px`,
-                'min-width:630px',
-                'max-width:630px',
-                'transform:none',
-                'transition:none',
-                'animation:none',
-                'margin:0',
-            ].join(';');
-            exportStage.appendChild(exportCard);
-            document.body.appendChild(exportStage);
-
-            const renderCard = async () => {
-                if (document.fonts && document.fonts.ready) {
-                    await document.fonts.ready;
-                }
-
-                const exportHeight = Math.max(1, Math.ceil(exportCard.getBoundingClientRect().height));
-
-                return html2canvas(exportCard, {
-                    backgroundColor: '#fdf6ee',
-                    scale: 2,
-                    width: exportWidth,
-                    height: exportHeight,
-                    windowWidth: exportWidth,
-                    windowHeight: exportHeight,
-                    x: 0,
-                    y: 0,
-                    useCORS: true,
-                    logging: false,
-                    imageTimeout: 15000,
-                    removeContainer: true,
-                    onclone: clonedDocument => {
-                        clonedDocument.querySelectorAll('link[rel="stylesheet"], style').forEach(
-                            stylesheet => {
-                                const href = stylesheet.getAttribute('href') || '';
-                                const cssText = stylesheet.textContent || '';
-                                const isFontStylesheet = href.includes(
-                                        'fonts.googleapis.com') ||
-                                    href.includes('cdnjs.cloudflare.com');
-
-                                if (stylesheet.tagName === 'LINK' && !isFontStylesheet) {
-                                    stylesheet.remove();
-                                } else if (!isFontStylesheet && /oklch\(/i.test(cssText)) {
-                                    stylesheet.remove();
-                                }
-                            });
-
-                        const colorCanvas = clonedDocument.createElement('canvas');
-                        const colorContext = colorCanvas.getContext('2d');
-                        const colorProperties = [
-                            'color',
-                            'backgroundColor',
-                            'borderTopColor',
-                            'borderRightColor',
-                            'borderBottomColor',
-                            'borderLeftColor',
-                            'outlineColor',
-                            'textDecorationColor',
-                            'fill',
-                            'stroke',
-                        ];
-
-                        const normalizeColor = value => {
-                            if (!value || !/oklch\(/i.test(value) || !colorContext)
-                                return value;
-                            colorContext.fillStyle = '#000000';
-                            colorContext.fillStyle = value;
-                            return colorContext.fillStyle;
-                        };
-
-                        clonedDocument.querySelectorAll('*').forEach(element => {
-                            const computedStyle = clonedDocument.defaultView
-                                .getComputedStyle(element);
-
-                            colorProperties.forEach(property => {
-                                const value = normalizeColor(computedStyle[
-                                    property]);
-                                if (value && value !== computedStyle[property]) {
-                                    element.style[property] = value;
-                                }
-                            });
-
-                            if (/oklch\(/i.test(computedStyle.backgroundImage)) {
-                                element.style.backgroundImage = 'none';
-                            }
-
-                            if (/oklch\(/i.test(computedStyle.boxShadow)) {
-                                element.style.boxShadow = 'none';
-                            }
-
-                            if (/oklch\(/i.test(computedStyle.textShadow)) {
-                                element.style.textShadow = 'none';
-                            }
-                        });
-
-                        const captureStyle = clonedDocument.createElement('style');
-                        captureStyle.textContent = `
-                            *, *::before, *::after { box-sizing: border-box !important; }
-                            #idcard {
-                                width: ${exportWidth}px !important;
-                                min-width: ${exportWidth}px !important;
-                                max-width: ${exportWidth}px !important;
-                                transform: none !important;
-                                animation: none !important;
-                            }
-                            #idcard .ic-qr-inner,
-                            #idcard .ic-qr-inner svg {
-                                width: 100px !important;
-                                height: 100px !important;
-                                min-width: 100px !important;
-                                min-height: 100px !important;
-                                display: block !important;
-                            }
-                        `;
-                        clonedDocument.head.appendChild(captureStyle);
-                    },
-                });
-            };
-
-            renderCard()
-                .then(canvas => new Promise((resolve, reject) => {
-                    canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error(
-                        'The image could not be created')), 'image/png');
-                }))
-                .then(blob => {
-                    const url = URL.createObjectURL(blob);
-                    const link = document.createElement('a');
-                    link.href = url;
-                    link.download = `invitation-card-{{ $guest->invitation_code ?? 'export' }}.png`;
-                    document.body.appendChild(link);
-                    link.click();
-                    link.remove();
-                    URL.revokeObjectURL(url);
-
-                    spinner.classList.add('done');
-                    title.textContent = 'Ready!';
-                    sub.textContent = 'Your HD card has been downloaded';
-                    setTimeout(() => overlay.classList.remove('show'), 1500);
-                })
-                .catch(error => {
-                    overlay.classList.remove('show');
-                    if (window.showToast) showToast(error.message || 'Failed to generate image', 'error');
-                })
-                .finally(() => {
-                    exportStage.remove();
-                    button.disabled = false;
-                });
+            sub.textContent = 'Rendering the card on the server';
+            window.location.href =
+                '{{ route('user.generateCardImage', ['eventId' => $event->id, 'guestId' => $guest->id]) }}';
+            setTimeout(() => {
+                overlay.classList.remove('show');
+                spinner.classList.remove('done');
+                button.disabled = false;
+            }, 1800);
         };
 
         /* ── Copy link ── */

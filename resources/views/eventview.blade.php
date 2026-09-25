@@ -45,7 +45,7 @@
                     </div>
                     <div class="flex items-center justify-between">
                         <div>
-                            <div class="text-2xl font-bold">{{ $guests->count() }}</div>
+                            <div class="text-2xl font-bold">{{ $guests->total() }}</div>
                             <div class="text-xs text-gray-500">Guests Registered</div>
                         </div>
                         <div class="text-right">
@@ -139,7 +139,7 @@
                                 </tr>
                             </thead>
                             <tbody id="guestTableBody">
-                                @php $counter = 1; @endphp
+                                @php $counter = $guests->firstItem() ?? 1; @endphp
                                 @forelse ($guests as $guest)
                                     <tr class="guest-row">
                                         <td class="text-center">{{ $counter }}</td>
@@ -224,23 +224,17 @@
 
                                     @php $counter++; @endphp
                                 @empty
-                                    <div class="text-center py-10">
-                                        <div class="text-5xl mb-3">🎉</div>
-
-                                        <h3 class="text-xl font-semibold">
-                                            No guests yet
-                                        </h3>
-
-                                        <p class="text-gray-500 mt-2">
-                                            Start adding guests for this event.
-                                        </p>
-                                    </div>
-
+                                    <tr>
+                                        <td colspan="9" class="text-center py-10 text-gray-500">
+                                            No guests yet. Start adding guests for this event.
+                                        </td>
+                                    </tr>
                                 @endforelse
                             </tbody>
                         </table>
-                        @if ($guests->isEmpty())
-                            <div class="text-center py-10 text-gray-500">No guests added yet. Click "Add Guest" to start.
+                        @if ($guests->hasPages())
+                            <div class="border-t border-gray-100 dark:border-gray-800 px-4 py-4">
+                                {{ $guests->links() }}
                             </div>
                         @endif
                     </div>

@@ -71,6 +71,7 @@ Route::prefix('user')
             ->name('logout');
         Route::get('/{event}/cameralog', [UserController::class, 'cameralog'])->name('cameralog');
         Route::get('/card/export-image/{eventId}/{guestId}', [GuestController::class, 'generateCardImage'])->name('generateCardImage');
+        Route::get('/card/export-pdf/{eventId}/{guestId}', [GuestController::class, 'generateCardPdf'])->name('generateCardPdf');
         Route::post('/guest/send/{guest}', [GuestController::class, 'sendInvitation'])->name('guest.send');
         // Route::get('/card/export-image/{event}/{guest}', [GuestController::class, 'generateCardImage'])
         //     ->name('card.image');

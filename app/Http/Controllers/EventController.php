@@ -36,12 +36,16 @@ class EventController extends Controller
     public function eventview($id)
     {
         $events = Event::findOrFail($id);
-        $guests = Guest::where('order_id', $events->id)->get();
 
         // Optional: ownership check
         if ($events->user_id != Auth::id()) {
             abort(403, 'Unauthorized action.');
         }
+
+        $guests = Guest::where('order_id', $events->id)
+            ->latest('id')
+            ->paginate(100)
+            ->withQueryString();
 
         return view('eventview', compact('events', 'guests'));
     }

@@ -13,6 +13,7 @@ use AfricasTalking\SDK\AfricasTalking;
 use Spatie\Browsershot\Browsershot;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
@@ -452,9 +453,9 @@ class GuestController extends Controller
             $event = Event::findOrFail($eventId);
             $guest = Guest::findOrFail($guestId);
 
-            $html = view('cardview', compact('event', 'guest'))->render();
+            $this->ensureCardOwnership($event, $guest);
 
-            $fileName = 'event-card-' . time() . '.png';
+            $fileName = 'event-card-' . $guest->id . '-' . Str::uuid() . '.png';
             $path = storage_path('app/public/cards/' . $fileName);
 
             $dir = storage_path('app/public/cards');
@@ -462,56 +463,18 @@ class GuestController extends Controller
                 throw new \RuntimeException('The card storage directory could not be created.');
             }
 
-            $browser = Browsershot::html($html)
-                ->setContentUrl(rtrim(config('app.url'), '/') . '/card-export-content');
-            $browserlessEndpoint = config('services.browserless.ws_endpoint');
-
-            if ($browserlessEndpoint) {
-                if (str_starts_with($browserlessEndpoint, 'https://')) {
-                    $browserlessEndpoint = 'wss://' . substr($browserlessEndpoint, 8);
-                } elseif (str_starts_with($browserlessEndpoint, 'http://')) {
-                    $browserlessEndpoint = 'ws://' . substr($browserlessEndpoint, 7);
-                }
-
-                $browser->setWSEndpoint($browserlessEndpoint);
-            } else {
-                $nodeBinary = config('services.browserless.node_binary');
-                $npmBinary = config('services.browserless.npm_binary');
-                $nodeModulePath = config('services.browserless.node_module_path');
-                $chromePath = config('services.browserless.chrome_path');
-
-                if ($nodeBinary) {
-                    $browser->setNodeBinary($nodeBinary);
-                }
-                if ($npmBinary) {
-                    $browser->setNpmBinary($npmBinary);
-                }
-                if ($nodeModulePath) {
-                    $browser->setNodeModulePath($nodeModulePath);
-                }
-                if ($chromePath) {
-                    $browser->setChromePath($chromePath);
-                }
-            }
-
+            $browser = $this->cardBrowser($event, $guest, 'image');
             $browser
-                ->windowSize(650, 1000)
+                ->windowSize(800, 1000)
                 ->deviceScaleFactor(2)
                 ->waitUntilNetworkIdle()
-                ->select('#idcard')
+                ->select('.invitation-shell')
                 ->timeout(60)
                 ->setDelay(300)
                 ->noSandbox()
                 ->save($path);
 
-            if ($request->ajax()) {
-                return response()->json([
-                    'success' => true,
-                    'url' => asset('storage/cards/' . $fileName),
-                ]);
-            }
-
-            return response()->download($path, $fileName);
+            return response()->download($path, $fileName)->deleteFileAfterSend(true);
         } catch (\Throwable $exception) {
             Log::error('Invitation card image generation failed.', [
                 'event_id' => $eventId,
@@ -520,14 +483,89 @@ class GuestController extends Controller
                 'exception' => get_class($exception),
             ]);
 
-            if ($request->expectsJson() || $request->ajax()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'The invitation image could not be generated. Check the server configuration and logs.',
-                ], 500);
+            throw $exception;
+        }
+    }
+
+    public function generateCardPdf($eventId, $guestId)
+    {
+        try {
+            $event = Event::findOrFail($eventId);
+            $guest = Guest::findOrFail($guestId);
+            $this->ensureCardOwnership($event, $guest);
+
+            $fileName = 'event-card-' . $guest->id . '-' . Str::uuid() . '.pdf';
+            $path = storage_path('app/public/cards/' . $fileName);
+            $dir = dirname($path);
+
+            if (! is_dir($dir) && ! mkdir($dir, 0755, true) && ! is_dir($dir)) {
+                throw new \RuntimeException('The card storage directory could not be created.');
             }
 
+            $this->cardBrowser($event, $guest, 'pdf')
+                ->windowSize(800, 1000)
+                ->paperSize(180, 233)
+                ->showBackground()
+                ->margins(0, 0, 0, 0)
+                ->waitUntilNetworkIdle()
+                ->timeout(60)
+                ->setDelay(300)
+                ->noSandbox()
+                ->savePdf($path);
+
+            return response()->download($path, $fileName)->deleteFileAfterSend(true);
+        } catch (\Throwable $exception) {
+            Log::error('Invitation card PDF generation failed.', [
+                'event_id' => $eventId,
+                'guest_id' => $guestId,
+                'message' => $exception->getMessage(),
+                'exception' => get_class($exception),
+            ]);
+
             throw $exception;
+        }
+    }
+
+    private function cardBrowser(Event $event, Guest $guest, string $format): Browsershot
+    {
+        $html = view('cardview', [
+            'event' => $event,
+            'guest' => $guest,
+            'export' => true,
+        ])->render();
+        $browser = Browsershot::html($html);
+        $browserlessEndpoint = config('services.browserless.ws_endpoint');
+
+        if ($browserlessEndpoint) {
+            $browserlessEndpoint = preg_replace('/^https?:\/\//', function ($matches) {
+                return $matches[0] === 'https://' ? 'wss://' : 'ws://';
+            }, $browserlessEndpoint);
+            $browser->setWSEndpoint($browserlessEndpoint);
+        } else {
+            foreach (
+                [
+                    'node_binary' => 'setNodeBinary',
+                    'npm_binary' => 'setNpmBinary',
+                    'node_module_path' => 'setNodeModulePath',
+                    'chrome_path' => 'setChromePath',
+                ] as $configKey => $method
+            ) {
+                $value = config('services.browserless.' . $configKey);
+                if ($value) {
+                    $browser->{$method}($value);
+                }
+            }
+        }
+
+        return $format === 'image'
+            ? $browser->showBackground()
+            : $browser;
+    }
+
+    private function ensureCardOwnership(Event $event, Guest $guest): void
+    {
+        if ($guest->order_id != $event->id || $event->user_id != Auth::id()) {
+            abort(403, 'Unauthorized action.');
         }
     }
 
