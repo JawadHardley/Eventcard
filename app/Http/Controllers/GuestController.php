@@ -537,9 +537,12 @@ class GuestController extends Controller
         $browserlessEndpoint = config('services.browserless.ws_endpoint');
 
         if ($browserlessEndpoint) {
-            $browserlessEndpoint = preg_replace('/^https?:\/\//', function ($matches) {
-                return $matches[0] === 'https://' ? 'wss://' : 'ws://';
-            }, $browserlessEndpoint);
+            if (str_starts_with($browserlessEndpoint, 'https://')) {
+                $browserlessEndpoint = 'wss://' . substr($browserlessEndpoint, 8);
+            } elseif (str_starts_with($browserlessEndpoint, 'http://')) {
+                $browserlessEndpoint = 'ws://' . substr($browserlessEndpoint, 7);
+            }
+
             $browser->setWSEndpoint($browserlessEndpoint);
         } else {
             foreach (
