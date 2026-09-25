@@ -17,8 +17,8 @@
 
     <style>
         /* ══════════════════════════════════════════════════════════
-                                                                           PAGE WRAPPER
-                                                                           ══════════════════════════════════════════════════════════ */
+                                                                                       PAGE WRAPPER
+                                                                                       ══════════════════════════════════════════════════════════ */
         .cardview-page {
             display: flex;
             flex-direction: column;
@@ -190,8 +190,8 @@
         }
 
         /* ══════════════════════════════════════════════════════════
-                                                                           CARD SHELL
-                                                                           ══════════════════════════════════════════════════════════ */
+                                                                                       CARD SHELL
+                                                                                       ══════════════════════════════════════════════════════════ */
         .invitation-shell {
             perspective: 1400px;
             width: 100%;
@@ -212,8 +212,8 @@
         }
 
         /* ══════════════════════════════════════════════════════════
-                                                                           THE CARD  —  design tokens
-                                                                           ══════════════════════════════════════════════════════════ */
+                                                                                       THE CARD  —  design tokens
+                                                                                       ══════════════════════════════════════════════════════════ */
         #idcard {
             /* ── Light mode tokens ── */
             --card-bg: #f5efe6;
@@ -342,8 +342,8 @@
         }
 
         /* ══════════════════════════════════════════════════════════
-                                                                           LEFT COLUMN
-                                                                           ══════════════════════════════════════════════════════════ */
+                                                                                       LEFT COLUMN
+                                                                                       ══════════════════════════════════════════════════════════ */
         .card-left {
             display: flex;
             flex-direction: column;
@@ -505,8 +505,8 @@
         }
 
         /* ══════════════════════════════════════════════════════════
-                                                                           INFO ROWS  (icon │ text)
-                                                                           ══════════════════════════════════════════════════════════ */
+                                                                                       INFO ROWS  (icon │ text)
+                                                                                       ══════════════════════════════════════════════════════════ */
         .info-list {
             display: flex;
             flex-direction: column;
@@ -573,8 +573,8 @@
         }
 
         /* ══════════════════════════════════════════════════════════
-                                                                           TICKET / QR
-                                                                           ══════════════════════════════════════════════════════════ */
+                                                                                       TICKET / QR
+                                                                                       ══════════════════════════════════════════════════════════ */
         .ticket {
             margin-top: 4px;
             padding: 16px 16px 14px;
@@ -655,8 +655,8 @@
         }
 
         /* ══════════════════════════════════════════════════════════
-                                                                           CLOSING + FOOTER
-                                                                           ══════════════════════════════════════════════════════════ */
+                                                                                       CLOSING + FOOTER
+                                                                                       ══════════════════════════════════════════════════════════ */
         .closing {
             font-family: 'DM Serif Display', Georgia, serif;
             font-style: italic;
@@ -707,8 +707,8 @@
         }
 
         /* ══════════════════════════════════════════════════════════
-                                                                           RIGHT COLUMN  (image)
-                                                                           ══════════════════════════════════════════════════════════ */
+                                                                                       RIGHT COLUMN  (image)
+                                                                                       ══════════════════════════════════════════════════════════ */
         .card-right {
             position: relative;
             border-radius: var(--card-radius-lg);
@@ -729,8 +729,8 @@
         }
 
         /* ══════════════════════════════════════════════════════════
-                                                                           DOWNLOAD OVERLAY
-                                                                           ══════════════════════════════════════════════════════════ */
+                                                                                       DOWNLOAD OVERLAY
+                                                                                       ══════════════════════════════════════════════════════════ */
         .download-overlay {
             position: fixed;
             inset: 0;
@@ -804,8 +804,8 @@
         }
 
         /* ══════════════════════════════════════════════════════════
-                                                                           RESPONSIVE  —  shrink the card gracefully on small screens
-                                                                           ══════════════════════════════════════════════════════════ */
+                                                                                       RESPONSIVE  —  shrink the card gracefully on small screens
+                                                                                       ══════════════════════════════════════════════════════════ */
         @media (max-width: 720px) {
             #idcard {
                 grid-template-columns: 1fr;
@@ -899,7 +899,7 @@
             $whatsappMessage =
                 "*{$event->order_name}*\n\n" .
                 "Familia ya {$messageHost}, Wanapenda kukualika *{$guest->full_name}* " .
-                "Kwenye harusi ya vijana wao wapendwa *Yasin H. Seif & Upendo S. Juma*\n\n" .
+                "Kwenye harusi ya vijana wao wapendwa *{$event->order_name}*\n\n" .
                 "Tarehe: {$messageDate} | {$messageTime}\n" .
                 "Ukumbi: {$messageVenue}\n" .
                 "Mahali: {$messageVenue2}\n" .
@@ -976,7 +976,7 @@
                 $arrivalTime = \Carbon\Carbon::parse($event->arrival_time);
                 $publicUrl = $guest->more ?? url('/guest/' . $guest->qrcode);
                 $bgImage = $event->event_image
-                    ? asset('storage/' . $event->event_image)
+                    ? asset('storage/' . $event->event_image) . '?v=' . ($event->updated_at?->timestamp ?? $event->id)
                     : asset('storage/images/willsave.png');
 
                 $islamicTypes = [
@@ -1004,9 +1004,21 @@
                 {{-- ══ LEFT: TEXT COLUMN ══ --}}
                 <div class="card-left">
 
+                    {{-- Event name (hero) --}}
+                    <h2 class="event-name">{{ $event->order_name }}</h2>
+
+                    {{-- Host + event type chip --}}
+                    <div class="event-host-row">
+                        @if ($event->event_host)
+                            <div class="event-host">Hosted by {{ $event->event_host }}</div>
+                        @else
+                            <div class="event-host">&nbsp;</div>
+                        @endif
+                        <span class="event-type-chip">{{ ucfirst($eventType) }}</span>
+                    </div>
+
                     {{-- Eyebrows --}}
                     <div class="eyebrow-block">
-                        <div class="eyebrow">Together With Our Families</div>
                         <div class="eyebrow-rule"></div>
                         <div class="eyebrow">We Cordially Invite You To</div>
                     </div>
@@ -1023,19 +1035,6 @@
                             {{ ucfirst($guestTitle) }}
                         </span>
                     @endif
-
-                    {{-- Event name (hero) --}}
-                    <h2 class="event-name">{{ $event->order_name }}</h2>
-
-                    {{-- Host + event type chip --}}
-                    <div class="event-host-row">
-                        @if ($event->event_host)
-                            <div class="event-host">Hosted by {{ $event->event_host }}</div>
-                        @else
-                            <div class="event-host">&nbsp;</div>
-                        @endif
-                        <span class="event-type-chip">{{ ucfirst($eventType) }}</span>
-                    </div>
 
                     {{-- Ornament divider --}}
                     <div class="ornament">
