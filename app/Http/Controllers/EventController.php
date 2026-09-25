@@ -66,6 +66,7 @@ class EventController extends Controller
             'reminder_date' => 'nullable|date',
             'timezone' => 'nullable|string|max:100',
             'event_location' => 'nullable|string|max:255',
+            'card_link' => 'nullable|url|max:255',
             'event_desc' => 'nullable|string',
             'guest_limit' => 'nullable|integer|min:1',
         ]);
@@ -101,6 +102,7 @@ class EventController extends Controller
             'reminder_date' => 'nullable|date',
             'timezone' => 'nullable|string|max:100',
             'event_location' => 'nullable|string|max:255',
+            'card_link' => 'nullable|url|max:255',
             'event_desc' => 'nullable|string',
             'guest_limit' => 'nullable|integer|min:1',
         ]);

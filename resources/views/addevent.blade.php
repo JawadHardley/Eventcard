@@ -23,6 +23,8 @@
                             name="reminder_date" class="form-input"></div>
                     <div class="form-group col-span-2"><label class="form-label">Event Location</label><input type="text"
                             name="event_location" class="form-input"></div>
+                    <div class="form-group col-span-2"><label class="form-label">Map Link</label><input type="url"
+                            name="card_link" class="form-input" placeholder="https://maps.app.goo.gl/..."></div>
                     <div class="form-group col-span-2"><label class="form-label">Description</label>
                         <textarea name="event_desc" rows="3" class="form-input"></textarea>
                     </div>

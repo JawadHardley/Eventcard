@@ -17,8 +17,8 @@
 
     <style>
         /* ══════════════════════════════════════════════════════════
-                                   PAGE WRAPPER
-                                   ══════════════════════════════════════════════════════════ */
+                                                                           PAGE WRAPPER
+                                                                           ══════════════════════════════════════════════════════════ */
         .cardview-page {
             display: flex;
             flex-direction: column;
@@ -190,8 +190,8 @@
         }
 
         /* ══════════════════════════════════════════════════════════
-                                   CARD SHELL
-                                   ══════════════════════════════════════════════════════════ */
+                                                                           CARD SHELL
+                                                                           ══════════════════════════════════════════════════════════ */
         .invitation-shell {
             perspective: 1400px;
             width: 100%;
@@ -212,8 +212,8 @@
         }
 
         /* ══════════════════════════════════════════════════════════
-                                   THE CARD  —  design tokens
-                                   ══════════════════════════════════════════════════════════ */
+                                                                           THE CARD  —  design tokens
+                                                                           ══════════════════════════════════════════════════════════ */
         #idcard {
             /* ── Light mode tokens ── */
             --card-bg: #f5efe6;
@@ -342,8 +342,8 @@
         }
 
         /* ══════════════════════════════════════════════════════════
-                                   LEFT COLUMN
-                                   ══════════════════════════════════════════════════════════ */
+                                                                           LEFT COLUMN
+                                                                           ══════════════════════════════════════════════════════════ */
         .card-left {
             display: flex;
             flex-direction: column;
@@ -505,8 +505,8 @@
         }
 
         /* ══════════════════════════════════════════════════════════
-                                   INFO ROWS  (icon │ text)
-                                   ══════════════════════════════════════════════════════════ */
+                                                                           INFO ROWS  (icon │ text)
+                                                                           ══════════════════════════════════════════════════════════ */
         .info-list {
             display: flex;
             flex-direction: column;
@@ -573,8 +573,8 @@
         }
 
         /* ══════════════════════════════════════════════════════════
-                                   TICKET / QR
-                                   ══════════════════════════════════════════════════════════ */
+                                                                           TICKET / QR
+                                                                           ══════════════════════════════════════════════════════════ */
         .ticket {
             margin-top: 4px;
             padding: 16px 16px 14px;
@@ -655,8 +655,8 @@
         }
 
         /* ══════════════════════════════════════════════════════════
-                                   CLOSING + FOOTER
-                                   ══════════════════════════════════════════════════════════ */
+                                                                           CLOSING + FOOTER
+                                                                           ══════════════════════════════════════════════════════════ */
         .closing {
             font-family: 'DM Serif Display', Georgia, serif;
             font-style: italic;
@@ -707,14 +707,15 @@
         }
 
         /* ══════════════════════════════════════════════════════════
-                                   RIGHT COLUMN  (image)
-                                   ══════════════════════════════════════════════════════════ */
+                                                                           RIGHT COLUMN  (image)
+                                                                           ══════════════════════════════════════════════════════════ */
         .card-right {
             position: relative;
             border-radius: var(--card-radius-lg);
             overflow: hidden;
             background: var(--card-surface-2);
             min-height: 100%;
+            contain: layout paint;
         }
 
         .card-image {
@@ -728,8 +729,8 @@
         }
 
         /* ══════════════════════════════════════════════════════════
-                                   DOWNLOAD OVERLAY
-                                   ══════════════════════════════════════════════════════════ */
+                                                                           DOWNLOAD OVERLAY
+                                                                           ══════════════════════════════════════════════════════════ */
         .download-overlay {
             position: fixed;
             inset: 0;
@@ -803,8 +804,8 @@
         }
 
         /* ══════════════════════════════════════════════════════════
-                                   RESPONSIVE  —  shrink the card gracefully on small screens
-                                   ══════════════════════════════════════════════════════════ */
+                                                                           RESPONSIVE  —  shrink the card gracefully on small screens
+                                                                           ══════════════════════════════════════════════════════════ */
         @media (max-width: 720px) {
             #idcard {
                 grid-template-columns: 1fr;
@@ -864,11 +865,10 @@
                 </button>
             </div>
 
-            <a href="{{ route('user.generateCardPdf', ['eventId' => $event->id, 'guestId' => $guest->id]) }}"
-                class="btn btn-ghost btn-lg">
+            <button type="button" onclick="downloadPdf()" class="btn btn-ghost btn-lg">
                 <i class="fa-solid fa-file-pdf" style="margin-right:.4rem;"></i>
                 Download PDF
-            </a>
+            </button>
 
             <a href="{{ route('showpublic', $guest->qrcode) }}" target="_blank" class="btn btn-ghost btn-lg">
                 <i class="fa-solid fa-arrow-up-right-from-square" style="margin-right:.4rem;"></i>
@@ -890,10 +890,11 @@
                 : '[Add event time]';
             $messageHost = $event->event_host ?: '[Add family or host name]';
             $messageVenue = $event->event_location ?: '[Add venue]';
-            $messageVenue2 = 'Sinza Africasana, Dar es Salaam';
+            $messageVenue2 = 'Sinza Mugabe, Dar es Salaam';
             $messageCode = $guest->invitation_code ?: '[Add invitation code]';
-            $messageMapUrl = $event->card_link ?: 'https://maps.app.goo.gl/JqaKFPZhVwuCUURo6';
+            $messageMapUrl = $event->card_link ?: 'https://maps.app.goo.gl/qwK3FwZxDmXdG8Uc9?g_st=aw';
             $messageUrl = $guest->more ?? url('/guest/' . $guest->qrcode);
+            $allowedPersons = strtolower($guest->title ?? 'single') === 'double' ? 'Double' : 'Single';
 
             $whatsappMessage =
                 "*{$event->order_name}*\n\n" .
@@ -902,7 +903,8 @@
                 "Tarehe: {$messageDate} | {$messageTime}\n" .
                 "Ukumbi: {$messageVenue}\n" .
                 "Mahali: {$messageVenue2}\n" .
-                "Dresscode: Dark Purple\n" .
+                "Dresscode: Emerald Green\n" .
+                "Type: {$allowedPersons}\n" .
                 "S/N: {$messageCode}\n\n" .
                 "Location: {$messageMapUrl}\n\n" .
                 "Asante na Karibu Sana\n\n" .
@@ -917,7 +919,8 @@
                 "Tarehe: {$messageDate} | {$messageTime}\n" .
                 "Ukumbi: {$messageVenue}\n" .
                 "Mahali: {$messageVenue2}\n" .
-                "Dresscode: Dark Purple\n" .
+                "Dresscode: Emerald Green\n" .
+                "Type: {$allowedPersons}\n" .
                 "S/N: {$messageCode}\n\n" .
                 "Location: {$messageMapUrl}\n\n" .
                 "Asante na Karibu Sana\n" .
@@ -1136,7 +1139,8 @@
 
                 {{-- ══ RIGHT: IMAGE COLUMN ══ --}}
                 <div class="card-right">
-                    <img src="{{ $bgImage }}" alt="{{ $event->order_name }}" class="card-image">
+                    <img src="{{ $bgImage }}" alt="{{ $event->order_name }}" class="card-image" loading="lazy"
+                        decoding="async">
                 </div>
 
             </div>{{-- /#idcard --}}
@@ -1153,6 +1157,8 @@
         </div>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script>
         /* ── 3-D tilt on hover (desktop only) ── */
         (function() {
@@ -1211,14 +1217,151 @@
             overlay.classList.add('show');
             button.disabled = true;
             title.textContent = 'Generating high-quality image…';
-            sub.textContent = 'Rendering the card on the server';
-            window.location.href =
-                '{{ route('user.generateCardImage', ['eventId' => $event->id, 'guestId' => $guest->id]) }}';
-            setTimeout(() => {
+            sub.textContent = 'Preparing the card in your browser';
+
+            const card = document.getElementById('idcard');
+            const image = card ? card.querySelector('.card-image') : null;
+            const originalTransform = card ? card.style.transform : '';
+            const originalBoxShadow = card ? card.style.boxShadow : '';
+
+            const finish = () => {
                 overlay.classList.remove('show');
                 spinner.classList.remove('done');
                 button.disabled = false;
-            }, 1800);
+            };
+
+            if (!card || typeof html2canvas !== 'function') {
+                finish();
+                showToast('Image export is unavailable in this browser', 'error');
+                return;
+            }
+
+            const render = async () => {
+                if (image) {
+                    image.loading = 'eager';
+                    image.fetchPriority = 'high';
+                }
+                if (image && !image.complete) {
+                    await new Promise(resolve => {
+                        image.addEventListener('load', resolve, {
+                            once: true
+                        });
+                        image.addEventListener('error', resolve, {
+                            once: true
+                        });
+                    });
+                }
+                if (document.fonts && document.fonts.ready) await document.fonts.ready;
+
+                card.style.transform = 'none';
+                card.style.boxShadow = 'none';
+
+                const canvas = await html2canvas(card, {
+                    backgroundColor: null,
+                    scale: Math.min(3, window.devicePixelRatio || 2),
+                    useCORS: true,
+                    allowTaint: false,
+                    imageTimeout: 20000,
+                    logging: false,
+                    width: card.scrollWidth,
+                    height: card.scrollHeight,
+                    windowWidth: Math.max(800, card.scrollWidth),
+                    windowHeight: Math.max(1000, card.scrollHeight)
+                });
+
+                const link = document.createElement('a');
+                link.download = 'invitation-card-{{ $guest->invitation_code ?? 'export' }}.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            };
+
+            render()
+                .then(() => {
+                    title.textContent = 'Ready!';
+                    spinner.classList.add('done');
+                })
+                .catch(() => showToast('Could not create the card image', 'error'))
+                .finally(() => {
+                    card.style.transform = originalTransform;
+                    card.style.boxShadow = originalBoxShadow;
+                    setTimeout(finish, 900);
+                });
+        };
+
+        window.downloadPdf = function() {
+            const overlay = document.getElementById('download-overlay');
+            const spinner = document.getElementById('dl-spinner');
+            const title = document.getElementById('dl-title');
+            const sub = document.getElementById('dl-sub');
+            const card = document.getElementById('idcard');
+            const image = card ? card.querySelector('.card-image') : null;
+
+            if (!card || typeof html2canvas !== 'function' || !window.jspdf) {
+                showToast('PDF export is unavailable in this browser', 'error');
+                return;
+            }
+
+            overlay.classList.add('show');
+            title.textContent = 'Generating PDF…';
+            sub.textContent = 'Preparing the card in your browser';
+
+            const originalTransform = card.style.transform;
+            const originalBoxShadow = card.style.boxShadow;
+            const restore = () => {
+                card.style.transform = originalTransform;
+                card.style.boxShadow = originalBoxShadow;
+                overlay.classList.remove('show');
+                spinner.classList.remove('done');
+            };
+
+            const renderPdf = async () => {
+                if (image) {
+                    image.loading = 'eager';
+                    image.fetchPriority = 'high';
+                }
+                if (image && !image.complete) {
+                    await new Promise(resolve => {
+                        image.addEventListener('load', resolve, {
+                            once: true
+                        });
+                        image.addEventListener('error', resolve, {
+                            once: true
+                        });
+                    });
+                }
+                if (document.fonts && document.fonts.ready) await document.fonts.ready;
+                card.style.transform = 'none';
+                card.style.boxShadow = 'none';
+
+                const canvas = await html2canvas(card, {
+                    backgroundColor: null,
+                    scale: Math.min(3, window.devicePixelRatio || 2),
+                    useCORS: true,
+                    allowTaint: false,
+                    imageTimeout: 20000,
+                    logging: false,
+                    width: card.scrollWidth,
+                    height: card.scrollHeight,
+                    windowWidth: Math.max(800, card.scrollWidth),
+                    windowHeight: Math.max(1000, card.scrollHeight)
+                });
+                const pdf = new window.jspdf.jsPDF({
+                    orientation: 'portrait',
+                    unit: 'px',
+                    format: [canvas.width, canvas.height],
+                    compress: true
+                });
+                pdf.addImage(canvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, canvas.width, canvas.height);
+                pdf.save('invitation-card-{{ $guest->invitation_code ?? 'export' }}.pdf');
+            };
+
+            renderPdf()
+                .then(() => {
+                    title.textContent = 'Ready!';
+                    spinner.classList.add('done');
+                })
+                .catch(() => showToast('Could not create the card PDF', 'error'))
+                .finally(() => setTimeout(restore, 900));
         };
 
         /* ── Copy link ── */

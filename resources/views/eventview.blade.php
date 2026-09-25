@@ -364,6 +364,9 @@
                             value="{{ $events->reminder_date }}" class="form-input"></div>
                     <div class="col-span-2"><label class="form-label">Event Location</label><input type="text"
                             name="event_location" value="{{ $events->event_location }}" class="form-input"></div>
+                    <div class="col-span-2"><label class="form-label">Map Link</label><input type="url"
+                            name="card_link" value="{{ $events->card_link }}" class="form-input"
+                            placeholder="https://maps.app.goo.gl/..."></div>
                     <div class="col-span-2"><label class="form-label">Description</label>
                         <textarea name="event_desc" rows="3" class="form-input">{{ $events->event_desc }}</textarea>
                     </div>
