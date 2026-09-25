@@ -17,8 +17,8 @@
 
     <style>
         /* ══════════════════════════════════════════════════════════
-                                                                                                                   PAGE WRAPPER
-                                                                                                                   ══════════════════════════════════════════════════════════ */
+                                                                                                                       PAGE WRAPPER
+                                                                                                                       ══════════════════════════════════════════════════════════ */
         .cardview-page {
             display: flex;
             flex-direction: column;
@@ -190,8 +190,8 @@
         }
 
         /* ══════════════════════════════════════════════════════════
-                                                                                                                   CARD SHELL
-                                                                                                                   ══════════════════════════════════════════════════════════ */
+                                                                                                                       CARD SHELL
+                                                                                                                       ══════════════════════════════════════════════════════════ */
         .invitation-shell {
             perspective: 1400px;
             width: 100%;
@@ -212,8 +212,8 @@
         }
 
         /* ══════════════════════════════════════════════════════════
-                                                                                                                   THE CARD  —  design tokens
-                                                                                                                   ══════════════════════════════════════════════════════════ */
+                                                                                                                       THE CARD  —  design tokens
+                                                                                                                       ══════════════════════════════════════════════════════════ */
         #idcard {
             /* ── Light mode tokens ── */
             --card-bg: #f5efe6;
@@ -342,8 +342,8 @@
         }
 
         /* ══════════════════════════════════════════════════════════
-                                                                                                                   LEFT COLUMN
-                                                                                                                   ══════════════════════════════════════════════════════════ */
+                                                                                                                       LEFT COLUMN
+                                                                                                                       ══════════════════════════════════════════════════════════ */
         .card-left {
             display: flex;
             flex-direction: column;
@@ -505,8 +505,8 @@
         }
 
         /* ══════════════════════════════════════════════════════════
-                                                                                                                   INFO ROWS  (icon │ text)
-                                                                                                                   ══════════════════════════════════════════════════════════ */
+                                                                                                                       INFO ROWS  (icon │ text)
+                                                                                                                       ══════════════════════════════════════════════════════════ */
         .info-list {
             display: flex;
             flex-direction: column;
@@ -573,8 +573,8 @@
         }
 
         /* ══════════════════════════════════════════════════════════
-                                                                                                                   TICKET / QR
-                                                                                                                   ══════════════════════════════════════════════════════════ */
+                                                                                                                       TICKET / QR
+                                                                                                                       ══════════════════════════════════════════════════════════ */
         .ticket {
             margin-top: 4px;
             padding: 16px 16px 14px;
@@ -655,8 +655,8 @@
         }
 
         /* ══════════════════════════════════════════════════════════
-                                                                                                                   CLOSING + FOOTER
-                                                                                                                   ══════════════════════════════════════════════════════════ */
+                                                                                                                       CLOSING + FOOTER
+                                                                                                                       ══════════════════════════════════════════════════════════ */
         .closing {
             font-family: 'DM Serif Display', Georgia, serif;
             font-style: italic;
@@ -707,8 +707,8 @@
         }
 
         /* ══════════════════════════════════════════════════════════
-                                                                                                                   RIGHT COLUMN  (image)
-                                                                                                                   ══════════════════════════════════════════════════════════ */
+                                                                                                                       RIGHT COLUMN  (image)
+                                                                                                                       ══════════════════════════════════════════════════════════ */
         .card-right {
             position: relative;
             border-radius: var(--card-radius-lg);
@@ -729,8 +729,8 @@
         }
 
         /* ══════════════════════════════════════════════════════════
-                                                                                                                   DOWNLOAD OVERLAY
-                                                                                                                   ══════════════════════════════════════════════════════════ */
+                                                                                                                       DOWNLOAD OVERLAY
+                                                                                                                       ══════════════════════════════════════════════════════════ */
         .download-overlay {
             position: fixed;
             inset: 0;
@@ -804,8 +804,8 @@
         }
 
         /* ══════════════════════════════════════════════════════════
-                                                                                                                   RESPONSIVE  —  shrink the card gracefully on small screens
-                                                                                                                   ══════════════════════════════════════════════════════════ */
+                                                                                                                       RESPONSIVE  —  shrink the card gracefully on small screens
+                                                                                                                       ══════════════════════════════════════════════════════════ */
         @media (max-width: 720px) {
             #idcard {
                 grid-template-columns: 1fr;
@@ -1138,8 +1138,8 @@
 
                 {{-- ══ RIGHT: IMAGE COLUMN ══ --}}
                 <div class="card-right">
-                    <img data-card-image-src="{{ $bgImage }}" alt="{{ $event->order_name }}" class="card-image"
-                        loading="lazy" decoding="async">
+                    <img src="{{ $bgImage }}" data-card-image-src="{{ $bgImage }}"
+                        alt="{{ $event->order_name }}" class="card-image" loading="lazy" decoding="async">
                 </div>
 
             </div>{{-- /#idcard --}}
@@ -1164,12 +1164,11 @@
             if (!image) return;
 
             const imageUrl = image.dataset.cardImageSrc;
-            const fallback = () => {
-                image.src = imageUrl;
+            const useDirectImage = () => {
+                if (!image.src || image.src === window.location.href) image.src = imageUrl;
             };
 
             if (!window.caches || !window.fetch) {
-                fallback();
                 return;
             }
 
@@ -1186,9 +1185,9 @@
                     });
                     if (!response.ok) throw new Error('Card image request failed');
                     await cache.put(imageUrl, response.clone());
-                    image.src = URL.createObjectURL(await response.blob());
+                    useDirectImage();
                 })
-                .catch(fallback);
+                .catch(useDirectImage);
         })();
 
         /* ── 3-D tilt on hover (desktop only) ── */

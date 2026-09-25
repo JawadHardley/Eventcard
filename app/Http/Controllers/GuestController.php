@@ -163,10 +163,16 @@ class GuestController extends Controller
             'phone' => [
                 'required',
                 'string',
+                'max:40',
+                'regex:/^\+?[0-9\s().-]{7,39}$/',
             ],
         ]);
 
         $cleanPhone = $this->normalizePhone($validated['phone']);
+        if (! preg_match('/^\+[1-9]\d{7,14}$/', $cleanPhone)) {
+            return back()->withErrors(['phone' => 'Enter a valid international phone number.'])->withInput();
+        }
+
         $validated['full_name'] = Str::title(strtolower($validated['full_name']));
         $eventId = $validated['event_id'];
         // dd($cleanPhone);
@@ -238,35 +244,24 @@ class GuestController extends Controller
 
     function normalizePhone(string $input): string
     {
-        // 1️⃣ Remove spaces, hyphens, parentheses, dots
-        $clean = preg_replace('/[\s\-\(\)\.]/', '', $input);
+        $clean = preg_replace('/[^+0-9]/', '', trim($input)) ?? '';
+        $hasInternationalPrefix = str_starts_with($clean, '+') || str_starts_with($clean, '00');
+        $digits = preg_replace('/\D/', '', $clean) ?? '';
 
-        // 2️⃣ Remove leading '00' (some people write 00255 instead of +255)
-        $clean = preg_replace('/^00/', '', $clean);
-
-        // 3️⃣ If starts with +, remove it
-        $clean = preg_replace('/^\+/', '', $clean);
-
-        // 4️⃣ Handle cases
-
-        // Case A: starts with 0 → keep as local number (07XXXXXXXX)
-        if (Str::startsWith($clean, '0')) {
-            return $clean; // ✅ stays local format
+        if (str_starts_with($clean, '00')) {
+            $digits = substr($digits, 2);
+            $hasInternationalPrefix = true;
         }
 
-        // Case B: starts with country code (like 255, 254, 1, 44, 91, etc.)
-        // Usually country codes don’t start with 0 and have 1–3 digits
-        if (preg_match('/^(1|2|3|4|5|6|7|8|9)\d{6,14}$/', $clean)) {
-            return $clean; // ✅ already international
+        // Keep legacy local Tanzanian numbers working; international numbers
+        // submitted by the country-aware input already include a country code.
+        if (! $hasInternationalPrefix && str_starts_with($digits, '0')) {
+            $digits = '255' . substr($digits, 1);
+        } elseif (! $hasInternationalPrefix && strlen($digits) === 9) {
+            $digits = '255' . $digits;
         }
 
-        // Case C: missing leading 0 but clearly local digits (like "712345678")
-        if (preg_match('/^[1-9]\d{8}$/', $clean)) {
-            return '0' . $clean; // ✅ convert to 07XXXXXXXX
-        }
-
-        // Case D: fallback – just return cleaned digits
-        return $clean;
+        return '+' . $digits;
     }
 
     public function guestupdatexx(Request $request, $id)
@@ -329,11 +324,15 @@ class GuestController extends Controller
             'phone' => [
                 'required',
                 'string',
-                // 'regex:/^(\+?255|0)[0-9]{10}$/',
+                'max:40',
+                'regex:/^\+?[0-9\s().-]{7,39}$/',
             ],
         ]);
 
         $cleanPhone = $this->normalizePhone($validated['phone']);
+        if (! preg_match('/^\+[1-9]\d{7,14}$/', $cleanPhone)) {
+            return back()->withErrors(['phone' => 'Enter a valid international phone number.'])->withInput();
+        }
 
         // Prevent duplicate phone for the SAME event, excluding this guest
         $exists = Guest::where('order_id', $validated['event_id'])
@@ -348,15 +347,30 @@ class GuestController extends Controller
             ]);
         }
 
-        // Update the guest
-        $guest->update([
+        // Attendance is controlled by the check-in flow, not guest edits.
+        // Keep the ticket type fixed after any check-in so its status cannot be
+        // reinterpreted by changing between single and double tickets.
+        $hasAttendanceProgress = (bool) $guest->verified
+            || in_array($guest->counter, ['[1/2]', '[2/2]'], true);
+
+        $changes = [
             'full_name' => Str::title(strtolower($validated['full_name'])),
-            'title' => $validated['title'],
             'email' => $validated['email'],
             'phone' => $cleanPhone,
             'address' => $validated['address'] ?? null,
             'delivery_method' => $validated['delivery_method'],
-        ]);
+        ];
+
+        if ($hasAttendanceProgress) {
+            $changes['title'] = $guest->title;
+        } else {
+            $changes['title'] = $validated['title'];
+            if ($changes['title'] !== $guest->title) {
+                $changes['counter'] = $changes['title'] === 'single' ? '[0/1]' : '[0/2]';
+            }
+        }
+
+        $guest->update($changes);
 
         return back()->with([
             'status' => 'success',
@@ -661,14 +675,18 @@ class GuestController extends Controller
                     continue; // skip invalid row
                 }
 
-                // Check duplicates in Excel
-                if (in_array($phone, $usedPhones)) {
-                    throw new \Exception("Duplicate phone found in Excel: $phone (row " . ($rowIndex + 2) . ")");
-                }
-                $usedPhones[] = $phone;
-
                 // Normalize phone using your controller method
                 $cleanPhone = $this->normalizePhone($phone);
+                if (! preg_match('/^\+[1-9]\d{7,14}$/', $cleanPhone)) {
+                    throw new \Exception('Invalid phone number on row ' . ($rowIndex + 2) . ': ' . $phone);
+                }
+
+                // Compare duplicates after normalization so formatted variations
+                // of the same international number are treated as one number.
+                if (in_array($cleanPhone, $usedPhones, true)) {
+                    throw new \Exception('Duplicate phone found in Excel: ' . $cleanPhone . ' (row ' . ($rowIndex + 2) . ')');
+                }
+                $usedPhones[] = $cleanPhone;
 
                 // Generate unique 4-digit code per event
                 do {
@@ -694,7 +712,7 @@ class GuestController extends Controller
                     'address' => $address ?: null,
                     'delivery_method' => $method,
                     'order_id' => $request->event_id,
-                    'counter' => '[0/2]',
+                    'counter' => $cardType === 'single' ? '[0/1]' : '[0/2]',
                     'invitation_code' => $shortCode,
                 ]);
 
@@ -764,12 +782,7 @@ class GuestController extends Controller
 
     private function sendSmsBeem($phone, $data)
     {
-        // Normalize phone to international format without +
-        $phone = $this->normalizePhone($phone);
-        $phone = ltrim($phone, '0'); // remove leading zero if any
-        if (!str_starts_with($phone, '255')) {
-            $phone = '255' . $phone;
-        }
+        $phone = ltrim($this->normalizePhone($phone), '+');
 
         $message = "Dear {$data['guest']->full_name}, you are invited to {$data['event']->order_name} on " .
             \Carbon\Carbon::parse($data['event']->event_date)->format('F j, Y') .
@@ -803,9 +816,7 @@ class GuestController extends Controller
 
     private function sendWhatsAppBeem($phone, $data)
     {
-        $phone = $this->normalizePhone($phone);
-        $phone = ltrim($phone, '0');
-        if (!str_starts_with($phone, '255')) $phone = '255' . $phone;
+        $phone = ltrim($this->normalizePhone($phone), '+');
 
         // TODO: Integrate Beem WhatsApp API (Moja) using WhatsApp templates
         // You need a pre-approved template.

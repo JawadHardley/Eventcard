@@ -24,6 +24,7 @@
         "@tailwindcss/typography": "^0.5.19",
         "chart.js": "^4.5.1",
         "html5-qrcode": "^2.3.8",
+        "intl-tel-input": "^29.5.3",
         "puppeteer": "^24.29.1"
     }
 }

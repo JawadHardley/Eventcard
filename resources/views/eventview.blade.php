@@ -182,20 +182,28 @@
                                             @endif
                                         </td>
                                         <td>
-                                            <button
-                                                onclick="showQRModal({{ $guest->id }}, `{{ $guest->full_name }}`, `{{ $guest->more }}`, `{{ $guest->qrcode }}`)"
+                                            <button type="button" data-guest-qr data-guest-id="{{ $guest->id }}"
+                                                data-guest-name="{{ $guest->full_name }}"
+                                                data-guest-link="{{ $guest->more }}"
+                                                data-guest-code="{{ $guest->qrcode }}"
                                                 class="text-blue-600 hover:underline text-sm">
                                                 <i class="fa fa-qrcode"></i> View
                                             </button>
                                         </td>
                                         <td>
-                                            <button
-                                                onclick="openEditGuestModal({{ $guest->id }}, '{{ addslashes($guest->full_name) }}', '{{ $guest->title }}', '{{ $guest->email }}', '{{ $guest->phone }}', '{{ $guest->delivery_method }}', '{{ addslashes($guest->address) }}')"
+                                            <button type="button" data-guest-edit data-guest-id="{{ $guest->id }}"
+                                                data-guest-name="{{ $guest->full_name }}"
+                                                data-guest-title="{{ $guest->title }}"
+                                                data-guest-email="{{ $guest->email }}"
+                                                data-guest-phone="{{ $guest->phone }}"
+                                                data-guest-delivery="{{ $guest->delivery_method }}"
+                                                data-guest-address="{{ $guest->address }}"
+                                                data-guest-title-locked="{{ $guest->verified || in_array($guest->counter, ['[1/2]', '[2/2]'], true) ? 'true' : 'false' }}"
                                                 class="text-gray-600 hover:text-blue-600 mx-1">
                                                 <i class="fa fa-edit"></i>
                                             </button>
-                                            <button
-                                                onclick="confirmDeleteGuest({{ $guest->id }}, '{{ addslashes($guest->full_name) }}')"
+                                            <button type="button" data-guest-delete data-guest-id="{{ $guest->id }}"
+                                                data-guest-name="{{ $guest->full_name }}"
                                                 class="text-gray-600 hover:text-red-600 mx-1">
                                                 <i class="fa fa-trash"></i>
                                             </button>
@@ -272,11 +280,7 @@
                             <label class="form-label">Phone Number</label>
                             <div class="relative">
                                 <input type="tel" class="phone-masked-input form-input w-full pr-16"
-                                    placeholder="0712 345 678" name="phone" autocomplete="off">
-                                <input type="hidden" name="phonex" class="phone-hidden-value">
-                                <span
-                                    class="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400 country-hint">🇹🇿
-                                    +255</span>
+                                    placeholder="Phone number" name="phone" autocomplete="tel" required>
                             </div>
                             <div class="phone-feedback text-xs mt-1 text-gray-500"></div>
                         </div>
@@ -445,6 +449,9 @@
                             <option value="single">Single</option>
                             <option value="double">Double</option>
                         </select>
+                        <input type="hidden" name="title" id="edit_title_locked" disabled>
+                        <p id="edit_title_note" class="text-xs text-gray-500 mt-1 hidden">Ticket type is locked after
+                            check-in to preserve attendance status.</p>
                     </div>
                     <div><label class="form-label">Email</label><input type="email" name="email" id="edit_email"
                             class="form-input"></div>
@@ -452,10 +459,7 @@
                         <label class="form-label">Phone Number</label>
                         <div class="relative">
                             <input type="tel" id="edit_phone" class="phone-masked-input form-input w-full pr-16"
-                                placeholder="0712 345 678" name="phone" autocomplete="off">
-                            <input type="hidden" name="phonex" class="phone-hidden-value">
-                            <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400 country-hint">🇹🇿
-                                +255</span>
+                                placeholder="Phone number" name="phone" autocomplete="tel" required>
                         </div>
                         <div class="phone-feedback text-xs mt-1 text-gray-500"></div>
                     </div>
@@ -564,6 +568,33 @@
             });
         });
 
+        document.getElementById('guestTableBody').addEventListener('click', function(event) {
+            const button = event.target.closest('button');
+            if (!button) return;
+
+            if (button.hasAttribute('data-guest-qr')) {
+                showQRModal(
+                    button.dataset.guestId,
+                    button.dataset.guestName,
+                    button.dataset.guestLink,
+                    button.dataset.guestCode
+                );
+            } else if (button.hasAttribute('data-guest-edit')) {
+                openEditGuestModal(
+                    button.dataset.guestId,
+                    button.dataset.guestName,
+                    button.dataset.guestTitle,
+                    button.dataset.guestEmail,
+                    button.dataset.guestPhone,
+                    button.dataset.guestDelivery,
+                    button.dataset.guestAddress,
+                    button.dataset.guestTitleLocked === 'true'
+                );
+            } else if (button.hasAttribute('data-guest-delete')) {
+                confirmDeleteGuest(button.dataset.guestId, button.dataset.guestName);
+            }
+        });
+
         // ----- QR Modal (using inline data) -----
         let currentQR = '';
 
@@ -629,26 +660,24 @@
         //     openModal('modal-edit-guest');
         // }
 
-        function openEditGuestModal(id, name, title, email, phone, delivery, address) {
+        function openEditGuestModal(id, name, title, email, phone, delivery, address, titleLocked = false) {
             document.getElementById('edit-guest-form').action = `/user/guest/${id}/update`;
             document.getElementById('edit_full_name').value = name;
             document.getElementById('edit_title').value = title;
+            document.getElementById('edit_title').disabled = titleLocked;
+            document.getElementById('edit_title_locked').value = title;
+            document.getElementById('edit_title_locked').disabled = !titleLocked;
+            document.getElementById('edit_title_note').classList.toggle('hidden', !titleLocked);
             document.getElementById('edit_email').value = email;
             document.getElementById('edit_delivery_method').value = delivery;
             document.getElementById('edit_address').value = address;
 
-            //  Remove direct assignment – let SmartPhoneInput handle it
-            // Wait for modal to open and input to be ready
             setTimeout(() => {
-                const maskedInput = document.querySelector('#edit-guest-form .phone-masked-input');
-                if (maskedInput && maskedInput.smartPhone) {
-                    maskedInput.smartPhone.setValueFromDatabase(phone);
-                } else {
-                    // Fallback: just set raw value (should not happen)
-                    const phoneInput = document.getElementById('edit_phone');
-                    if (phoneInput) phoneInput.value = phone;
+                const phoneInput = document.getElementById('edit_phone');
+                if (phoneInput && window.setInternationalPhoneValue) {
+                    window.setInternationalPhoneValue(phoneInput, phone);
                 }
-            }, 150); // Slight delay ensures SmartPhoneInput is initialized
+            }, 150);
 
             openModal('modal-edit-guest');
         }
@@ -691,151 +720,6 @@
         document.addEventListener('DOMContentLoaded', function() {
             const confirmBtn = document.getElementById('confirm-delete-btn');
             if (confirmBtn) confirmBtn.addEventListener('click', deleteGuest);
-        });
-
-        class SmartPhoneInput {
-            constructor(inputElement, hiddenInput, feedbackElement) {
-                this.input = inputElement;
-                this.hidden = hiddenInput;
-                this.input.smartPhone = this;
-                this.feedback = feedbackElement;
-                this.countryCode = '255'; // default Tanzania
-                this.maxLocalDigits = 10;
-                this.init();
-            }
-
-            init() {
-                // Format on every input
-                this.input.addEventListener('input', (e) => this.handleInput(e));
-                this.input.addEventListener('focus', () => this.animateFocus(true));
-                this.input.addEventListener('blur', () => this.animateFocus(false));
-                // Initial sync
-                this.updateHidden();
-            }
-
-            animateFocus(inFocus) {
-                this.input.style.transition = 'all 0.2s ease';
-                if (inFocus) {
-                    this.input.style.transform = 'scale(1.01)';
-                    this.input.style.borderColor = '#f97316';
-                    this.input.style.boxShadow = '0 0 0 2px rgba(249,115,22,0.2)';
-                } else {
-                    this.input.style.transform = 'scale(1)';
-                    this.input.style.borderColor = '#d1d5db';
-                    this.input.style.boxShadow = 'none';
-                }
-            }
-
-            handleInput(e) {
-                let raw = this.input.value.replace(/\D/g, ''); // keep only digits
-                // Limit to maxLocalDigits
-                if (raw.length > this.maxLocalDigits) raw = raw.slice(0, this.maxLocalDigits);
-
-                // Format: XXXX XXX XXX
-                let formatted = '';
-
-                for (let i = 0; i < raw.length; i++) {
-                    if (
-                        (i === 4) || // after first 4 digits
-                        (i > 4 && (i - 4) % 3 === 0) // then every 3 digits
-                    ) {
-                        formatted += ' ';
-                    }
-
-                    formatted += raw[i];
-                }
-
-                this.input.value = formatted;
-
-                // Real-time feedback
-                if (raw.length === 0) {
-                    this.feedback.innerHTML = 'Enter phone number (e.g., 0712345678)';
-                    this.feedback.classList.remove('text-red-500', 'text-green-500');
-                    this.feedback.classList.add('text-gray-500');
-                } else if (raw.length < this.maxLocalDigits) {
-                    this.feedback.innerHTML = `${raw.length}/${this.maxLocalDigits} digits – keep typing`;
-                    this.feedback.classList.remove('text-green-500', 'text-gray-500');
-                    this.feedback.classList.add('text-orange-500');
-                } else {
-                    this.feedback.innerHTML = '✓ Valid number';
-                    this.feedback.classList.remove('text-orange-500', 'text-gray-500');
-                    this.feedback.classList.add('text-green-500');
-                }
-
-                this.updateHidden(raw);
-            }
-
-            updateHidden(rawDigits = null) {
-                let digits = rawDigits !== null ? rawDigits : this.input.value.replace(/\D/g, '');
-                if (digits.length > 0) {
-                    // Build full number with country code: e.g., 255712345678
-                    this.hidden.value = this.countryCode + digits;
-                } else {
-                    this.hidden.value = '';
-                }
-            }
-
-            // Call this when editing to prefill from existing phone (e.g., "0712345678" or "255712345678")
-            setValueFromDatabase(fullNumber) {
-                if (!fullNumber) return;
-                let digits = fullNumber.replace(/\D/g, '');
-
-                // Detect country code (Tanzania, Kenya, Uganda, US, UK)
-                let detectedCode = '255';
-                if (digits.startsWith('255')) detectedCode = '255';
-                else if (digits.startsWith('254')) detectedCode = '254';
-                else if (digits.startsWith('256')) detectedCode = '256';
-                else if (digits.startsWith('1')) detectedCode = '1';
-                else if (digits.startsWith('44')) detectedCode = '44';
-
-                this.countryCode = detectedCode;
-
-                // Update the little flag hint
-                const hintSpan = this.input.parentElement.querySelector('.country-hint');
-                if (hintSpan) {
-                    let flag = '🇹🇿';
-                    if (detectedCode === '254') flag = '🇰🇪';
-                    if (detectedCode === '256') flag = '🇺🇬';
-                    hintSpan.innerHTML = `${flag} +${detectedCode}`;
-                }
-
-                // Remove country code to get local digits (e.g., "712345678" or "0712345678")
-                let localDigits = digits.replace(new RegExp('^' + detectedCode), '');
-
-                // If the original had a leading zero (e.g., "0712..."), keep it
-                // But digits after stripping country code may start with 0 already
-                this.input.value = localDigits;
-
-                // Trigger the input event so formatting and feedback run
-                this.input.dispatchEvent(new Event('input', {
-                    bubbles: true
-                }));
-            }
-        }
-
-        // Initialize all smart phone inputs when modals open
-        function initPhoneInputs() {
-            document.querySelectorAll('.phone-container').forEach(container => {
-                if (container.dataset.initialized) return;
-                const maskedInput = container.querySelector('.phone-masked-input');
-                const hiddenInput = container.querySelector('.phone-hidden-value');
-                const feedback = container.querySelector('.phone-feedback');
-                if (maskedInput && hiddenInput) {
-                    new SmartPhoneInput(maskedInput, hiddenInput, feedback);
-                    container.dataset.initialized = 'true';
-                }
-            });
-        }
-
-        // Call initialization on page load and whenever modals open
-        document.addEventListener('DOMContentLoaded', () => {
-            initPhoneInputs();
-            // Also observe dynamic modals (since you open them via JS)
-            const observer = new MutationObserver(() => initPhoneInputs());
-            observer.observe(document.body, {
-                childList: true,
-                subtree: true
-            });
         });
     </script>
 @endsection

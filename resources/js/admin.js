@@ -1,5 +1,134 @@
 import './bootstrap';
 import Chart from 'chart.js/auto';
+import intlTelInput from 'intl-tel-input';
+import 'intl-tel-input/styles';
+
+const phoneInputInstances = new WeakMap();
+
+function cleanPhonePaste(value) {
+    const trimmed = value.trim();
+    const digits = trimmed.replace(/\D/g, '');
+    const hasInternationalPrefix = trimmed.startsWith('+') || trimmed.startsWith('00');
+    const looksLikeInternationalDigits = !trimmed.startsWith('0') && digits.length > 10;
+
+    if (!hasInternationalPrefix && !looksLikeInternationalDigits) return null;
+
+    const internationalDigits = trimmed.startsWith('00') ? digits.slice(2) : digits;
+    return internationalDigits ? `+${internationalDigits}` : null;
+}
+
+function setPhoneNumber(iti, input, value) {
+    const normalized = cleanPhonePaste(value) || value.trim();
+    iti.setNumber(normalized);
+
+    // Tanzania commonly writes the national trunk prefix (0) locally even
+    // though E.164 omits it. Keep that familiar form visible while editing.
+    if (iti.getSelectedCountry()?.iso2 === 'tz') {
+        const digits = normalized.replace(/\D/g, '');
+        const nationalDigits = digits.startsWith('255') ? digits.slice(3) : digits;
+        if (nationalDigits && !nationalDigits.startsWith('0')) {
+            input.value = `0${nationalDigits}`;
+            input.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+    }
+}
+
+function initializeInternationalPhoneInputs() {
+    document.querySelectorAll('.phone-masked-input').forEach((input) => {
+        if (phoneInputInstances.has(input)) return;
+
+        const container = input.closest('.phone-container');
+        const feedback = container?.querySelector('.phone-feedback');
+        const form = input.form;
+        const iti = intlTelInput(input, {
+            initialCountry: 'tz',
+            loadUtils: () => import('intl-tel-input/utils'),
+            formatAsYouType: true,
+            nationalMode: true,
+            separateDialCode: true,
+            strictMode: true,
+            countrySearch: true,
+            dropdownContainer: document.body,
+        });
+
+        phoneInputInstances.set(input, iti);
+        input.style.width = '100%';
+        input.closest('.iti')?.style.setProperty('width', '100%');
+
+        const updateFeedback = () => {
+            if (!feedback) return;
+            const value = input.value.trim();
+            if (!value) {
+                feedback.textContent = 'Choose a country and enter a phone number.';
+                feedback.className = 'phone-feedback text-xs mt-1 text-gray-500';
+                return;
+            }
+
+            const valid = iti.isValidNumber();
+            feedback.textContent = valid ? 'Valid phone number' : 'Check the number and country code.';
+            feedback.className = `phone-feedback text-xs mt-1 ${valid ? 'text-green-600' : 'text-red-500'}`;
+        };
+
+        input.addEventListener('input', updateFeedback);
+        input.addEventListener('countrychange', updateFeedback);
+        input.addEventListener('blur', updateFeedback);
+        input.addEventListener('paste', (event) => {
+            const pastedValue = event.clipboardData?.getData('text') || '';
+            const internationalNumber = cleanPhonePaste(pastedValue);
+            if (!internationalNumber) return;
+
+            event.preventDefault();
+            setPhoneNumber(iti, input, internationalNumber);
+            updateFeedback();
+        });
+
+        if (form) {
+            let submitting = false;
+            form.addEventListener('submit', async (event) => {
+                if (submitting) return;
+
+                event.preventDefault();
+                await iti.promise;
+
+                if (!iti.isValidNumber()) {
+                    input.setCustomValidity('Enter a valid phone number for the selected country.');
+                    input.reportValidity();
+                    updateFeedback();
+                    return;
+                }
+
+                input.setCustomValidity('');
+                input.value = iti.getNumber();
+                submitting = true;
+                form.requestSubmit();
+            });
+        }
+    });
+}
+
+window.setInternationalPhoneValue = function(input, phone) {
+    const iti = phoneInputInstances.get(input);
+    if (!iti || !phone) return;
+    const trimmed = phone.trim();
+    const digits = trimmed.replace(/\D/g, '');
+    let normalized = trimmed;
+
+    if (trimmed.startsWith('00')) normalized = `+${digits.slice(2)}`;
+    else if (!trimmed.startsWith('+') && digits.startsWith('0')) normalized = `+255${digits.slice(1)}`;
+    else if (!trimmed.startsWith('+') && digits.length === 9) normalized = `+255${digits}`;
+    else if (!trimmed.startsWith('+') && digits.length >= 10) normalized = `+${digits}`;
+
+    setPhoneNumber(iti, input, normalized);
+};
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeInternationalPhoneInputs);
+} else {
+    initializeInternationalPhoneInputs();
+}
+
+const phoneInputObserver = new MutationObserver(initializeInternationalPhoneInputs);
+phoneInputObserver.observe(document.documentElement, { childList: true, subtree: true });
 
 // ─── Dark mode (keep your existing logic or use AuraUI's) ───
 (function() {

@@ -638,6 +638,14 @@
        MODAL
     ───────────────────────────────────────────────── */
 
+       .iti {
+      width: 100%;
+    }
+
+    .iti__dropdown-content {
+      z-index: 100001;
+    }
+
    .modal-overlay {
     position: fixed;
     inset: 0;

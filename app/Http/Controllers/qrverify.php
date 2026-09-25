@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Guest;
+use App\Models\GuestCheckIn;
 use App\Models\Event;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class qrverify extends Controller
 {
@@ -259,57 +261,59 @@ class qrverify extends Controller
             return response()->json(['status' => 'invalid', 'message' => 'QR/Code not found'], 404);
         }
 
-        // double ticket flow
-        if ($guest->title === 'double') {
-            if ($guest->counter === '[0/2]') {
-                $guest->update(['verified' => 1, 'counter' => '[1/2]']);
-                return response()->json([
-                    'status' => 'checked_in',
-                    'name' => $guest->full_name,
-                    'counter' => '[1/2]',
-                    'verified' => true,
-                    'type' => $guest->title
-                ]);
+        $result = DB::transaction(function () use ($guest) {
+            $guest = Guest::whereKey($guest->id)->lockForUpdate()->firstOrFail();
+            $attendeeNumber = null;
+            $counter = null;
+
+            if ($guest->title === 'double') {
+                if ($guest->counter === '[0/2]') {
+                    $attendeeNumber = 1;
+                    $counter = '[1/2]';
+                } elseif ($guest->counter === '[1/2]') {
+                    $attendeeNumber = 2;
+                    $counter = '[2/2]';
+                } else {
+                    return [
+                        'status' => 'already_checked',
+                        'name' => $guest->full_name,
+                        'counter' => $guest->counter ?? '[2/2]',
+                        'verified' => true,
+                        'type' => $guest->title,
+                    ];
+                }
+
+                $guest->update(['verified' => true, 'counter' => $counter]);
+            } else {
+                if ($guest->verified) {
+                    return [
+                        'status' => 'already_checked',
+                        'name' => $guest->full_name,
+                        'verified' => true,
+                        'type' => $guest->title,
+                        'counter' => null,
+                    ];
+                }
+
+                $attendeeNumber = 1;
+                $guest->update(['verified' => true]);
             }
 
-            if ($guest->counter === '[1/2]') {
-                $guest->update(['counter' => '[2/2]', 'verified' => 1]);
-                return response()->json([
-                    'status' => 'checked_in',
-                    'name' => $guest->full_name,
-                    'counter' => '[2/2]',
-                    'verified' => true,
-                    'type' => $guest->title
-                ]);
-            }
-
-            return response()->json([
-                'status' => 'already_checked',
-                'name' => $guest->full_name,
-                'counter' => $guest->counter ?? '[2/2]',
-                'verified' => true,
-                'type' => $guest->title
+            GuestCheckIn::create([
+                'guest_id' => $guest->id,
+                'event_id' => $guest->order_id,
+                'attendee_number' => $attendeeNumber,
             ]);
-        }
 
-        // single ticket flow
-        if (!$guest->verified) {
-            $guest->update(['verified' => 1]);
-            return response()->json([
+            return [
                 'status' => 'checked_in',
                 'name' => $guest->full_name,
                 'verified' => true,
                 'type' => $guest->title,
-                'counter' => null
-            ]);
-        }
+                'counter' => $counter,
+            ];
+        });
 
-        return response()->json([
-            'status' => 'already_checked',
-            'name' => $guest->full_name,
-            'verified' => true,
-            'type' => $guest->title,
-            'counter' => null
-        ]);
+        return response()->json($result);
     }
 }

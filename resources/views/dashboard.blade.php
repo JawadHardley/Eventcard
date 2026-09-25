@@ -21,7 +21,7 @@
         </div>
 
         <!-- Stats cards -->
-        <div class="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
+        <div class="grid grid-cols-2 md:grid-cols-3 2xl:grid-cols-6 gap-4 mb-6">
             <div class="stat-card">
                 <div class="stat-icon bg-blue-100 dark:bg-blue-900/20"><i
                         class="fa fa-calendar-alt text-blue-600 text-xl"></i></div>
@@ -36,7 +36,7 @@
                 <div class="stat-icon bg-green-100 dark:bg-green-900/20"><i class="fa fa-users text-green-600 text-xl"></i>
                 </div>
                 <div class="stat-value">{{ $totalGuests }}</div>
-                <div class="stat-label">Total Guests</div>
+                <div class="stat-label">Guest Cards</div>
                 <div class="stat-change up">
                     {{ App\Models\Guest::whereIn('order_id', App\Models\Event::where('user_id', $user->id)->pluck('id'))->whereMonth('created_at', \Carbon\Carbon::now()->month)->count() }}
                     new</div>
@@ -45,14 +45,21 @@
                 <div class="stat-icon bg-yellow-100 dark:bg-yellow-900/20"><i
                         class="fa fa-check-circle text-yellow-600 text-xl"></i></div>
                 <div class="stat-value">{{ $checkedIn }}</div>
-                <div class="stat-label">Checked In</div>
+                <div class="stat-label">Cards Used</div>
                 <div class="stat-change up">{{ $checkinRate }}% rate</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon bg-teal-100 dark:bg-teal-900/20"><i
+                        class="fa fa-person-circle-check text-teal-600 text-xl"></i></div>
+                <div class="stat-value">{{ $peopleAttended }}</div>
+                <div class="stat-label">People Attended</div>
+                <div class="stat-change up">{{ $peopleAttendanceRate }}% of {{ $expectedAttendees }} seats</div>
             </div>
             <div class="stat-card">
                 <div class="stat-icon bg-purple-100 dark:bg-purple-900/20"><i
                         class="fa fa-hourglass-half text-purple-600 text-xl"></i></div>
-                <div class="stat-value">{{ $pendingGuests }}</div>
-                <div class="stat-label">Pending</div>
+                <div class="stat-value">{{ $remainingSeats }}</div>
+                <div class="stat-label">Remaining Seats</div>
                 <div class="stat-change down">awaiting check-in</div>
             </div>
             <div class="stat-card">
@@ -70,7 +77,7 @@
                 <div class="chart-header">
                     <div>
                         <div class="chart-title">Your Guest Check-ins (Last 7 days)</div>
-                        <div class="chart-subtitle">Daily attendance trend</div>
+                        <div class="chart-subtitle">Individual people admitted each day</div>
                     </div>
                 </div>
                 <canvas id="checkinsChart" height="200"></canvas>
@@ -78,7 +85,7 @@
             <div class="chart-card">
                 <div class="chart-header">
                     <div>
-                        <div class="chart-title">Top Events by Attendance</div>
+                        <div class="chart-title">Top Events by People Attended</div>
                         <div class="chart-subtitle">Most popular among your events</div>
                     </div>
                 </div>
@@ -86,11 +93,11 @@
                     @foreach ($topEvents as $event)
                         <div>
                             <div class="flex justify-between text-sm"><span
-                                    class="truncate">{{ $event->order_name }}</span><span>{{ $event->guests_count }}
-                                    guests</span></div>
+                                    class="truncate">{{ $event->order_name }}</span><span>{{ $event->attendees_count }}
+                                    people</span></div>
                             <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mt-1">
                                 <div class="bg-red-500 h-2 rounded-full"
-                                    style="width: {{ min(100, ($event->guests_count / max($topEvents->first()->guests_count, 1)) * 100) }}%">
+                                    style="width: {{ min(100, ($event->attendees_count / max($topEvents->first()->attendees_count, 1)) * 100) }}%">
                                 </div>
                             </div>
                         </div>
@@ -115,7 +122,9 @@
                             <tr>
                                 <th>Event</th>
                                 <th>Date</th>
-                                <th>Guests</th>
+                                <th>Guest Cards</th>
+                                <th>Cards Used</th>
+                                <th>People Attended</th>
                                 <th>Status</th>
                             </tr>
                         </thead>
@@ -125,15 +134,16 @@
                                     style="cursor:pointer">
                                     <td class="font-medium">{{ $event->order_name }}</td>
                                     <td>{{ \Carbon\Carbon::parse($event->event_date)->format('d M Y') }}</td>
-                                    <td>{{ App\Models\Guest::where('order_id', $event->id)->count() }}/{{ $event->guest_limit ?? '∞' }}
-                                    </td>
+                                    <td>{{ $event->guest_cards_count }}/{{ $event->guest_limit ?? '∞' }}</td>
+                                    <td>{{ $event->cards_used_count }}/{{ $event->guest_cards_count }}</td>
+                                    <td>{{ $event->attendees_count }}</td>
                                     <td><span
                                             class="badge {{ $event->event_status == 'active' ? 'badge-green' : 'badge-gray' }}">{{ ucfirst($event->event_status) }}</span>
                                     </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="4" class="text-center py-6 text-gray-500">No events created yet</td>
+                                    <td colspan="6" class="text-center py-6 text-gray-500">No events created yet</td>
                                 </tr>
                             @endforelse
                         </tbody>
@@ -149,12 +159,12 @@
                     @forelse($recentCheckins as $checkin)
                         <div class="p-3 flex justify-between items-center">
                             <div>
-                                <div class="font-medium">{{ $checkin->full_name }}</div>
-                                <div class="text-xs text-gray-500">{{ $checkin->phone }}</div>
+                                <div class="font-medium">{{ $checkin->guest->full_name }}</div>
+                                <div class="text-xs text-gray-500">{{ $checkin->guest->phone }}</div>
                             </div>
                             <div class="text-right">
-                                <span class="badge badge-green">Checked in</span>
-                                <div class="text-xs text-gray-400">{{ $checkin->updated_at->diffForHumans() }}</div>
+                                <span class="badge badge-green">Person {{ $checkin->attendee_number }} checked in</span>
+                                <div class="text-xs text-gray-400">{{ $checkin->created_at->diffForHumans() }}</div>
                             </div>
                         </div>
                     @empty
