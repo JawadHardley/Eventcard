@@ -17,8 +17,8 @@
 
     <style>
         /* ══════════════════════════════════════════════════════════
-                                                                                       PAGE WRAPPER
-                                                                                       ══════════════════════════════════════════════════════════ */
+                                                                                                   PAGE WRAPPER
+                                                                                                   ══════════════════════════════════════════════════════════ */
         .cardview-page {
             display: flex;
             flex-direction: column;
@@ -190,8 +190,8 @@
         }
 
         /* ══════════════════════════════════════════════════════════
-                                                                                       CARD SHELL
-                                                                                       ══════════════════════════════════════════════════════════ */
+                                                                                                   CARD SHELL
+                                                                                                   ══════════════════════════════════════════════════════════ */
         .invitation-shell {
             perspective: 1400px;
             width: 100%;
@@ -212,8 +212,8 @@
         }
 
         /* ══════════════════════════════════════════════════════════
-                                                                                       THE CARD  —  design tokens
-                                                                                       ══════════════════════════════════════════════════════════ */
+                                                                                                   THE CARD  —  design tokens
+                                                                                                   ══════════════════════════════════════════════════════════ */
         #idcard {
             /* ── Light mode tokens ── */
             --card-bg: #f5efe6;
@@ -342,8 +342,8 @@
         }
 
         /* ══════════════════════════════════════════════════════════
-                                                                                       LEFT COLUMN
-                                                                                       ══════════════════════════════════════════════════════════ */
+                                                                                                   LEFT COLUMN
+                                                                                                   ══════════════════════════════════════════════════════════ */
         .card-left {
             display: flex;
             flex-direction: column;
@@ -505,8 +505,8 @@
         }
 
         /* ══════════════════════════════════════════════════════════
-                                                                                       INFO ROWS  (icon │ text)
-                                                                                       ══════════════════════════════════════════════════════════ */
+                                                                                                   INFO ROWS  (icon │ text)
+                                                                                                   ══════════════════════════════════════════════════════════ */
         .info-list {
             display: flex;
             flex-direction: column;
@@ -573,8 +573,8 @@
         }
 
         /* ══════════════════════════════════════════════════════════
-                                                                                       TICKET / QR
-                                                                                       ══════════════════════════════════════════════════════════ */
+                                                                                                   TICKET / QR
+                                                                                                   ══════════════════════════════════════════════════════════ */
         .ticket {
             margin-top: 4px;
             padding: 16px 16px 14px;
@@ -655,8 +655,8 @@
         }
 
         /* ══════════════════════════════════════════════════════════
-                                                                                       CLOSING + FOOTER
-                                                                                       ══════════════════════════════════════════════════════════ */
+                                                                                                   CLOSING + FOOTER
+                                                                                                   ══════════════════════════════════════════════════════════ */
         .closing {
             font-family: 'DM Serif Display', Georgia, serif;
             font-style: italic;
@@ -707,8 +707,8 @@
         }
 
         /* ══════════════════════════════════════════════════════════
-                                                                                       RIGHT COLUMN  (image)
-                                                                                       ══════════════════════════════════════════════════════════ */
+                                                                                                   RIGHT COLUMN  (image)
+                                                                                                   ══════════════════════════════════════════════════════════ */
         .card-right {
             position: relative;
             border-radius: var(--card-radius-lg);
@@ -729,8 +729,8 @@
         }
 
         /* ══════════════════════════════════════════════════════════
-                                                                                       DOWNLOAD OVERLAY
-                                                                                       ══════════════════════════════════════════════════════════ */
+                                                                                                   DOWNLOAD OVERLAY
+                                                                                                   ══════════════════════════════════════════════════════════ */
         .download-overlay {
             position: fixed;
             inset: 0;
@@ -804,8 +804,8 @@
         }
 
         /* ══════════════════════════════════════════════════════════
-                                                                                       RESPONSIVE  —  shrink the card gracefully on small screens
-                                                                                       ══════════════════════════════════════════════════════════ */
+                                                                                                   RESPONSIVE  —  shrink the card gracefully on small screens
+                                                                                                   ══════════════════════════════════════════════════════════ */
         @media (max-width: 720px) {
             #idcard {
                 grid-template-columns: 1fr;
@@ -895,11 +895,12 @@
             $messageMapUrl = $event->card_link ?: 'https://maps.app.goo.gl/qwK3FwZxDmXdG8Uc9?g_st=aw';
             $messageUrl = $guest->more ?? url('/guest/' . $guest->qrcode);
             $allowedPersons = strtolower($guest->title ?? 'single') === 'double' ? 'Double' : 'Single';
+            $messageEventName = trim(preg_replace('/\s+wedding\s*$/i', '', $event->order_name));
 
             $whatsappMessage =
-                "*{$event->order_name}*\n\n" .
+                "*{$messageEventName}*\n\n" .
                 "Familia ya {$messageHost}, Wanapenda kukualika *{$guest->full_name}* " .
-                "Kwenye harusi ya vijana wao wapendwa *{$event->order_name}*\n\n" .
+                "Kwenye harusi ya vijana wao wapendwa *{$messageEventName}*\n\n" .
                 "Tarehe: {$messageDate} | {$messageTime}\n" .
                 "Ukumbi: {$messageVenue}\n" .
                 "Mahali: {$messageVenue2}\n" .
@@ -913,20 +914,19 @@
                 'Designed by TapEventCard 0778515202';
 
             $smsMessage =
-                "{$event->order_name}\n\n" .
+                "{$messageEventName}\n\n" .
                 "Familia ya {$messageHost}, Wanapenda kukualika ({$guest->full_name}) " .
-                "kwenye harusi ya vijana wao wapendwa *Yasin H. Seif & Upendo S. Juma*.\n\n" .
+                "Kwenye harusi ya vijana wao wapendwa *{$messageEventName}*\n\n" .
                 "Tarehe: {$messageDate} | {$messageTime}\n" .
                 "Ukumbi: {$messageVenue}\n" .
                 "Mahali: {$messageVenue2}\n" .
                 "Dresscode: Emerald Green\n" .
                 "Type: {$allowedPersons}\n" .
                 "S/N: {$messageCode}\n\n" .
-                "Location: {$messageMapUrl}\n\n" .
                 "Asante na Karibu Sana\n" .
                 "NOTE: WATOTO TUNAWAPENDA ILA HAWARUHUSIWI\n\n" .
-                "{$messageUrl}\n" .
-                'Designed by TapEventCard 0778515202';
+                "TapEventCard 0778515202\n" .
+                'Ukipata huu ujumbe usifute ndo Kadi yako';
         @endphp
 
         {{-- ── Copy-ready share messages ── --}}
