@@ -528,41 +528,54 @@ class GuestController extends Controller
 
     private function cardBrowser(Event $event, Guest $guest, string $format): Browsershot
     {
+        $nodeBinary = config('services.browserless.node_binary');
+        $nodeModulePath = config('services.browserless.node_module_path');
+        $npmBinary = config('services.browserless.npm_binary');
+
+        if (! $nodeBinary && ! $this->commandExists('node')) {
+            throw new \RuntimeException(
+                'Card export requires Node.js. Install Node.js on the server or set BROWSERSHOT_NODE_BINARY in the production environment.'
+            );
+        }
+
+        if (! $nodeModulePath && ! $npmBinary && ! $this->commandExists('npm')) {
+            throw new \RuntimeException(
+                'Card export requires npm or BROWSERSHOT_NODE_MODULE_PATH. Configure the global Node modules directory in production.'
+            );
+        }
+
         $html = view('cardview', [
             'event' => $event,
             'guest' => $guest,
             'export' => true,
         ])->render();
         $browser = Browsershot::html($html);
-        $browserlessEndpoint = config('services.browserless.ws_endpoint');
-
-        if ($browserlessEndpoint) {
-            if (str_starts_with($browserlessEndpoint, 'https://')) {
-                $browserlessEndpoint = 'wss://' . substr($browserlessEndpoint, 8);
-            } elseif (str_starts_with($browserlessEndpoint, 'http://')) {
-                $browserlessEndpoint = 'ws://' . substr($browserlessEndpoint, 7);
-            }
-
-            $browser->setWSEndpoint($browserlessEndpoint);
-        } else {
-            foreach (
-                [
-                    'node_binary' => 'setNodeBinary',
-                    'npm_binary' => 'setNpmBinary',
-                    'node_module_path' => 'setNodeModulePath',
-                    'chrome_path' => 'setChromePath',
-                ] as $configKey => $method
-            ) {
-                $value = config('services.browserless.' . $configKey);
-                if ($value) {
-                    $browser->{$method}($value);
-                }
+        foreach (
+            [
+                'node_binary' => 'setNodeBinary',
+                'npm_binary' => 'setNpmBinary',
+                'node_module_path' => 'setNodeModulePath',
+                'chrome_path' => 'setChromePath',
+            ] as $configKey => $method
+        ) {
+            $value = config('services.browserless.' . $configKey);
+            if ($value) {
+                $browser->{$method}($value);
             }
         }
 
         return $format === 'image'
             ? $browser->showBackground()
             : $browser;
+    }
+
+    private function commandExists(string $command): bool
+    {
+        $lookup = PHP_OS_FAMILY === 'Windows' ? 'where.exe ' : 'command -v ';
+        $suffix = PHP_OS_FAMILY === 'Windows' ? ' 2>NUL' : ' 2>/dev/null';
+        $result = shell_exec($lookup . escapeshellarg($command) . $suffix);
+
+        return is_string($result) && trim($result) !== '';
     }
 
     private function ensureCardOwnership(Event $event, Guest $guest): void

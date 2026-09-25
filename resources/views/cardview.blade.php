@@ -17,8 +17,8 @@
 
     <style>
         /* ══════════════════════════════════════════════════════════
-                               PAGE WRAPPER
-                               ══════════════════════════════════════════════════════════ */
+                                   PAGE WRAPPER
+                                   ══════════════════════════════════════════════════════════ */
         .cardview-page {
             display: flex;
             flex-direction: column;
@@ -190,8 +190,8 @@
         }
 
         /* ══════════════════════════════════════════════════════════
-                               CARD SHELL
-                               ══════════════════════════════════════════════════════════ */
+                                   CARD SHELL
+                                   ══════════════════════════════════════════════════════════ */
         .invitation-shell {
             perspective: 1400px;
             width: 100%;
@@ -212,8 +212,8 @@
         }
 
         /* ══════════════════════════════════════════════════════════
-                               THE CARD  —  design tokens
-                               ══════════════════════════════════════════════════════════ */
+                                   THE CARD  —  design tokens
+                                   ══════════════════════════════════════════════════════════ */
         #idcard {
             /* ── Light mode tokens ── */
             --card-bg: #f5efe6;
@@ -342,8 +342,8 @@
         }
 
         /* ══════════════════════════════════════════════════════════
-                               LEFT COLUMN
-                               ══════════════════════════════════════════════════════════ */
+                                   LEFT COLUMN
+                                   ══════════════════════════════════════════════════════════ */
         .card-left {
             display: flex;
             flex-direction: column;
@@ -505,8 +505,8 @@
         }
 
         /* ══════════════════════════════════════════════════════════
-                               INFO ROWS  (icon │ text)
-                               ══════════════════════════════════════════════════════════ */
+                                   INFO ROWS  (icon │ text)
+                                   ══════════════════════════════════════════════════════════ */
         .info-list {
             display: flex;
             flex-direction: column;
@@ -573,8 +573,8 @@
         }
 
         /* ══════════════════════════════════════════════════════════
-                               TICKET / QR
-                               ══════════════════════════════════════════════════════════ */
+                                   TICKET / QR
+                                   ══════════════════════════════════════════════════════════ */
         .ticket {
             margin-top: 4px;
             padding: 16px 16px 14px;
@@ -655,8 +655,8 @@
         }
 
         /* ══════════════════════════════════════════════════════════
-                               CLOSING + FOOTER
-                               ══════════════════════════════════════════════════════════ */
+                                   CLOSING + FOOTER
+                                   ══════════════════════════════════════════════════════════ */
         .closing {
             font-family: 'DM Serif Display', Georgia, serif;
             font-style: italic;
@@ -707,8 +707,8 @@
         }
 
         /* ══════════════════════════════════════════════════════════
-                               RIGHT COLUMN  (image)
-                               ══════════════════════════════════════════════════════════ */
+                                   RIGHT COLUMN  (image)
+                                   ══════════════════════════════════════════════════════════ */
         .card-right {
             position: relative;
             border-radius: var(--card-radius-lg);
@@ -728,8 +728,8 @@
         }
 
         /* ══════════════════════════════════════════════════════════
-                               DOWNLOAD OVERLAY
-                               ══════════════════════════════════════════════════════════ */
+                                   DOWNLOAD OVERLAY
+                                   ══════════════════════════════════════════════════════════ */
         .download-overlay {
             position: fixed;
             inset: 0;
@@ -803,8 +803,8 @@
         }
 
         /* ══════════════════════════════════════════════════════════
-                               RESPONSIVE  —  shrink the card gracefully on small screens
-                               ══════════════════════════════════════════════════════════ */
+                                   RESPONSIVE  —  shrink the card gracefully on small screens
+                                   ══════════════════════════════════════════════════════════ */
         @media (max-width: 720px) {
             #idcard {
                 grid-template-columns: 1fr;
@@ -1109,8 +1109,10 @@
                                 <div class="ticket-value">{{ $guest->invitation_code }}</div>
                             </div>
                             <div class="ticket-field">
-                                <div class="ticket-label">Admission</div>
-                                <div class="ticket-value">{{ $guest->counter ?? '1 Person' }}</div>
+                                <div class="ticket-label">Allowed Persons</div>
+                                <div class="ticket-value">
+                                    {{ strtolower($guest->title ?? 'single') === 'double' ? '2 Persons' : '1 Person' }}
+                                </div>
                             </div>
                             <div class="ticket-hint">Scan QR or present code at the entrance</div>
                         </div>
